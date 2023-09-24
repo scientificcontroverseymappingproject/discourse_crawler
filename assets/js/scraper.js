@@ -62,6 +62,17 @@ function listenForInput() {
          				
          				var p = document.createElement('hr');
          				div.appendChild(p);
+         				
+         				var div = document.getElementById('overallAnalysis')
+						var p = document.createElement('h1')
+						p.innerHTML = 'Overall Analysis Results'
+						div.appendChild(p);
+         				
+         				
+         				var div = document.getElementById('overallAnalysis')
+						var p = document.createElement('div')
+						p.innerHTML = '<div class="box"><a href="' + urlToScrape + '"><h2>' + urlToScrape + '</h2></a><ul class="emotions"> <h3>EMOTIONS:</h3><li>Happiness</li><li>Sadness</li><li>Fear</li><li>Anger</li><li>Disgust</li><li>Surprise</li></ul><ul class="topics"> <h3>TOPICS:</h3><li>Vaccines</li><li>Safety</li><li>Etc.</li></ul><ul class="foundations"> <h3>MORAL FOUNDATIONS:</h3><li>Care</li><li>Fairness</li><li>Loyalty</li><li>Authority</li><li>Purity</li><li>Equality</li><li>Proportionality</li><li>Liberty</li><li>Honor</li><li>Ownership</li></ul></div>'
+						div.appendChild(p);
 						
 						var anchors = [], l = html.links;
 							for(var i=0; i<l.length; i++) {
@@ -128,9 +139,21 @@ function listenForInput() {
 						
 												p.textContent = htmlWithoutScripts
 												div.appendChild(p);
+												
+												var div = document.getElementById('specificAnalysis')
+												var p = document.createElement('h1')
+												p.innerHTML = 'Specific Page Analysis Results'
+												div.appendChild(p);
+												
+												var response = "emotion data goes here"
+												
+												var div = document.getElementById('specificAnalysis')
+												var p = document.createElement('div')
+												p.innerHTML = '<div class="box"><a href="' + domainSpecificUrls + '"><h2>' + domainSpecificUrls + '</h2></a><ul class="emotions"> <h3>EMOTIONS: ' + response + '</h3><li>Happiness</li><li>Sadness</li><li>Fear</li><li>Anger</li><li>Disgust</li><li>Surprise</li></ul><ul class="topics"> <h3>TOPICS:</h3><li>Vaccines</li><li>Safety</li><li>Etc.</li></ul><ul class="foundations"> <h3>MORAL FOUNDATIONS:</h3><li>Care</li><li>Fairness</li><li>Loyalty</li><li>Authority</li><li>Purity</li><li>Equality</li><li>Proportionality</li><li>Liberty</li><li>Honor</li><li>Ownership</li></ul></div>'
+												div.appendChild(p);
+												
 												document.getElementById("thinkingIMG").remove();
 												document.getElementById("crawling").remove();
-												document.getElementById("crawlingURL").remove();
 
 												
 											});	//subpage GET
@@ -140,7 +163,7 @@ function listenForInput() {
 										
 										
 										
-													
+											// useful utility for forming calls: https://curlconverter.com/javascript-jquery/		
 										 // else if (!domainSpecificUrls.includes("http")) {
 // 										
 // 											if (!domainSpecificUrls.includes("///")) {

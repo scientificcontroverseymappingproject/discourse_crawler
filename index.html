@@ -31,6 +31,12 @@
 						<div id="urlIO">
 							<label id="tagline2" for="urlInput">Enter the URL for a Website You'd like to Crawl <br> <div id="disclaimer"> (Homepages Work Best - Keep in Mind that Some Pages Can Take A While to Crawl)</div></label>
 							<input type="text" id="urlInput" name="urlInput"><br>
+							<div class="analysis" id="overallAnalysis">
+							
+							</div>
+							<section id="overallAnalysis"></section>
+							<section id="specificAnalysis"></section>
+							
 								<div id="output">
 									<p id="terminal"></p>
 								</div>	
@@ -369,6 +375,58 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 	</body>
 </html>
 <style>
+h2 {
+color: turquoise; 
+}
+h3 {
+
+}
+li {
+float: left;
+}
+.box {
+width: 75%; 
+ white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  border-color: purple; 
+  display: inline-block;
+  background-color: #282828; 
+  
+}
+
+.topics {
+display: flex; 
+list-style-type: none; 
+
+}
+li.topics {
+display: inline-block;
+
+}
+.foundations {
+display: flex; 
+list-style-type: none; 
+
+}
+li.foundations {
+display: inline-block;
+
+}
+.emotions {
+display: flex; 
+list-style-type: none; 
+
+}
+li.emotions {
+display: inline-block;
+
+}
+p {
+border: none; 
+}
 #footerContent {
 color: white; 
 }
@@ -411,7 +469,5 @@ color: limegreen;
 #spider {
 margin-top: 10px; 
 }
-iframe {
-width: 80%
-}
+
 </style>
