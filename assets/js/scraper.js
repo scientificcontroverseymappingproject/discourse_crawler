@@ -128,6 +128,23 @@ function listenForInput() {
 												
 												let htmlWithoutScripts = workingHTML.querySelector('body').innerText.trim();
 												
+         										$.ajax({
+													url: 'https://apis.paralleldots.com/v4/emotion',
+													type: 'post',
+													data: {
+														'api_key': 'hL7rOIhghKLZtrI6w04cFjxVvAOHQ7BiNhjMLAVnMPw', 
+														'text': htmlWithoutScripts
+													},
+													dataType: 'json',
+													success: function (data) {
+														console.log(data);
+													},
+													error: function (xhr, ajaxOptions, thrownError) {
+        												alert(xhr.status);
+        												alert(thrownError);
+      												}
+												});
+         										
          										var div = document.getElementById('terminal');
 												var p = document.createElement('h1');
 												p.textContent = domainSpecificUrls
