@@ -138,41 +138,66 @@ function listenForInput() {
 													dataType: 'json',
 													success: function (data) {
 														console.log(data);
-													},
-													error: function (xhr, ajaxOptions, thrownError) {
-        												alert(xhr.status);
-        												alert(thrownError);
-      												}
-												});
-         										
-         										var div = document.getElementById('terminal');
-												var p = document.createElement('h1');
-												p.textContent = domainSpecificUrls
-												div.appendChild(p);
+														
+														let obj = JSON.parse(data)
+														const anger = Math.round(obj.emotion.Angry * 10) 
+														console.log("anger: " + anger);
+														const fear = Math.round(obj.emotion.Fear * 10) 
+														const excitement = Math.round(obj.emotion.Excited * 10)
+														const boredom = Math.round(obj.emotion.Bored * 10)
+														const sadness = Math.round(obj.emotion.Sad * 10)
+														const happiness = Math.round(obj.emotion.Happy * 10)
+														
+														var div = document.getElementById('terminal');
+														var p = document.createElement('h1');
+														p.textContent = domainSpecificUrls
+														div.appendChild(p);
 															
-												var p = document.createElement('div');
-												p.innerHTML = ""     				
-												div.appendChild(p);
+														var p = document.createElement('div');
+														p.innerHTML = ""     				
+														div.appendChild(p);
 						
-												p.textContent = htmlWithoutScripts
-												div.appendChild(p);
+														p.textContent = htmlWithoutScripts
+														div.appendChild(p);
+																								
+														var div = document.getElementById('specificAnalysis')
+														var p = document.createElement('h1')
+														p.innerHTML = 'Specific Page Analysis Results'
+														div.appendChild(p);
 												
-												var div = document.getElementById('specificAnalysis')
-												var p = document.createElement('h1')
-												p.innerHTML = 'Specific Page Analysis Results'
-												div.appendChild(p);
+														if (anger && anger >= 0.5) {
+															var angerOutput = "<span style='color:red'><strong>Anger: " + anger + "</strong></span>"
+														}
+														if (fear && fear >= 0.5) {
+															var fearOutput = "<span style='color:yellow'><strong>Fear: " + fear + "</strong></span>"
+														}
+														if (excitement && excitement >= 0.5) {
+															var excitementOutput = "<span style='color:pink'><strong>Excitement: " + excitement + "</strong></span>"
+														}
+														if (boredom && boredom >= 0.5) {
+															var boredomOutput = "<span style='color:brown'><strong>Boredom<: " + boredom + "/strong></span>"
+														}
+														if (sadness && sadness >= 0.5) {
+															var sadnessOutput = "<span style='color:blue'><strong>Sadness: " + sadness + "</strong></span>"
+														}
+														if (happiness && happiness >= 0.5) {
+															var happinessOutput = "<span style='color:orange'><strong>Happiness: " + happiness + "</strong></span>"
+														}
 												
-												var response = "emotion data goes here"
+														var div = document.getElementById('specificAnalysis')
+														var p = document.createElement('div')
+														p.innerHTML = '<div class="box"><a href="' + domainSpecificUrls + '"><h2>' + domainSpecificUrls + '</h2></a><ul class="emotions"> <h3>EMOTIONS:</h3><li>' + happinessOutput + '</li><li>' + sadnessOutput + '</li><li>' + fearOutput + '</li><li>' + angerOutput + '</li><li>' + boredomOutput + '</li><li>' + excitementOutput + '</li></ul><ul class="topics"> <h3>TOPICS:</h3><li>Vaccines</li><li>Safety</li><li>Etc.</li></ul><ul class="foundations"> <h3>MORAL FOUNDATIONS:</h3><li>Care</li><li>Fairness</li><li>Loyalty</li><li>Authority</li><li>Purity</li><li>Equality</li><li>Proportionality</li><li>Liberty</li><li>Honor</li><li>Ownership</li></ul></div>'
+														div.appendChild(p);
 												
-												var div = document.getElementById('specificAnalysis')
-												var p = document.createElement('div')
-												p.innerHTML = '<div class="box"><a href="' + domainSpecificUrls + '"><h2>' + domainSpecificUrls + '</h2></a><ul class="emotions"> <h3>EMOTIONS: ' + response + '</h3><li>Happiness</li><li>Sadness</li><li>Fear</li><li>Anger</li><li>Disgust</li><li>Surprise</li></ul><ul class="topics"> <h3>TOPICS:</h3><li>Vaccines</li><li>Safety</li><li>Etc.</li></ul><ul class="foundations"> <h3>MORAL FOUNDATIONS:</h3><li>Care</li><li>Fairness</li><li>Loyalty</li><li>Authority</li><li>Purity</li><li>Equality</li><li>Proportionality</li><li>Liberty</li><li>Honor</li><li>Ownership</li></ul></div>'
-												div.appendChild(p);
+														document.getElementById("thinkingIMG").remove();
+														document.getElementById("crawling").remove();
 												
-												document.getElementById("thinkingIMG").remove();
-												document.getElementById("crawling").remove();
-
-												
+															},
+															error: function (xhr, ajaxOptions, thrownError) {
+																console.log(xhr.status);
+																console.log(thrownError);
+															}
+														});
 											});	//subpage GET
 										
 										
