@@ -1,6 +1,8 @@
 <template>
   <div id="body" class="dashboard">
-  <input id="URLInput">
+  <input id="URLInput" type="text" v-model="urlToScrape" placeholder="Enter the URL You Would Like to Crawl - Homepages Work Best">
+  
+  <button @click="grabPage">Crawl</button>
   <p v-if="!loading" id="loadingContainer">Initializing <br><img id="loading" src="https://media.giphy.com/media/Ky5F5Rhn1WRVZmvE5W/giphy.gif"><br><span id="initialMessage">(Make sure your webcam is facing you.)</span></p>
     <h1 v-if="showProcess" id="mainTitle"> <img id="talking" alt="image of voice waves leaving someone's mouth. Attribution: Speak Icon, by Voysla, 'https://www.flaticon.com/free-icons/speak'" src="talking.png"> {{ msg }} </h1>
 		<p v-if="showProcess" id="messageTwo">
@@ -9,8 +11,11 @@
 		<p v-if="showProcess" id="messageThree"> 
 			{{ msg3 }} 
 		</p>
-		
-		
+		<button @click="revealData">Show Data</button>
+		<section id="specificAnalysis"></section>
+		<section id="specificAnalysis2"></section>
+		<p v-if="showData" id="rawData">{{ JSON }}{{ JSON2 }}</p>
+		{{ urlToScrape }} 
 		
 		
 			<footer id="footer">
@@ -27,8 +32,9 @@
 <script>
 import paralleldots from 'paralleldots'
 import * as rs from 'text-readability'
+//import * as cheerio from 'cheerio';
+import axios from 'axios'
 //import Plotly from 'plotly.js-dist'
-//import * as faceapi from 'face-api.js'
 export default {
   name: 'publicSpeakingDashboard',
   props: {
@@ -38,6 +44,8 @@ export default {
 			msg: 'Discourse Crawler',
 			msg2: "An AI-powered tool for performing top-level analysis of websites.",
 			msg3: "",
+			urlToScrape: "https://milesccoleman.com/", 
+			pageText: "",
 			anger: 0, 
 			fear: 0, 
 			excitement: 0, 
@@ -46,7 +54,12 @@ export default {
 			happiness: 0,
 			readability: 0, 
 			loading: true, 
-			showProcess: true
+			showProcess: true, 
+			anchorsForCrawl: "", 
+			secondIteration: false, 
+			JSON: "", 
+			JSON2: "",
+			showData: false
 		}
 	},
 	
@@ -56,19 +69,112 @@ export default {
 
 	methods: {
 	
-		begin: function () {
+	revealData: function () {
+		this.showData = true
+	},
+	
+	grabPage: function() {
+	
+	var url = "https://api.allorigins.win/raw?url=" + encodeURIComponent(this.urlToScrape) + "&callback=?";
+	
+		axios
+			.get(url)
+			.then((response) => {				
+						const data = response.data
+						const data2 = data.replace(/\s+/g, ' ').trim();
+						const parser = new DOMParser();
+						const html = parser.parseFromString(data2, 'text/html');
+						const workingHTML = html
+						workingHTML.querySelectorAll('script, style').forEach(s => s.remove());
+						let htmlWithoutScripts = workingHTML.querySelector('body').innerText.trim()
+						console.log("Crawling: " + this.urlToScrape)
+						
+						if (this.secondIteration == false) {
+							var anchors = [], l = html.links;
+							for(var i=0; i<l.length; i++) {
+								if (html.links[i].href.includes(this.urlToScrape)) {
+									anchors.push(l[i].href);
+									console.log("Subpage to be crawled: " + html.links[i].href)
+								}
+							}
+							this.anchorsForCrawl = removeDuplicates(anchors)
+							this.secondIteration = true;
+						}
+						
+						function removeDuplicates(anchors) {
+							return anchors.filter((item,
+							index) => anchors.indexOf(item) === index);
+						}
+						
+						this.pageText = htmlWithoutScripts 
+						this.grabSubpages()
+			})
+			.catch((errors) => {
+				console.log(errors); // Errors
+			});
+    },
+    
+		
+		grabSubpages: function () {
+		
+			var i, len = this.anchorsForCrawl.length;		
+				for( i = 0; i < len; i++ ) {
+				const usableURL = this.anchorsForCrawl[i]
+				var url = "https://api.allorigins.win/raw?url=" + encodeURIComponent(this.anchorsForCrawl[i]) + "&callback=?";
+					axios
+						.get(url)
+						.then((response) => {				
+									const data = response.data
+									const data2 = data.replace(/\s+/g, ' ').trim();
+									const parser = new DOMParser();
+									const html = parser.parseFromString(data2, 'text/html');
+									const workingHTML = html
+									workingHTML.querySelectorAll('script, style').forEach(s => s.remove());
+									let htmlWithoutScripts = workingHTML.querySelector('body').innerText.trim()
+									console.log("Crawling: " + this.urlToScrape)
+									this.pageText = htmlWithoutScripts
+									
+
+										var div = document.getElementById('specificAnalysis')
+										var p = document.createElement('div')
+										p.innerHTML = '{"url":' + '"' + usableURL + '"' + "," + '"text":' + '"' + this.pageText + '"' + "},"
+										div.appendChild(p);
+									
+									if (i == len) {
+										var workingJSON = document.getElementById('specificAnalysis').innerText
+										this.JSON = '[' + workingJSON.slice(0,-1) + ']'
+										this.getEmotionStats()
+										console.log("JSON: " + this.JSON)
+									}
+						
+									
+									//this.renderData()
+						})
+						.catch((errors) => {
+							console.log(errors); // Errors
+						});
+				
+				
+				
+				
+				
+				}
+		
 		},
 		
-		startVolumeMeter: function () {
-		
-			},
-		
-		
 		getEmotionStats: function () {
+		
+		var i, len = this.JSON.length;		
+				for( i = 0; i < len; i++ ) {
+				
+					const usableURL = this.JSON[i].url
+					const usableText = this.JSON[i].text
+		
+		
 		//send transcript data to be evaluated as per emotional content
 			const pd = require('paralleldots' || paralleldots)
 			pd.apiKey = "hL7rOIhghKLZtrI6w04cFjxVvAOHQ7BiNhjMLAVnMPw";
-			pd.emotion(this.workingOutput,"en")
+			pd.emotion(this.pageText,"en")
 			.then((response) => {
 				let obj = JSON.parse(response)
 				this.textEmotionData = response.slice(1)
@@ -78,10 +184,24 @@ export default {
 				this.boredom = Math.round(obj.emotion.Bored * 100)
 				this.sadness = Math.round(obj.emotion.Sad * 100)
 				this.happiness = Math.round(obj.emotion.Happy * 100)
+				
+				
+										var div = document.getElementById('specificAnalysis2')
+										var p = document.createElement('div')
+										p.innerHTML = '{"url":' + '"' + usableURL + '"' + "," + '"text":' + '"' + usableText + '"' + "," + '"Angry":' + this.anger + "," + '"Fear":' + this.fear + "," + '"Excited":' + this.excitement + "," + '"Bored":' + this.boredom + "," + '"Sad":' + this.sadness + "," + '"Happy":' + this.happiness + "},"
+										div.appendChild(p);
+									
+									if (i == len) {
+										var workingJSON = document.getElementById('specificAnalysis2').innerText
+										this.JSON = ""
+										this.JSON2 = '[' + workingJSON.slice(0,-1) + ']'
+										console.log("JSON2: " + this.JSON2)
+									}
 			})
 				.catch((error) => {
 				console.log(error);
 			})
+			}
 		
 		}, 
 		
@@ -105,10 +225,8 @@ export default {
 		renderData: function() {
 		
 			const promise1 = new Promise((resolve, reject) => {
-				this.setVolume()
-				//this.getEmotionStats()
+				this.getEmotionStats()
 				this.getReadabilityStats()
-				this.registerWPM()
 				resolve('Data rendered!');
 				reject('Data render failed')
 			});
@@ -142,6 +260,10 @@ export default {
 @import url('https://fonts.cdnfonts.com/css/lcd');
 #textEmotion, #faceEmotion, #voiceEmotion, #wpm {
 display: inline-block; 
+}
+
+#specificAnalysis {
+display: none; 
 }
 div {
 background-color: none; 
@@ -329,7 +451,6 @@ margin-top: -3px;
 }
 
 #rawData {
-display: none; 
 margin: auto; 
 color: lawngreen; 
 background-color: #222831; 
