@@ -1,31 +1,21 @@
 <template>
   <div id="body" class="dashboard">
-  <input id="URLInput" type="text" v-model="urlToScrape" placeholder="Enter the URL You Would Like to Crawl - Homepages Work Best">
+  <input id="URLInput" type="text" v-model="urlToScrape" placeholder="Enter URL">
   
   <button @click="grabPage">Crawl</button>
   <p v-if="!loading" id="loadingContainer">Initializing <br><img id="loading" src="https://media.giphy.com/media/Ky5F5Rhn1WRVZmvE5W/giphy.gif"><br><span id="initialMessage">(Make sure your webcam is facing you.)</span></p>
-    <h1 v-if="showProcess" id="mainTitle"> <img id="talking" alt="image of voice waves leaving someone's mouth. Attribution: Speak Icon, by Voysla, 'https://www.flaticon.com/free-icons/speak'" src="talking.png"> {{ msg }} </h1>
+    <h1 v-if="showProcess" id="mainTitle">  {{ msg }} </h1>
 		<p v-if="showProcess" id="messageTwo">
 			{{ msg2 }} 
 		</p>
 		<p v-if="showProcess" id="messageThree"> 
 			{{ msg3 }} 
 		</p>
-		<button @click="revealData">Show Data</button>
 		<section id="specificAnalysis"></section>
 		<section id="specificAnalysis2"></section>
-		<p v-if="showData" id="rawData">{{ JSON }}{{ JSON2 }}</p>
-		{{ urlToScrape }} 
 		
 		
-			<footer id="footer">
-			<section id="version">Version 0.1 (Beta)<br>
-					<div id="bugs">
-					<section>If you find a bug please report it here: <a href="https://rowan.co1.qualtrics.com/jfe/form/SV_8AhIsft05UgIUqW">Bug/Error Report Form</a></section>
-					
-					</div>
-			</section>
-		</footer>	<!--<p v-if="!showWPM" id="wpm">{{ wpm }} <br><b>Overall Average Words Per Minute</b></p><br>-->
+
   </div>
 </template>
 
@@ -44,7 +34,7 @@ export default {
 			msg: 'Discourse Crawler',
 			msg2: "An AI-powered tool for performing top-level analysis of websites.",
 			msg3: "",
-			urlToScrape: "https://milesccoleman.com/", 
+			urlToScrape: "", 
 			pageText: "",
 			anger: 0, 
 			fear: 0, 
@@ -58,8 +48,7 @@ export default {
 			anchorsForCrawl: "", 
 			secondIteration: false, 
 			JSON: "", 
-			JSON2: "",
-			showData: false
+			JSON2: ""
 		}
 	},
 	
@@ -69,9 +58,6 @@ export default {
 
 	methods: {
 	
-	revealData: function () {
-		this.showData = true
-	},
 	
 	grabPage: function() {
 	
@@ -98,7 +84,10 @@ export default {
 								}
 							}
 							this.anchorsForCrawl = removeDuplicates(anchors)
-							this.secondIteration = true;
+							var div = document.getElementById('specificAnalysis')
+							var p = document.createElement('div')
+							p.innerHTML = '{"url":' + '"' + this.urlToScrape + '"' + "," + '"text":' + '"' + this.pageText + '"' + "},"
+							div.appendChild(p);
 						}
 						
 						function removeDuplicates(anchors) {
@@ -119,7 +108,10 @@ export default {
 		
 			var i, len = this.anchorsForCrawl.length;		
 				for( i = 0; i < len; i++ ) {
+				
 				const usableURL = this.anchorsForCrawl[i]
+				this.msg = "Crawling"
+				this.msg2 = usableURL
 				var url = "https://api.allorigins.win/raw?url=" + encodeURIComponent(this.anchorsForCrawl[i]) + "&callback=?";
 					axios
 						.get(url)
@@ -140,10 +132,11 @@ export default {
 										p.innerHTML = '{"url":' + '"' + usableURL + '"' + "," + '"text":' + '"' + this.pageText + '"' + "},"
 										div.appendChild(p);
 									
-									if (i == len) {
+
+									if (i === this.anchorsForCrawl.length -1) {
 										var workingJSON = document.getElementById('specificAnalysis').innerText
 										this.JSON = '[' + workingJSON.slice(0,-1) + ']'
-										this.getEmotionStats()
+										//this.getEmotionStats()
 										console.log("JSON: " + this.JSON)
 									}
 						
@@ -155,7 +148,7 @@ export default {
 						});
 				
 				
-				
+					
 				
 				
 				}
@@ -263,7 +256,6 @@ display: inline-block;
 }
 
 #specificAnalysis {
-display: none; 
 }
 div {
 background-color: none; 
