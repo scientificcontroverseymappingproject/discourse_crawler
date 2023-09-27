@@ -86,7 +86,7 @@ export default {
 							this.anchorsForCrawl = removeDuplicates(anchors)
 							var div = document.getElementById('specificAnalysis')
 							var p = document.createElement('div')
-							p.innerHTML = '{"url":' + '"' + this.urlToScrape + '"' + "," + '"text":' + '"' + this.pageText + '"' + "},"
+							p.innerHTML = '{"url":' + '"' + this.urlToScrape + '"' + "," + '"text":' + '"' + htmlWithoutScripts + '"' + "},"
 							div.appendChild(p);
 						}
 						
