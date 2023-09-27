@@ -39,6 +39,7 @@ import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 //import Plotly from 'plotly.js-dist'
+import OpenAI from "openai";
 export default {
   name: "publicSpeakingDashboard",
   props: {},
@@ -60,7 +61,7 @@ export default {
       showProcess: true,
       anchorsForCrawl: "",
       secondIteration: false,
-      JSON: null,
+      JSON1: null,
       JSON2: "",
     };
   },
@@ -184,16 +185,43 @@ export default {
     getEmotionStats: function () {
       var workingJSON = document.getElementById("specificAnalysis").innerText;
       const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON = JSON.parse(middleJSON);
-      console.log("test " + this.JSON[0].text);
+      this.JSON1 = JSON.parse(middleJSON);
+      console.log("test " + this.JSON1[0].text);
+      const usableText = JSON.stringify(this.JSON1[0].text);
+      const dotenv = require("dotenv");
+      dotenv.config();
 
-      if (this.JSON != null) {
+      const openai = new OpenAI({
+        apiKey: ,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const response = openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "user",
+            content:
+              "Analyze the emotions in this text returning a JSON object with values between 1 and 10 for fear, anger, sadness, happiness, disgust, and surprise. " +
+              usableText,
+          },
+        ],
+        temperature: 0,
+        max_tokens: 4096,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+      });
+
+      const GPTResponse = response.choices[0].message;
+      console.log("GPT " + GPTResponse);
+
+      if (this.JSON == null) {
         var i,
           len = this.JSON.length;
         for (i = 0; i < len; i++) {
           const usableURL = this.JSON[i].url;
           const usableText = this.JSON[i].text;
-
           //send transcript data to be evaluated as per emotional content
           const pd = require("paralleldots" || paralleldots);
           pd.apiKey = "hL7rOIhghKLZtrI6w04cFjxVvAOHQ7BiNhjMLAVnMPw";
