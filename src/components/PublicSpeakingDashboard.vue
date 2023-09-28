@@ -52,8 +52,8 @@ export default {
       pageText: "",
       anger: 0,
       fear: 0,
-      excitement: 0,
-      boredom: 0,
+      surprise: 0,
+      disgust: 0,
       sadness: 0,
       happiness: 0,
       readability: 0,
@@ -186,119 +186,91 @@ export default {
       var workingJSON = document.getElementById("specificAnalysis").innerText;
       const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
       this.JSON1 = JSON.parse(middleJSON);
-      console.log("test " + this.JSON1[0].text);
-      const usableText = this.JSON1[0].text.substring(0, 500);
       //const usableText = JSON.stringify(this.JSON1[0].text);
       // const dotenv = require("dotenv");
       // dotenv.config();
-      const API_KEY = ;
-      const client = axios.create({
-        headers: {
-          Authorization: "Bearer " + API_KEY,
-        },
-      });
 
-      const params = {
-        messages: [
-          {
-            role: "user",
-            content:
-              "Peform sentiment analysis on this text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and discust in JSON. " +
-              usableText,
-          },
-        ],
-        model: "gpt-3.5-turbo",
-        max_tokens: 500,
-        temperature: 0,
-      };
+      if (this.JSON1 != null) {
+        console.log("test");
+        var i,
+          len = this.JSON1.length;
+        for (i = 0; i < len; i++) {
+          const usableURL = this.JSON1[i].url;
+          const usableText = this.JSON1[i].text.substring(0, 500);
 
-      client
-        .post("https://api.openai.com/v1/chat/completions", params)
-        .then((result) => {
-          console.log(result.data.choices[0].message.content);
-          const emotionResults = JSON.parse(
-            result.data.choices[0].message.content
-          );
-          console.log(emotionResults.anger);
-          var div = document.getElementById("specificAnalysis2");
-          var p = document.createElement("div");
-          p.innerHTML =
-            "Anger: " +
-            emotionResults.anger +
-            " Fear: " +
-            emotionResults.anger +
-            " Happiness: " +
-            emotionResults.happiness +
-            " Surprise: " +
-            emotionResults.surprise +
-            " Sadness: " +
-            emotionResults.sadness +
-            " Disgust: " +
-            emotionResults.disgust;
-          div.appendChild(p);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+          const API_KEY = ;
+          const client = axios.create({
+            headers: {
+              Authorization: "Bearer " + API_KEY,
+            },
+          });
 
-      // if (this.JSON1 == null) {
-      //   var i,
-      //     len = this.JSON.length;
-      //   for (i = 0; i < len; i++) {
-      //     const usableURL = this.JSON[i].url;
-      //     const usableText = this.JSON[i].text;
-      //     //send transcript data to be evaluated as per emotional content
-      //     const pd = require("paralleldots" || paralleldots);
-      //     pd.apiKey = "hL7rOIhghKLZtrI6w04cFjxVvAOHQ7BiNhjMLAVnMPw";
-      //     pd.emotion(usableText, "en")
-      //       .then((response) => {
-      //         let obj = JSON.parse(response);
-      //         this.textEmotionData = response.slice(1);
-      //         this.anger = Math.round(obj.emotion.Angry * 100);
-      //         this.fear = Math.round(obj.emotion.Fear * 100);
-      //         this.excitement = Math.round(obj.emotion.Excited * 100);
-      //         this.boredom = Math.round(obj.emotion.Bored * 100);
-      //         this.sadness = Math.round(obj.emotion.Sad * 100);
-      //         this.happiness = Math.round(obj.emotion.Happy * 100);
+          const params = {
+            messages: [
+              {
+                role: "user",
+                content:
+                  "Peform sentiment analysis on this text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and discust in JSON. " +
+                  usableText,
+              },
+            ],
+            model: "gpt-3.5-turbo",
+            max_tokens: 500,
+            temperature: 0,
+          };
 
-      //         var div = document.getElementById("specificAnalysis2");
-      //         var p = document.createElement("div");
-      //         p.innerHTML =
-      //           '{"url":' +
-      //           '"' +
-      //           usableURL +
-      //           '"' +
-      //           "," +
-      //           '"text":' +
-      //           '"' +
-      //           usableText +
-      //           '"' +
-      //           "," +
-      //           '"Angry":' +
-      //           this.anger +
-      //           "," +
-      //           '"Fear":' +
-      //           this.fear +
-      //           "," +
-      //           '"Excited":' +
-      //           this.excitement +
-      //           "," +
-      //           '"Bored":' +
-      //           this.boredom +
-      //           "," +
-      //           '"Sad":' +
-      //           this.sadness +
-      //           "," +
-      //           '"Happy":' +
-      //           this.happiness +
-      //           "},";
-      //         div.appendChild(p);
-      //       })
-      //       .catch((error) => {
-      //         console.log(error);
-      //       });
-      //   }
-      // }
+          client
+            .post("https://api.openai.com/v1/chat/completions", params)
+            .then((result) => {
+              console.log(result.data.choices[0].message.content);
+              const emotionResults = JSON.parse(
+                result.data.choices[0].message.content
+              );
+              this.anger = emotionResults.anger;
+              this.fear = emotionResults.fear;
+              this.surprise = emotionResults.surprise;
+              this.disgust = emotionResults.disgust;
+              this.sadness = emotionResults.sadness;
+              this.happiness = emotionResults.happiness;
+
+              var div = document.getElementById("specificAnalysis2");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"url":' +
+                '"' +
+                usableURL +
+                '"' +
+                "," +
+                '"text":' +
+                '"' +
+                usableText +
+                '"' +
+                "," +
+                '"Angry":' +
+                this.anger +
+                "," +
+                '"Fear":' +
+                this.fear +
+                "," +
+                '"Excited":' +
+                this.surprise +
+                "," +
+                '"Bored":' +
+                this.disgust +
+                "," +
+                '"Sad":' +
+                this.sadness +
+                "," +
+                '"Happy":' +
+                this.happiness +
+                "},";
+              div.appendChild(p);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }
     },
 
     returnJSON: function () {
