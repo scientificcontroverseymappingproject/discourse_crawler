@@ -183,11 +183,11 @@ export default {
     },
 
     getEmotionStats: function () {
-      // var workingJSON = document.getElementById("specificAnalysis").innerText;
-      // const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      // this.JSON1 = JSON.parse(middleJSON);
-      // console.log("test " + this.JSON1[0].text);
-      // const usableText = this.JSON1[0].text.substring(0, 500);
+      var workingJSON = document.getElementById("specificAnalysis").innerText;
+      const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
+      this.JSON1 = JSON.parse(middleJSON);
+      console.log("test " + this.JSON1[0].text);
+      const usableText = this.JSON1[0].text.substring(0, 500);
       //const usableText = JSON.stringify(this.JSON1[0].text);
       // const dotenv = require("dotenv");
       // dotenv.config();
@@ -199,19 +199,26 @@ export default {
       });
 
       const params = {
-        prompt: "How are you?",
-        model: "text-davinci-003",
+        messages: [
+          {
+            role: "user",
+            content:
+              "Peform sentiment analysis on this text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and discust in JSON. " +
+              usableText,
+          },
+        ],
+        model: "gpt-3.5-turbo",
         max_tokens: 500,
         temperature: 0,
       };
 
       client
-        .post("https://api.openai.com/v1/completions", params)
+        .post("https://api.openai.com/v1/chat/completions", params)
         .then((result) => {
-          console.log(result.data.choices[0].text);
+          console.log(result.data.choices[0].message);
           var div = document.getElementById("specificAnalysis2");
           var p = document.createElement("div");
-          p.innerHTML = result.data.choices[0].text;
+          p.innerHTML = result.data.choices[0].message;
           div.appendChild(p);
         })
         .catch((err) => {
