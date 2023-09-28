@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <PublicSpeakingDashboard/>
+    <discourse_crawler/>
   </div>
 </template>
 
 <script>
-import PublicSpeakingDashboard from './components/PublicSpeakingDashboard.vue'
+import discourse_crawler from './components/discourse_crawler.vue'
 
 export default {
   name: 'App',
   components: {
-    PublicSpeakingDashboard
+    discourse_crawler
   }
 }
 </script>
