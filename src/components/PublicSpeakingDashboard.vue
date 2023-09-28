@@ -8,7 +8,8 @@
     />
 
     <button @click="grabPage">Crawl</button>
-    <button @click="getEmotionStats">Analyze</button>
+    <button @click="getEmotionStats">Analyze Emotion</button>
+    <button @click="getMoralFoundations">Analyze Moral Foundations</button>
     <button @click="returnJSON">Return Usable JSON</button>
 
     <p v-if="!loading" id="loadingContainer">
@@ -28,8 +29,8 @@
     </p>
     <section id="specificAnalysis"></section>
     <section id="specificAnalysis2"></section>
-
     <section id="specificAnalysis3"></section>
+    <section id="specificAnalysis4"></section>
   </div>
 </template>
 
@@ -62,7 +63,10 @@ export default {
       anchorsForCrawl: "",
       secondIteration: false,
       JSON1: null,
-      JSON2: "",
+      JSON2: null,
+      JSON3: null,
+      moralFoundationAnalysis: "",
+      apiKEY: ,
     };
   },
 
@@ -100,6 +104,7 @@ export default {
                 console.log("Subpage to be crawled: " + html.links[i].href);
               }
             }
+            const actualText = htmlWithoutScripts.replaceAll('"', "");
             this.anchorsForCrawl = removeDuplicates(anchors);
             var div = document.getElementById("specificAnalysis");
             var p = document.createElement("div");
@@ -111,7 +116,7 @@ export default {
               "," +
               '"text":' +
               '"' +
-              htmlWithoutScripts +
+              actualText.replaceAll("'", "") +
               '"' +
               "},";
             div.appendChild(p);
@@ -157,8 +162,8 @@ export default {
               .querySelector("body")
               .innerText.trim();
             console.log("Crawling: " + this.urlToScrape);
-            this.pageText = htmlWithoutScripts;
-
+            this.pageText = htmlWithoutScripts.replaceAll('"', "");
+            const actualText = this.pageText.replaceAll("'", "");
             var div = document.getElementById("specificAnalysis");
             var p = document.createElement("div");
             p.innerHTML =
@@ -169,7 +174,7 @@ export default {
               "," +
               '"text":' +
               '"' +
-              this.pageText +
+              actualText +
               '"' +
               "},";
             div.appendChild(p);
@@ -198,7 +203,7 @@ export default {
           const usableURL = this.JSON1[i].url;
           const usableText = this.JSON1[i].text.substring(0, 500);
 
-          const API_KEY = ;
+          const API_KEY = this.apiKEY;
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + API_KEY,
@@ -246,22 +251,22 @@ export default {
                 usableText +
                 '"' +
                 "," +
-                '"Angry":' +
+                '"anger":' +
                 this.anger +
                 "," +
-                '"Fear":' +
+                '"fear":' +
                 this.fear +
                 "," +
-                '"Excited":' +
+                '"surprise":' +
                 this.surprise +
                 "," +
-                '"Bored":' +
+                '"disgust":' +
                 this.disgust +
                 "," +
-                '"Sad":' +
+                '"sadness":' +
                 this.sadness +
                 "," +
-                '"Happy":' +
+                '"happiness":' +
                 this.happiness +
                 "},";
               div.appendChild(p);
@@ -273,14 +278,113 @@ export default {
       }
     },
 
-    returnJSON: function () {
+    getMoralFoundations: function () {
       var workingJSON = document.getElementById("specificAnalysis2").innerText;
+      const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
+      this.JSON2 = JSON.parse(middleJSON);
+      //const usableText = JSON.stringify(this.JSON1[0].text);
+      // const dotenv = require("dotenv");
+      // dotenv.config();
+
+      if (this.JSON2 != null) {
+        console.log("test");
+        var i,
+          len = this.JSON2.length;
+        for (i = 0; i < len; i++) {
+          const usableURL = this.JSON2[i].url;
+          const angry = this.JSON2[i].anger;
+          const happy = this.JSON2[i].happiness;
+          const disgusted = this.JSON2[i].disgust;
+          const fearful = this.JSON2[i].fear;
+          const surprised = this.JSON2[i].surprise;
+          const sad = this.JSON2[i].sadness;
+          const usableText = this.JSON2[i].text.substring(0, 500);
+
+          const API_KEY = this.apiKEY;
+          const client = axios.create({
+            headers: {
+              Authorization: "Bearer " + API_KEY,
+            },
+          });
+
+          const params = {
+            messages: [
+              {
+                role: "user",
+                content:
+                  "Analyze this text to identify which of the moral foundations that it represents. Include an explanation." +
+                  usableText,
+              },
+            ],
+            model: "gpt-3.5-turbo",
+            max_tokens: 500,
+            temperature: 0,
+          };
+
+          client
+            .post("https://api.openai.com/v1/chat/completions", params)
+            .then((result) => {
+              console.log(result.data.choices[0].message.content);
+              const moralFoundationResults =
+                result.data.choices[0].message.content.replaceAll('"', "");
+              this.moralFoundationAnalysis = moralFoundationResults.replaceAll(
+                "'",
+                ""
+              );
+
+              var div = document.getElementById("specificAnalysis3");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"url":' +
+                '"' +
+                usableURL +
+                '"' +
+                "," +
+                '"text":' +
+                '"' +
+                usableText +
+                '"' +
+                "," +
+                '"moralFoundation":' +
+                '"' +
+                this.moralFoundationAnalysis +
+                '"' +
+                "," +
+                '"anger":' +
+                angry +
+                "," +
+                '"fear":' +
+                fearful +
+                "," +
+                '"surprise":' +
+                surprised +
+                "," +
+                '"disgust":' +
+                disgusted +
+                "," +
+                '"sadness":' +
+                sad +
+                "," +
+                '"happiness":' +
+                happy +
+                "},";
+              div.appendChild(p);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }
+    },
+
+    returnJSON: function () {
+      var workingJSON = document.getElementById("specificAnalysis3").innerText;
       var middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON2 = middleJSON;
-      console.log("JSON2: " + this.JSON2);
-      var div = document.getElementById("specificAnalysis3");
+      this.JSON3 = middleJSON;
+      console.log("JSON2: " + this.JSON3);
+      var div = document.getElementById("specificAnalysis4");
       var p = document.createElement("div");
-      p.innerHTML = this.JSON2;
+      p.innerHTML = this.JSON3;
       div.appendChild(p);
     },
     getReadabilityStats: function () {
@@ -407,6 +511,9 @@ export default {
 }
 #specificAnalysis3 {
   color: blue;
+}
+#specificAnalysis4 {
+  color: purple;
 }
 div {
   background-color: none;
