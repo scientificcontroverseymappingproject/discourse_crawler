@@ -215,10 +215,26 @@ export default {
       client
         .post("https://api.openai.com/v1/chat/completions", params)
         .then((result) => {
-          console.log(result.data.choices[0].message);
+          console.log(result.data.choices[0].message.content);
+          const emotionResults = JSON.parse(
+            result.data.choices[0].message.content
+          );
+          console.log(emotionResults.anger);
           var div = document.getElementById("specificAnalysis2");
           var p = document.createElement("div");
-          p.innerHTML = result.data.choices[0].message;
+          p.innerHTML =
+            "Anger: " +
+            emotionResults.anger +
+            " Fear: " +
+            emotionResults.anger +
+            " Happiness: " +
+            emotionResults.happiness +
+            " Surprise: " +
+            emotionResults.surprise +
+            " Sadness: " +
+            emotionResults.sadness +
+            " Disgust: " +
+            emotionResults.disgust;
           div.appendChild(p);
         })
         .catch((err) => {
