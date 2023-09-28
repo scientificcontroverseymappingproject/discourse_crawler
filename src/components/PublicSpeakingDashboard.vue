@@ -26,7 +26,8 @@
     <p v-if="showProcess" id="messageThree">
       {{ msg3 }}
     </p>
-    <section id="visuals"></section>
+    <p id="terminal"></p>
+    <section id="visuals" class="visuals"></section>
     <section id="specificAnalysis"></section>
     <section id="specificAnalysis2"></section>
     <section id="specificAnalysis3"></section>
@@ -60,14 +61,15 @@ export default {
       readability: 0,
       loading: true,
       showProcess: true,
-      anchorsForCrawl: "",
+      anchorsForCrawl: [],
       secondIteration: false,
       JSON1: null,
       JSON2: null,
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: "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",
+      apiKEY: ,
+      unique: []
     };
   },
 
@@ -75,6 +77,10 @@ export default {
 
   methods: {
     grabPage: function () {
+    let img = document.createElement('img');
+    img.src ='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif';
+	img.setAttribute("id", 'thinkingIMG')
+	document.getElementById('terminal').appendChild(img);
       var url =
         "https://api.allorigins.win/raw?url=" +
         encodeURIComponent(this.urlToScrape) +
@@ -94,63 +100,60 @@ export default {
           let htmlWithoutScripts = workingHTML
             .querySelector("body")
             .innerText.trim();
-          console.log("Crawling: " + this.urlToScrape);
+            
 
           if (this.secondIteration == false) {
             var anchors = [],
               l = html.links;
+              const tickerA = html.links.length
             for (var i = 0; i < l.length; i++) {
+				const counterTickerA = i
               if (html.links[i].href.includes(this.urlToScrape)) {
                 anchors.push(l[i].href);
-                console.log("Subpage to be crawled: " + html.links[i].href);
-              }
+				}
+				if (counterTickerA === tickerA -1) {
+						this.pageText = htmlWithoutScripts;
+						this.anchorsForCrawl =  anchors.filter(function(item, pos) {
+							return anchors.indexOf(item) == pos;
+							})
+						console.log(this.anchorsForCrawl)
+						
+						setTimeout(() => {
+							console.log("Delayed for 1 second.");
+							this.grabSubpages();
+							}, 1000);
+									
+				}
             }
-            const actualText = htmlWithoutScripts.replaceAll('"', "");
-            this.anchorsForCrawl = removeDuplicates(anchors);
-            var div = document.getElementById("specificAnalysis");
-            var p = document.createElement("div");
-            p.innerHTML =
-              '{"url":' +
-              '"' +
-              this.urlToScrape +
-              '"' +
-              "," +
-              '"text":' +
-              '"' +
-              actualText.replaceAll("'", "") +
-              '"' +
-              "},";
-            div.appendChild(p);
+            
+            
           }
-
-          function removeDuplicates(anchors) {
-            return anchors.filter(
-              (item, index) => anchors.indexOf(item) === index
-            );
-          }
-
-          this.pageText = htmlWithoutScripts;
-          this.grabSubpages();
+                  
+			
         })
         .catch((errors) => {
-          console.log(errors); // Errors
+          console.log(errors); // Errors and stuff
         });
+        
+        
     },
 
     grabSubpages: function () {
       var i,
         len = this.anchorsForCrawl.length;
+        const ticker = this.anchorsForCrawl.length;
       for (i = 0; i < len; i++) {
         const usableURL = this.anchorsForCrawl[i];
-        this.msg = "Crawling";
-        this.msg2 = usableURL;
+        const counterTicker = i
         var url =
           "https://api.allorigins.win/raw?url=" +
-          encodeURIComponent(this.anchorsForCrawl[i]) +
+          encodeURIComponent(usableURL) +
           "&callback=?";
         axios
           .get(url)
           .then((response) => {
+			this.msg = "Crawling";
+			this.msg2 = usableURL;
             const data = response.data;
             const data2 = data.replace(/\s+/g, " ").trim();
             const parser = new DOMParser();
@@ -179,8 +182,13 @@ export default {
               '"' +
               "},";
             div.appendChild(p);
-
-            //this.renderData()
+			console.log(usableURL)
+			if (counterTicker === ticker - 1) {
+				setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					this.getEmotionStats()
+				}, 1000);
+			}
           })
           .catch((errors) => {
             console.log(errors); // Errors
@@ -200,10 +208,12 @@ export default {
         console.log("test");
         var i,
           len = this.JSON1.length;
+        const ticker2 = this.JSON1.length;
         for (i = 0; i < len; i++) {
+        
           const usableURL = this.JSON1[i].url;
+          const counterTicker2 = i
           const usableText = this.JSON1[i].text.substring(0, 500);
-
           const API_KEY = this.apiKEY;
           const client = axios.create({
             headers: {
@@ -216,7 +226,7 @@ export default {
               {
                 role: "user",
                 content:
-                  "Peform sentiment analysis on this text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and discust in JSON. " +
+                  "Peform sentiment analysis on this text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust in JSON only, no explanation. " +
                   usableText,
               },
             ],
@@ -228,7 +238,11 @@ export default {
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
+            this.msg = "Analyzing Emotion of:";
+			this.msg2 = usableURL;
               console.log(result.data.choices[0].message.content);
+              
+              
               const emotionResults = JSON.parse(
                 result.data.choices[0].message.content
               );
@@ -271,9 +285,16 @@ export default {
                 this.happiness +
                 "},";
               div.appendChild(p);
+              if (counterTicker2 === ticker2 - 1) {
+				setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					this.getMoralFoundations()
+				}, 1000);
+			}
             })
             .catch((error) => {
               console.log(error);
+
             });
         }
       }
@@ -291,8 +312,11 @@ export default {
         console.log("test");
         var i,
           len = this.JSON2.length;
+          const ticker3 = this.JSON2.length;
         for (i = 0; i < len; i++) {
+        
           const usableURL = this.JSON2[i].url;
+          const counterTicker3 = i;
           const angry = this.JSON2[i].anger;
           const happy = this.JSON2[i].happiness;
           const disgusted = this.JSON2[i].disgust;
@@ -318,13 +342,15 @@ export default {
               },
             ],
             model: "gpt-3.5-turbo",
-            max_tokens: 500,
+            max_tokens: 2000,
             temperature: 0,
           };
 
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
+            this.msg = "Analyzing Moral Foundations of:";
+			this.msg2 = usableURL;
               console.log(result.data.choices[0].message.content);
               const moralFoundationResults =
                 result.data.choices[0].message.content.replaceAll('"', "");
@@ -370,6 +396,12 @@ export default {
                 happy +
                 "},";
               div.appendChild(p);
+              if (counterTicker3 === ticker3 - 1) {
+				setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					this.returnJSON()
+				}, 1000);
+			}
             })
             .catch((error) => {
               console.log(error);
@@ -387,9 +419,19 @@ export default {
       var p = document.createElement("div");
       p.innerHTML = this.JSON3;
       div.appendChild(p);
+      
+      setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					this.renderVisuals()
+				}, 1000);
     },
 
     renderVisuals: function () {
+		document.getElementById("thinkingIMG").remove();
+		let img = document.createElement('img');
+		img.src ='https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif';
+		img.setAttribute("id", 'thinkingIMG')
+		document.getElementById('terminal').appendChild(img);
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
       //const usableText = JSON.stringify(this.JSON1[0].text);
@@ -413,14 +455,14 @@ export default {
           var div = document.getElementById("visuals");
           var p = document.createElement("div");
           p.innerHTML =
-            "<h2>URL: </h2>" +
-            usableURL +
+            "<h2>" +
+            usableURL + "</h2>" +
             "<h3>Moral Foundations Analysis: </h3>" +
             moralAnalysis +
             "<h3>Emotional Analysis: </h3><ul>" +
             "<li> Anger: " +
             angry +
-            ",</li>" +
+            "</li>" +
             "<li> Fear: " +
             fearful +
             "</li>" +
@@ -438,6 +480,11 @@ export default {
             "</li>" +
             "</ul>";
           div.appendChild(p);
+          
+				setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					document.getElementById("thinkingIMG").remove();
+				}, 3000);
         }
       }
     },
@@ -557,6 +604,15 @@ export default {
 #voiceEmotion,
 #wpm {
   display: inline-block;
+}
+.visuals {
+color: orange;
+border: solid; 
+font-size: 20px;
+width: 75%;
+margin: auto;
+padding: 10px;
+
 }
 
 #specificAnalysis {
