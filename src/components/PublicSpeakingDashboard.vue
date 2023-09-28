@@ -11,12 +11,11 @@
     <button @click="getEmotionStats">Analyze Emotion</button>
     <button @click="getMoralFoundations">Analyze Moral Foundations</button>
     <button @click="returnJSON">Return Usable JSON</button>
+    <button @click="renderVisuals">Visualize</button>
 
     <p v-if="!loading" id="loadingContainer">
-      Initializing <br /><img
-        id="loading"
-        src="https://media.giphy.com/media/Ky5F5Rhn1WRVZmvE5W/giphy.gif"
-      /><br /><span id="initialMessage"
+      Initializing <br /><img id="loading" src= /><br /><span
+        id="initialMessage"
         >(Make sure your webcam is facing you.)</span
       >
     </p>
@@ -27,6 +26,7 @@
     <p v-if="showProcess" id="messageThree">
       {{ msg3 }}
     </p>
+    <section id="visuals"></section>
     <section id="specificAnalysis"></section>
     <section id="specificAnalysis2"></section>
     <section id="specificAnalysis3"></section>
@@ -65,8 +65,9 @@ export default {
       JSON1: null,
       JSON2: null,
       JSON3: null,
+      JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: ,
+      apiKEY: "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",
     };
   },
 
@@ -387,6 +388,60 @@ export default {
       p.innerHTML = this.JSON3;
       div.appendChild(p);
     },
+
+    renderVisuals: function () {
+      var workingJSON = document.getElementById("specificAnalysis4").innerText;
+      this.JSON4 = JSON.parse(workingJSON);
+      //const usableText = JSON.stringify(this.JSON1[0].text);
+      // const dotenv = require("dotenv");
+      // dotenv.config();
+
+      if (this.JSON4 != null) {
+        console.log("test");
+        var i,
+          len = this.JSON4.length;
+        for (i = 0; i < len; i++) {
+          const usableURL = this.JSON4[i].url;
+          const angry = this.JSON4[i].anger;
+          const happy = this.JSON4[i].happiness;
+          const disgusted = this.JSON4[i].disgust;
+          const fearful = this.JSON4[i].fear;
+          const surprised = this.JSON4[i].surprise;
+          const sad = this.JSON4[i].sadness;
+          const moralAnalysis = this.JSON4[i].moralFoundation;
+
+          var div = document.getElementById("visuals");
+          var p = document.createElement("div");
+          p.innerHTML =
+            "<h2>URL: </h2>" +
+            usableURL +
+            "<h3>Moral Foundations Analysis: </h3>" +
+            moralAnalysis +
+            "<h3>Emotional Analysis: </h3><ul>" +
+            "<li> Anger: " +
+            angry +
+            ",</li>" +
+            "<li> Fear: " +
+            fearful +
+            "</li>" +
+            "<li> Surpise: " +
+            surprised +
+            "</li>" +
+            "<li> Disgust: " +
+            disgusted +
+            "</li>" +
+            "<li> Sadness: " +
+            sad +
+            "</li>" +
+            "<li> Happiness: " +
+            happy +
+            "</li>" +
+            "</ul>";
+          div.appendChild(p);
+        }
+      }
+    },
+
     getReadabilityStats: function () {
       this.readability = rs.gunningFog(this.workingOutput);
       console.log(this.readability + " " + this.workingOutput);
