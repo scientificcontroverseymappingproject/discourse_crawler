@@ -1,17 +1,20 @@
 <template>
   <div id="body" class="dashboard">
+    
     <input
       id="URLInput"
       type="text"
       v-model="urlToScrape"
-      placeholder="Enter URL"
-    />
+      placeholder="Enter URL to Crawl"
+    /><p></p>
+    <button id="startButton" @click="grabPage">Crawl Website</button>
 
-    <button @click="grabPage">Crawl</button>
+<!-- 
     <button @click="getEmotionStats">Analyze Emotion</button>
     <button @click="getMoralFoundations">Analyze Moral Foundations</button>
     <button @click="returnJSON">Return Usable JSON</button>
     <button @click="renderVisuals">Visualize</button>
+ -->
 
     <p v-if="!loading" id="loadingContainer">
       Initializing <br /><img id="loading" src= /><br /><span
@@ -50,7 +53,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
-      urlToScrape: "https://rhetoricmatters.school.blog/",
+      urlToScrape: "",
       pageText: "",
       anger: 0,
       fear: 0,
@@ -121,7 +124,7 @@ export default {
 						setTimeout(() => {
 							console.log("Delayed for 1 second.");
 							this.grabSubpages();
-							}, 1000);
+							}, 2000);
 									
 				}
             }
@@ -132,7 +135,9 @@ export default {
 			
         })
         .catch((errors) => {
-          console.log(errors); // Errors and stuff
+          console.log(errors); 
+           this.msg = errors// Errors and stuff
+           
         });
         
         
@@ -187,11 +192,12 @@ export default {
 				setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					this.getEmotionStats()
-				}, 1000);
+				}, 2000);
 			}
           })
           .catch((errors) => {
-            console.log(errors); // Errors
+            console.log(errors); 
+             this.msg = errors// Errors
           });
       }
     },
@@ -289,12 +295,12 @@ export default {
 				setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					this.getMoralFoundations()
-				}, 1000);
+				}, 5000);
 			}
             })
             .catch((error) => {
               console.log(error);
-
+			this.msg = error
             });
         }
       }
@@ -323,7 +329,7 @@ export default {
           const fearful = this.JSON2[i].fear;
           const surprised = this.JSON2[i].surprise;
           const sad = this.JSON2[i].sadness;
-          const usableText = this.JSON2[i].text.substring(0, 500);
+          const usableText = this.JSON2[i].text.substring(0, 3000);
 
           const API_KEY = this.apiKEY;
           const client = axios.create({
@@ -342,7 +348,7 @@ export default {
               },
             ],
             model: "gpt-3.5-turbo",
-            max_tokens: 2000,
+            max_tokens: 500,
             temperature: 0,
           };
 
@@ -400,11 +406,12 @@ export default {
 				setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					this.returnJSON()
-				}, 1000);
+				}, 5000);
 			}
             })
             .catch((error) => {
               console.log(error);
+              this.msg = error
             });
         }
       }
@@ -423,10 +430,11 @@ export default {
       setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					this.renderVisuals()
-				}, 1000);
+				}, 5000);
     },
 
     renderVisuals: function () {
+		document.getElementById("visuals").style.display="block"
 		document.getElementById("thinkingIMG").remove();
 		let img = document.createElement('img');
 		img.src ='https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif';
@@ -484,7 +492,9 @@ export default {
 				setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					document.getElementById("thinkingIMG").remove();
-				}, 3000);
+					this.msg = "Analysis Complete"
+					this.msg2 = ""
+				}, 5000);
         }
       }
     },
@@ -605,13 +615,32 @@ export default {
 #wpm {
   display: inline-block;
 }
+#URLInput {
+width: 50%;
+font-size: 30px;
+text-align: center;
+background-color: #f7ec59; 
+color: #252627;
+border: none;
+}
+#startButton {
+background: #2f4858;
+font-size: 30px;
+color: white; 
+border: none;
+}
+
+#startButton:hover{
+background: purple;
+}
 .visuals {
-color: orange;
+color: #ff66d8;
 border: solid; 
 font-size: 20px;
 width: 75%;
 margin: auto;
 padding: 10px;
+display: none;
 
 }
 
@@ -652,7 +681,7 @@ div {
 }
 
 #messageTwo {
-  color: #f48d79;
+  color: #92dce5;
   font-size: 25px;
 }
 
