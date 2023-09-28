@@ -34,12 +34,12 @@
 </template>
 
 <script>
-import paralleldots from "paralleldots";
+//import paralleldots from "paralleldots";
 import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 //import Plotly from 'plotly.js-dist'
-import OpenAI from "openai";
+//import OpenAI from "openai";
 export default {
   name: "publicSpeakingDashboard",
   props: {},
@@ -183,97 +183,99 @@ export default {
     },
 
     getEmotionStats: function () {
-      var workingJSON = document.getElementById("specificAnalysis").innerText;
-      const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON1 = JSON.parse(middleJSON);
-      console.log("test " + this.JSON1[0].text);
-      const usableText = JSON.stringify(this.JSON1[0].text);
-      const dotenv = require("dotenv");
-      dotenv.config();
-
-      const openai = new OpenAI({
-        apiKey: ,
-        dangerouslyAllowBrowser: true,
+      // var workingJSON = document.getElementById("specificAnalysis").innerText;
+      // const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
+      // this.JSON1 = JSON.parse(middleJSON);
+      // console.log("test " + this.JSON1[0].text);
+      // const usableText = this.JSON1[0].text.substring(0, 500);
+      //const usableText = JSON.stringify(this.JSON1[0].text);
+      // const dotenv = require("dotenv");
+      // dotenv.config();
+      const API_KEY = ;
+      const client = axios.create({
+        headers: {
+          Authorization: "Bearer " + API_KEY,
+        },
       });
 
-      const response = openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content:
-              "Analyze the emotions in this text returning a JSON object with values between 1 and 10 for fear, anger, sadness, happiness, disgust, and surprise. " +
-              usableText,
-          },
-        ],
+      const params = {
+        prompt: "How are you?",
+        model: "text-davinci-003",
+        max_tokens: 500,
         temperature: 0,
-        max_tokens: 4096,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-      });
+      };
 
-      const GPTResponse = response.choices[0].message;
-      console.log("GPT " + GPTResponse);
+      client
+        .post("https://api.openai.com/v1/completions", params)
+        .then((result) => {
+          console.log(result.data.choices[0].text);
+          var div = document.getElementById("specificAnalysis2");
+          var p = document.createElement("div");
+          p.innerHTML = result.data.choices[0].text;
+          div.appendChild(p);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
-      if (this.JSON == null) {
-        var i,
-          len = this.JSON.length;
-        for (i = 0; i < len; i++) {
-          const usableURL = this.JSON[i].url;
-          const usableText = this.JSON[i].text;
-          //send transcript data to be evaluated as per emotional content
-          const pd = require("paralleldots" || paralleldots);
-          pd.apiKey = "hL7rOIhghKLZtrI6w04cFjxVvAOHQ7BiNhjMLAVnMPw";
-          pd.emotion(usableText, "en")
-            .then((response) => {
-              let obj = JSON.parse(response);
-              this.textEmotionData = response.slice(1);
-              this.anger = Math.round(obj.emotion.Angry * 100);
-              this.fear = Math.round(obj.emotion.Fear * 100);
-              this.excitement = Math.round(obj.emotion.Excited * 100);
-              this.boredom = Math.round(obj.emotion.Bored * 100);
-              this.sadness = Math.round(obj.emotion.Sad * 100);
-              this.happiness = Math.round(obj.emotion.Happy * 100);
+      // if (this.JSON1 == null) {
+      //   var i,
+      //     len = this.JSON.length;
+      //   for (i = 0; i < len; i++) {
+      //     const usableURL = this.JSON[i].url;
+      //     const usableText = this.JSON[i].text;
+      //     //send transcript data to be evaluated as per emotional content
+      //     const pd = require("paralleldots" || paralleldots);
+      //     pd.apiKey = "hL7rOIhghKLZtrI6w04cFjxVvAOHQ7BiNhjMLAVnMPw";
+      //     pd.emotion(usableText, "en")
+      //       .then((response) => {
+      //         let obj = JSON.parse(response);
+      //         this.textEmotionData = response.slice(1);
+      //         this.anger = Math.round(obj.emotion.Angry * 100);
+      //         this.fear = Math.round(obj.emotion.Fear * 100);
+      //         this.excitement = Math.round(obj.emotion.Excited * 100);
+      //         this.boredom = Math.round(obj.emotion.Bored * 100);
+      //         this.sadness = Math.round(obj.emotion.Sad * 100);
+      //         this.happiness = Math.round(obj.emotion.Happy * 100);
 
-              var div = document.getElementById("specificAnalysis2");
-              var p = document.createElement("div");
-              p.innerHTML =
-                '{"url":' +
-                '"' +
-                usableURL +
-                '"' +
-                "," +
-                '"text":' +
-                '"' +
-                usableText +
-                '"' +
-                "," +
-                '"Angry":' +
-                this.anger +
-                "," +
-                '"Fear":' +
-                this.fear +
-                "," +
-                '"Excited":' +
-                this.excitement +
-                "," +
-                '"Bored":' +
-                this.boredom +
-                "," +
-                '"Sad":' +
-                this.sadness +
-                "," +
-                '"Happy":' +
-                this.happiness +
-                "},";
-              div.appendChild(p);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }
-      }
+      //         var div = document.getElementById("specificAnalysis2");
+      //         var p = document.createElement("div");
+      //         p.innerHTML =
+      //           '{"url":' +
+      //           '"' +
+      //           usableURL +
+      //           '"' +
+      //           "," +
+      //           '"text":' +
+      //           '"' +
+      //           usableText +
+      //           '"' +
+      //           "," +
+      //           '"Angry":' +
+      //           this.anger +
+      //           "," +
+      //           '"Fear":' +
+      //           this.fear +
+      //           "," +
+      //           '"Excited":' +
+      //           this.excitement +
+      //           "," +
+      //           '"Bored":' +
+      //           this.boredom +
+      //           "," +
+      //           '"Sad":' +
+      //           this.sadness +
+      //           "," +
+      //           '"Happy":' +
+      //           this.happiness +
+      //           "},";
+      //         div.appendChild(p);
+      //       })
+      //       .catch((error) => {
+      //         console.log(error);
+      //       });
+      //   }
+      // }
     },
 
     returnJSON: function () {
