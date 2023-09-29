@@ -1,3 +1,3 @@
 module.exports = {
-  publicPath: "/feels_bot/",
+  publicPath: "/discourse_crawler/",
 };
