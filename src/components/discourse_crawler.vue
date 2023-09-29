@@ -98,7 +98,7 @@ export default {
     img.src ='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif';
 	img.setAttribute("id", 'thinkingIMG')
 	document.getElementById('terminal').appendChild(img);
-      var url = this.urlToScrape
+      const url = this.urlToScrape
 
       axios
         .get(url)
