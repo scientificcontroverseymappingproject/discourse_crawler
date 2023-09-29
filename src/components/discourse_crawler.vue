@@ -1,6 +1,14 @@
 <template>
   <div id="body" class="dashboard">
-    
+    <input
+      id="APIinput"
+      type="text"
+      v-model="APIkey"
+      v-if="showAPI"
+      placeholder="Enter OpenAI API Key"
+    /><br><span v-if="showAPI">Set up an OpenAI account and get an API key <a href="https://openai.com/product">here</a>.</span>
+   <br><button v-if="showAPI" id="apiButton" @click="registerAPI">Set API Key</button>
+    <br><br><br>
     <input
       id="URLInput"
       type="text"
@@ -64,6 +72,7 @@ export default {
       readability: 0,
       loading: true,
       showProcess: true,
+      showAPI: true, 
       anchorsForCrawl: [],
       secondIteration: false,
       JSON1: null,
@@ -71,7 +80,7 @@ export default {
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: ,
+      apiKEY: "",
       unique: []
     };
   },
@@ -79,15 +88,17 @@ export default {
   created: function () {},
 
   methods: {
+  
+	registerAPI: function () {
+		this.showAPI = false; 
+	},
+  
     grabPage: function () {
     let img = document.createElement('img');
     img.src ='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif';
 	img.setAttribute("id", 'thinkingIMG')
 	document.getElementById('terminal').appendChild(img);
-      var url =
-        "https://api.allorigins.win/raw?url=" +
-        encodeURIComponent(this.urlToScrape) +
-        "&callback=?";
+      var url = this.urlToScrape
 
       axios
         .get(url)
@@ -150,10 +161,7 @@ export default {
       for (i = 0; i < len; i++) {
         const usableURL = this.anchorsForCrawl[i];
         const counterTicker = i
-        var url =
-          "https://api.allorigins.win/raw?url=" +
-          encodeURIComponent(usableURL) +
-          "&callback=?";
+        var url = usableURL
         axios
           .get(url)
           .then((response) => {
@@ -623,6 +631,15 @@ background-color: #f7ec59;
 color: #252627;
 border: none;
 }
+
+#APIinput {
+width: 50%;
+font-size: 20px;
+text-align: center;
+background-color: hotpink; 
+color: #252627;
+border: none;
+}
 #startButton {
 background: #2f4858;
 font-size: 30px;
@@ -631,6 +648,17 @@ border: none;
 }
 
 #startButton:hover{
+background: purple;
+}
+
+#apiButton {
+background: #2f4858;
+font-size: 20px;
+color: white; 
+border: none;
+}
+
+#apiButton:hover{
 background: purple;
 }
 .visuals {
