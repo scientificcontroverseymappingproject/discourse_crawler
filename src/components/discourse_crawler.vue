@@ -11,12 +11,11 @@
     <br><br><br>
     <input
       id="URLInput"
-      type="text"
+      type="input"
       v-model="urlToScrape"
       placeholder="Enter URL to Crawl"
     /><p></p>
     <button id="startButton" @click="grabPage">Crawl Website</button>
-
 <!-- 
     <button @click="getEmotionStats">Analyze Emotion</button>
     <button @click="getMoralFoundations">Analyze Moral Foundations</button>
@@ -98,7 +97,9 @@ export default {
     img.src ='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif';
 	img.setAttribute("id", 'thinkingIMG')
 	document.getElementById('terminal').appendChild(img);
-      const url = this.urlToScrape
+      const url = "https://api.allorigins.win/raw?url=" +
+        encodeURIComponent(this.urlToScrape) +
+        "&callback=?";
 
       axios
         .get(url)
@@ -161,7 +162,9 @@ export default {
       for (i = 0; i < len; i++) {
         const usableURL = this.anchorsForCrawl[i];
         const counterTicker = i
-        var url = usableURL
+        var url = "https://api.allorigins.win/raw?url=" +
+          encodeURIComponent(usableURL) +
+          "&callback=?";
         axios
           .get(url)
           .then((response) => {
