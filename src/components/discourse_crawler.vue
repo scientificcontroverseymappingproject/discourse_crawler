@@ -60,7 +60,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
-      urlToScrape: "https://rhetoricmatters.school.blog",
+      urlToScrape: "",
       pageText: "",
       anger: 0,
       fear: 0,
@@ -189,14 +189,14 @@ export default {
             let htmlWithoutScripts = workingHTML
               .querySelector("body")
               .innerText.trim();
-            console.log("Crawling:"+ i + ":" + usableURL);
+            console.log("Crawling:"+ i + " " + usableURL);
             
-            instance.msg = "crawling"
+            instance.msg = "Crawling"
 			instance.msg2 = workingAnchorsArray[i]
             
-			if (htmlWithoutScripts.length <= 1999) {
-				this.pageText = htmlWithoutScripts.replaceAll('"', "");
-				const actualText = this.pageText.replaceAll("'", "");
+			if (htmlWithoutScripts.length <= 999) {
+				const workingActualText = htmlWithoutScripts.replaceAll('"', ' ');
+				const actualText = workingActualText.replaceAll("'", " ");
 				var div = document.getElementById("specificAnalysis");
 				var p = document.createElement("div");
 				p.innerHTML =
@@ -213,9 +213,9 @@ export default {
 				div.appendChild(p);
 				
 			} else {
-					this.pageText = htmlWithoutScripts.substring(0, 2000)
-					this.pageText = htmlWithoutScripts.replaceAll('"', "");
-					const actualText = this.pageText.replaceAll("'", "");
+					const workingActualText  = htmlWithoutScripts.substring(0, 1000)
+					const workingActualText2  = workingActualText.replaceAll('"', ' ');
+					const actualText = workingActualText2.replaceAll("'", " ");
 					var div2 = document.getElementById("specificAnalysis");
 					var p2 = document.createElement("div");
 					p2.innerHTML =
@@ -234,7 +234,7 @@ export default {
 				if (counterTicker === ticker - 1) {
 						setTimeout(() => {
 						console.log("Delayed for 2 seconds.");
-						//this.getEmotionStats()
+						instance.getEmotionStats()
 					}, 2000);
 				}
           })
@@ -242,32 +242,39 @@ export default {
             console.log(errors); 
              this.msg = errors// Errors
           });
-      }, 500 * i );
+      }, 1500 * i );
 	}
     },
 
     getEmotionStats: function () {
       var workingJSON = document.getElementById("specificAnalysis").innerText;
       const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON1 = JSON.parse(middleJSON);
+      const workingJSON1 = JSON.parse(middleJSON);
+      let i2, len2 = workingJSON1.length;
+			const ticker2 = workingJSON1.length;
+			const instance = this
+			
+			for (i2 = 0; i2 < len2; i2++) {
+				fire(i2)
+			}
+	
+	function fire(i2) {
+		setTimeout(function(){
+      
       //const usableText = JSON.stringify(this.JSON1[0].text);
       // const dotenv = require("dotenv");
       // dotenv.config();
 
-      if (this.JSON1 != null) {
-        console.log("test");
-        var i,
-          len = this.JSON1.length;
-        const ticker2 = this.JSON1.length;
-        
-        for (i = 0; i < len; i++) {
-          const usableURL = this.JSON1[i].url;
-          const counterTicker2 = i
-          const usableText = this.JSON1[i].text;
+        console.log("Analyzing Emotion");
+
+          const usableURL = workingJSON1[i2].url;
+          const counterTicker2 = i2
+          const usableText = workingJSON1[i2].text
+          console.log(usableText)
           
           const client = axios.create({
             headers: {
-              Authorization: "Bearer " + this.apiKEY,
+              Authorization: "Bearer " + instance.apiKEY,
             },
           });
 
@@ -280,28 +287,28 @@ export default {
                   usableText,
               },
             ],
-            model: "gpt-4",
-            max_tokens: 1000,
+            model: "gpt-3.5-turbo",
+            max_tokens: 2000,
             temperature: 0,
           };
 
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
-            this.msg = "Analyzing Emotion of:";
-			this.msg2 = usableURL;
+            instance.msg = "Analyzing emotion of";
+			instance.msg2 = usableURL;
               console.log(result.data.choices[0].message.content);
               
               
               const emotionResults = JSON.parse(
                 result.data.choices[0].message.content
               );
-              this.anger = emotionResults.anger;
-              this.fear = emotionResults.fear;
-              this.surprise = emotionResults.surprise;
-              this.disgust = emotionResults.disgust;
-              this.sadness = emotionResults.sadness;
-              this.happiness = emotionResults.happiness;
+              instance.anger = emotionResults.anger;
+              instance.fear = emotionResults.fear;
+              instance.surprise = emotionResults.surprise;
+              instance.disgust = emotionResults.disgust;
+              instance.sadness = emotionResults.sadness;
+              instance.happiness = emotionResults.happiness;
 
               var div = document.getElementById("specificAnalysis2");
               var p = document.createElement("div");
@@ -317,38 +324,41 @@ export default {
                 '"' +
                 "," +
                 '"anger":' +
-                this.anger +
+                instance.anger +
                 "," +
                 '"fear":' +
-                this.fear +
+                instance.fear +
                 "," +
                 '"surprise":' +
-                this.surprise +
+                instance.surprise +
                 "," +
                 '"disgust":' +
-                this.disgust +
+                instance.disgust +
                 "," +
                 '"sadness":' +
-                this.sadness +
+                instance.sadness +
                 "," +
                 '"happiness":' +
-                this.happiness +
+                instance.happiness +
                 "},";
               div.appendChild(p);
-              
+
             })
             .catch((error) => {
               console.log(error);
-			this.msg = error
+			instance.msg = error
             });
-            if (counterTicker2 === ticker2 - 1) {
+        if (counterTicker2 === ticker2 - 1) {
 				setTimeout(() => {
-					console.log("Delayed for 5 seconds.");
-					this.getMoralFoundations()
-				}, 10000);
+					console.log("Delayed for 2 seconds.");
+					instance.getMoralFoundations()
+				}, 2000);
 			}
-        }
-      }
+			
+        
+		
+       }, 21000 * i2 );
+	}
     },
 
     getMoralFoundations: function () {
