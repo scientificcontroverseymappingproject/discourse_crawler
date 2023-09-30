@@ -3,7 +3,7 @@
     <input
       id="APIinput"
       type="text"
-      v-model="APIkey"
+      v-model="apiKEY"
       v-if="showAPI"
       placeholder="Enter OpenAI API Key"
     /><br><span v-if="showAPI">Set up an OpenAI account and get an API key <a href="https://openai.com/product">here</a>.</span>
@@ -79,7 +79,7 @@ export default {
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      APIkey: "",
+      apiKEY: "",
       unique: []
     };
   },
@@ -182,29 +182,52 @@ export default {
               .querySelector("body")
               .innerText.trim();
             console.log("Crawling: " + this.urlToScrape);
-            this.pageText = htmlWithoutScripts.replaceAll('"', "");
-            const actualText = this.pageText.replaceAll("'", "");
-            var div = document.getElementById("specificAnalysis");
-            var p = document.createElement("div");
-            p.innerHTML =
-              '{"url":' +
-              '"' +
-              usableURL +
-              '"' +
-              "," +
-              '"text":' +
-              '"' +
-              actualText +
-              '"' +
-              "},";
-            div.appendChild(p);
-			console.log(usableURL)
-			if (counterTicker === ticker - 1) {
-				setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					this.getEmotionStats()
-				}, 10000);
-			}
+            
+			if (this.pageText.lenth <= 1999) {
+				this.pageText = htmlWithoutScripts.replaceAll('"', "");
+				const actualText = this.pageText.replaceAll("'", "");
+				var div = document.getElementById("specificAnalysis");
+				var p = document.createElement("div");
+				p.innerHTML =
+				'{"url":' +
+				'"' +
+				usableURL +
+				'"' +
+				"," +
+				'"text":' +
+				'"' +
+				actualText +
+				'"' +
+				"},";
+				div.appendChild(p);
+				console.log(usableURL)
+				
+			} else {
+					this.pageText = this.pageText.substring(0, 2000)
+					this.pageText = htmlWithoutScripts.replaceAll('"', "");
+					const actualText = this.pageText.replaceAll("'", "");
+					var div2 = document.getElementById("specificAnalysis");
+					var p2 = document.createElement("div");
+					p2.innerHTML =
+					'{"url":' +
+					'"' +
+					usableURL +
+					'"' +
+					"," +
+					'"text":' +
+					'"' +
+					actualText +
+					'"' +
+					"},";
+					div2.appendChild(p2);
+					console.log(usableURL)
+				}
+				if (counterTicker === ticker - 1) {
+						setTimeout(() => {
+						console.log("Delayed for 10 seconds.");
+						this.getEmotionStats()
+					}, 10000);
+				}
           })
           .catch((errors) => {
             console.log(errors); 
@@ -226,15 +249,15 @@ export default {
         var i,
           len = this.JSON1.length;
         const ticker2 = this.JSON1.length;
-        const API_KEY = this.APIkey;
-        for (i = 0; i < len; i++) {
         
+        for (i = 0; i < len; i++) {
           const usableURL = this.JSON1[i].url;
           const counterTicker2 = i
-          const usableText = this.JSON1[i].text.substring(0, 2000);
+          const usableText = this.JSON1[i].text;
+          
           const client = axios.create({
             headers: {
-              Authorization: "Bearer " + API_KEY,
+              Authorization: "Bearer " + this.apiKEY,
             },
           });
 
@@ -247,8 +270,8 @@ export default {
                   usableText,
               },
             ],
-            model: "gpt-3.5-turbo",
-            max_tokens: 500,
+            model: "gpt-4",
+            max_tokens: 1000,
             temperature: 0,
           };
 
@@ -302,17 +325,18 @@ export default {
                 this.happiness +
                 "},";
               div.appendChild(p);
-              if (counterTicker2 === ticker2 - 1) {
-				setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					this.getMoralFoundations()
-				}, 5000);
-			}
+              
             })
             .catch((error) => {
               console.log(error);
 			this.msg = error
             });
+            if (counterTicker2 === ticker2 - 1) {
+				setTimeout(() => {
+					console.log("Delayed for 5 seconds.");
+					this.getMoralFoundations()
+				}, 10000);
+			}
         }
       }
     },
@@ -330,9 +354,8 @@ export default {
         var i,
           len = this.JSON2.length;
           const ticker3 = this.JSON2.length;
-          const API_KEY = this.APIkey;
+          
         for (i = 0; i < len; i++) {
-        
           const usableURL = this.JSON2[i].url;
           const counterTicker3 = i;
           const angry = this.JSON2[i].anger;
@@ -344,7 +367,7 @@ export default {
           const usableText = this.JSON2[i].text;
           const client = axios.create({
             headers: {
-              Authorization: "Bearer " + API_KEY,
+              Authorization: "Bearer " + this.apiKEY,
             },
           });
 
@@ -357,8 +380,8 @@ export default {
                   usableText,
               },
             ],
-            model: "gpt-3.5-turbo",
-            max_tokens: 500,
+            model: "gpt-4",
+            max_tokens: 1000,
             temperature: 0,
           };
 
@@ -412,17 +435,18 @@ export default {
                 happy +
                 "},";
               div.appendChild(p);
-              if (counterTicker3 === ticker3 - 1) {
-				setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					this.returnJSON()
-				}, 5000);
-			}
+			
             })
             .catch((error) => {
               console.log(error);
               this.msg = error
             });
+            if (counterTicker3 === ticker3 - 1) {
+				setTimeout(() => {
+					console.log("Delayed for 5 seconds.");
+					this.returnJSON()
+				}, 10000);
+				}
         }
       }
     },
