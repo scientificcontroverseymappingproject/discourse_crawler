@@ -158,13 +158,14 @@ export default {
     },
 
     grabSubpages: function () {
+    
 		let i, len = this.anchorsForCrawl.length;
 			const ticker = this.anchorsForCrawl.length;
 			const workingAnchorsArray = this.anchorsForCrawl
+			const instance = this
 			for (i = 0; i < len; i++) {
 				fire(i)
 			}
-
 	
 	function fire(i) {
 		setTimeout(function(){
@@ -188,7 +189,10 @@ export default {
             let htmlWithoutScripts = workingHTML
               .querySelector("body")
               .innerText.trim();
-            console.log("Crawling: " + usableURL);
+            console.log("Crawling:"+ i + ":" + usableURL);
+            
+            instance.msg = "crawling"
+			instance.msg2 = workingAnchorsArray[i]
             
 			if (htmlWithoutScripts.length <= 1999) {
 				this.pageText = htmlWithoutScripts.replaceAll('"', "");
