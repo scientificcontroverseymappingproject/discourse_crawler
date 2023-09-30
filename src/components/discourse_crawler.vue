@@ -60,7 +60,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
-      urlToScrape: "",
+      urlToScrape: "https://rhetoricmatters.school.blog",
       pageText: "",
       anger: 0,
       fear: 0,
@@ -134,15 +134,17 @@ export default {
 						console.log(this.anchorsForCrawl)
 						
 						setTimeout(() => {
-							console.log("Delayed for 1 second.");
+							console.log("Delayed for 2 seconds.");
 							this.grabSubpages();
 							}, 2000);
 									
 				}
+            
             }
             
             
           }
+          
                   
 			
         })
@@ -156,20 +158,25 @@ export default {
     },
 
     grabSubpages: function () {
-      var i,
-        len = this.anchorsForCrawl.length;
-        const ticker = this.anchorsForCrawl.length;
-      for (i = 0; i < len; i++) {
-        const usableURL = this.anchorsForCrawl[i];
+		let i, len = this.anchorsForCrawl.length;
+			const ticker = this.anchorsForCrawl.length;
+			const workingAnchorsArray = this.anchorsForCrawl
+			for (i = 0; i < len; i++) {
+				fire(i)
+			}
+
+	
+	function fire(i) {
+		setTimeout(function(){
+        const usableURL = workingAnchorsArray[i];
         const counterTicker = i
+        
         var url = "https://api.allorigins.win/raw?url=" +
           encodeURIComponent(usableURL) +
           "&callback=?";
         axios
           .get(url)
           .then((response) => {
-			this.msg = "Crawling";
-			this.msg2 = usableURL;
             const data = response.data;
             const data2 = data.replace(/\s+/g, " ").trim();
             const parser = new DOMParser();
@@ -181,9 +188,9 @@ export default {
             let htmlWithoutScripts = workingHTML
               .querySelector("body")
               .innerText.trim();
-            console.log("Crawling: " + this.urlToScrape);
+            console.log("Crawling: " + usableURL);
             
-			if (this.pageText.lenth <= 1999) {
+			if (htmlWithoutScripts.length <= 1999) {
 				this.pageText = htmlWithoutScripts.replaceAll('"', "");
 				const actualText = this.pageText.replaceAll("'", "");
 				var div = document.getElementById("specificAnalysis");
@@ -200,10 +207,9 @@ export default {
 				'"' +
 				"},";
 				div.appendChild(p);
-				console.log(usableURL)
 				
 			} else {
-					this.pageText = this.pageText.substring(0, 2000)
+					this.pageText = htmlWithoutScripts.substring(0, 2000)
 					this.pageText = htmlWithoutScripts.replaceAll('"', "");
 					const actualText = this.pageText.replaceAll("'", "");
 					var div2 = document.getElementById("specificAnalysis");
@@ -220,20 +226,20 @@ export default {
 					'"' +
 					"},";
 					div2.appendChild(p2);
-					console.log(usableURL)
 				}
 				if (counterTicker === ticker - 1) {
 						setTimeout(() => {
-						console.log("Delayed for 10 seconds.");
-						this.getEmotionStats()
-					}, 10000);
+						console.log("Delayed for 2 seconds.");
+						//this.getEmotionStats()
+					}, 2000);
 				}
           })
           .catch((errors) => {
             console.log(errors); 
              this.msg = errors// Errors
           });
-      }
+      }, 500 * i );
+	}
     },
 
     getEmotionStats: function () {
