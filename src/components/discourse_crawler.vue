@@ -79,7 +79,7 @@ export default {
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: "",
+      APIkey: "",
       unique: []
     };
   },
@@ -226,12 +226,12 @@ export default {
         var i,
           len = this.JSON1.length;
         const ticker2 = this.JSON1.length;
+        const API_KEY = this.APIkey;
         for (i = 0; i < len; i++) {
         
           const usableURL = this.JSON1[i].url;
           const counterTicker2 = i
-          const usableText = this.JSON1[i].text.substring(0, 500);
-          const API_KEY = this.apiKEY;
+          const usableText = this.JSON1[i].text.substring(0, 3000);
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + API_KEY,
@@ -330,6 +330,7 @@ export default {
         var i,
           len = this.JSON2.length;
           const ticker3 = this.JSON2.length;
+          const API_KEY = this.APIkey;
         for (i = 0; i < len; i++) {
         
           const usableURL = this.JSON2[i].url;
@@ -341,8 +342,6 @@ export default {
           const surprised = this.JSON2[i].surprise;
           const sad = this.JSON2[i].sadness;
           const usableText = this.JSON2[i].text.substring(0, 3000);
-
-          const API_KEY = this.apiKEY;
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + API_KEY,
