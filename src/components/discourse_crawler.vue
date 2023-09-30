@@ -203,7 +203,7 @@ export default {
 				setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					this.getEmotionStats()
-				}, 2000);
+				}, 10000);
 			}
           })
           .catch((errors) => {
