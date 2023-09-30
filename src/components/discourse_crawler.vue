@@ -231,7 +231,7 @@ export default {
         
           const usableURL = this.JSON1[i].url;
           const counterTicker2 = i
-          const usableText = this.JSON1[i].text.substring(0, 3000);
+          const usableText = this.JSON1[i].text.substring(0, 2000);
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + API_KEY,
@@ -341,7 +341,7 @@ export default {
           const fearful = this.JSON2[i].fear;
           const surprised = this.JSON2[i].surprise;
           const sad = this.JSON2[i].sadness;
-          const usableText = this.JSON2[i].text.substring(0, 3000);
+          const usableText = this.JSON2[i].text;
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + API_KEY,
