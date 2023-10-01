@@ -142,11 +142,8 @@ export default {
             
             }
             
-            
           }
-          
-                  
-			
+
         })
         .catch((errors) => {
           console.log(errors); 
@@ -194,9 +191,10 @@ export default {
             instance.msg = "Crawling"
 			instance.msg2 = workingAnchorsArray[i]
             
-			if (htmlWithoutScripts.length <= 999) {
-				const workingActualText = htmlWithoutScripts.replaceAll('"', ' ');
-				const actualText = workingActualText.replaceAll("'", " ");
+			if (htmlWithoutScripts.length <= 1999) {
+				const workingActualText  = htmlWithoutScripts.substring(100, 0)
+				const workingActualText2  = workingActualText.replace(/"/g, " ")
+				const actualText = workingActualText2.replace(/'/g, " ")
 				var div = document.getElementById("specificAnalysis");
 				var p = document.createElement("div");
 				p.innerHTML =
@@ -213,7 +211,7 @@ export default {
 				div.appendChild(p);
 				
 			} else {
-					const workingActualText  = htmlWithoutScripts.substring(0, 1000)
+					const workingActualText  = htmlWithoutScripts.substring(100, 2000)
 					const workingActualText2  = workingActualText.replaceAll('"', ' ');
 					const actualText = workingActualText2.replaceAll("'", " ");
 					var div2 = document.getElementById("specificAnalysis");
@@ -242,7 +240,7 @@ export default {
             console.log(errors); 
              this.msg = errors// Errors
           });
-      }, 1500 * i );
+      }, 2000 * i );
 	}
     },
 
@@ -269,7 +267,8 @@ export default {
 
           const usableURL = workingJSON1[i2].url;
           const counterTicker2 = i2
-          const usableText = workingJSON1[i2].text
+          const workingUsableText = workingJSON1[i2].text
+          const usableText = workingUsableText.substring(workingUsableText.indexOf("{"));
           console.log(usableText)
           
           const client = axios.create({
@@ -279,29 +278,25 @@ export default {
           });
 
           const params = {
-            messages: [
-              {
-                role: "user",
-                content:
-                  "Peform sentiment analysis on this text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust in JSON only, no explanation. " +
-                  usableText,
-              },
-            ],
-            model: "gpt-3.5-turbo",
-            max_tokens: 2000,
-            temperature: 0,
-          };
+							"model": "text-davinci-003",
+							"prompt": 'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format the as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' + usableText + '.',
+							"temperature": 1,
+							"max_tokens": 275,
+							"top_p": 1,
+							"frequency_penalty": 0,
+							"presence_penalty": 0
+						};
 
           client
-            .post("https://api.openai.com/v1/chat/completions", params)
+            .post("https://api.openai.com/v1/completions", params)
             .then((result) => {
             instance.msg = "Analyzing emotion of";
 			instance.msg2 = usableURL;
-              console.log(result.data.choices[0].message.content);
+              console.log(result.data.choices[0].text);
               
               
               const emotionResults = JSON.parse(
-                result.data.choices[0].message.content
+                result.data.choices[0].text
               );
               instance.anger = emotionResults.anger;
               instance.fear = emotionResults.fear;
@@ -351,13 +346,13 @@ export default {
         if (counterTicker2 === ticker2 - 1) {
 				setTimeout(() => {
 					console.log("Delayed for 2 seconds.");
-					instance.getMoralFoundations()
+					//instance.getMoralFoundations()
 				}, 2000);
 			}
 			
         
 		
-       }, 21000 * i2 );
+       }, 25000 * i2 );
 	}
     },
 
