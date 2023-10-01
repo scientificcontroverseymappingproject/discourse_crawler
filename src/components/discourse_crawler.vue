@@ -17,8 +17,11 @@
     /><p></p>
     <button id="startButton" @click="grabPage">Crawl Website</button>
 <!-- 
+    <button @click="<!~~ getMoralFoundations ~~>">Analyze Moral Foundations</button>
+ -->
+<!-- 
     <button @click="getEmotionStats">Analyze Emotion</button>
-    <button @click="getMoralFoundations">Analyze Moral Foundations</button>
+    
     <button @click="returnJSON">Return Usable JSON</button>
     <button @click="renderVisuals">Visualize</button>
  -->
@@ -267,9 +270,7 @@ export default {
 
           const usableURL = workingJSON1[i2].url;
           const counterTicker2 = i2
-          const workingUsableText = workingJSON1[i2].text
-          const usableText = workingUsableText.substring(workingUsableText.indexOf("{"));
-          console.log(usableText)
+          const usableText = workingJSON1[i2].text
           
           const client = axios.create({
             headers: {
@@ -292,11 +293,12 @@ export default {
             .then((result) => {
             instance.msg = "Analyzing emotion of";
 			instance.msg2 = usableURL;
-              console.log(result.data.choices[0].text);
-              
+              const rawResult = result.data.choices[0].text
+              const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
+              console.log(i2 + ": " + justTheJSON);
               
               const emotionResults = JSON.parse(
-                result.data.choices[0].text
+                justTheJSON
               );
               instance.anger = emotionResults.anger;
               instance.fear = emotionResults.fear;
@@ -346,7 +348,7 @@ export default {
         if (counterTicker2 === ticker2 - 1) {
 				setTimeout(() => {
 					console.log("Delayed for 2 seconds.");
-					//instance.getMoralFoundations()
+					instance.getMoralFoundations()
 				}, 2000);
 			}
 			
@@ -358,57 +360,56 @@ export default {
 
     getMoralFoundations: function () {
       var workingJSON = document.getElementById("specificAnalysis2").innerText;
-      const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON2 = JSON.parse(middleJSON);
-      //const usableText = JSON.stringify(this.JSON1[0].text);
-      // const dotenv = require("dotenv");
-      // dotenv.config();
+      const middleJSON2 = "[" + workingJSON.slice(0, -1) + "]";
+      const workingJSON2 = JSON.parse(middleJSON2);
+      let i3, len3 = workingJSON2.length;
+			const ticker3 = workingJSON2.length;
+			const instance = this
+			
+			for (i3 = 0; i3 < len3; i3++) {
+				fire(i3)
+			}
+	
+	function fire(i3) {
+		setTimeout(function(){
+      
 
-      if (this.JSON2 != null) {
-        console.log("test");
-        var i,
-          len = this.JSON2.length;
-          const ticker3 = this.JSON2.length;
-          
-        for (i = 0; i < len; i++) {
-          const usableURL = this.JSON2[i].url;
-          const counterTicker3 = i;
-          const angry = this.JSON2[i].anger;
-          const happy = this.JSON2[i].happiness;
-          const disgusted = this.JSON2[i].disgust;
-          const fearful = this.JSON2[i].fear;
-          const surprised = this.JSON2[i].surprise;
-          const sad = this.JSON2[i].sadness;
-          const usableText = this.JSON2[i].text;
+        console.log("Analyzing moral foundations");
+
+          const usableURL2 = workingJSON2[i3].url;
+          const counterTicker3 = i3;
+          const angry = workingJSON2[i3].anger;
+          const happy = workingJSON2[i3].happiness;
+          const disgusted = workingJSON2[i3].disgust;
+          const fearful = workingJSON2[i3].fear;
+          const surprised = workingJSON2[i3].surprise;
+          const sad = workingJSON2[i3].sadness;
+          const usableText2 = workingJSON2[i3].text;
           const client = axios.create({
             headers: {
-              Authorization: "Bearer " + this.apiKEY,
+              Authorization: "Bearer " + instance.apiKEY,
             },
           });
 
           const params = {
-            messages: [
-              {
-                role: "user",
-                content:
-                  "Analyze this text to identify which of the moral foundations that it represents. Include an explanation." +
-                  usableText,
-              },
-            ],
-            model: "gpt-4",
-            max_tokens: 1000,
-            temperature: 0,
-          };
+							"model": "text-davinci-003",
+							"prompt": 'Analyze this text to identify which of the moral foundations that it represents. Include an explanation.' + usableText2 + '.',
+							"temperature": 1,
+							"max_tokens": 275,
+							"top_p": 1,
+							"frequency_penalty": 0,
+							"presence_penalty": 0
+						};
 
           client
-            .post("https://api.openai.com/v1/chat/completions", params)
+            .post("https://api.openai.com/v1/completions", params)
             .then((result) => {
-            this.msg = "Analyzing Moral Foundations of:";
-			this.msg2 = usableURL;
-              console.log(result.data.choices[0].message.content);
+            instance.msg = "Analyzing moral foundations of";
+			instance.msg2 = usableURL2;
+              console.log(result.data.choices[0].text);
               const moralFoundationResults =
-                result.data.choices[0].message.content.replaceAll('"', "");
-              this.moralFoundationAnalysis = moralFoundationResults.replaceAll(
+                result.data.choices[0].text.replaceAll('"', "");
+              instance.moralFoundationAnalysis = moralFoundationResults.replaceAll(
                 "'",
                 ""
               );
@@ -418,17 +419,17 @@ export default {
               p.innerHTML =
                 '{"url":' +
                 '"' +
-                usableURL +
+                usableURL2 +
                 '"' +
                 "," +
                 '"text":' +
                 '"' +
-                usableText +
+                usableText2 +
                 '"' +
                 "," +
                 '"moralFoundation":' +
                 '"' +
-                this.moralFoundationAnalysis +
+                instance.moralFoundationAnalysis +
                 '"' +
                 "," +
                 '"anger":' +
@@ -459,11 +460,12 @@ export default {
             if (counterTicker3 === ticker3 - 1) {
 				setTimeout(() => {
 					console.log("Delayed for 5 seconds.");
-					this.returnJSON()
-				}, 10000);
+					instance.returnJSON()
+				}, 2000);
 				}
-        }
-      }
+        
+       }, 25000 * i3 );//timeout
+	}//fire
     },
 
     returnJSON: function () {
@@ -479,7 +481,7 @@ export default {
       setTimeout(() => {
 					console.log("Delayed for 1 second.");
 					this.renderVisuals()
-				}, 5000);
+				}, 2000);
     },
 
     renderVisuals: function () {
