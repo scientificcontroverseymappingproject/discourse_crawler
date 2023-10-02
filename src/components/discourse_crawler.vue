@@ -1,5 +1,13 @@
 <template>
   <div id="body" class="dashboard">
+  <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    <p v-if="showProcess2" id="messageTwo">
+      {{ msg2 }}
+    </p>
+    <p v-if="showProcess" id="messageThree">
+      {{ msg3 }}
+    </p>
+    <p id="results"><span id="overallMoralFoundations"></span><span id="overallEmotions"></span></p><section v-if="!showProcess2" id="overalExplanation">{{overallSummaryOutput}}</section>
     <input
       id="APIinput"
       type="text"
@@ -9,15 +17,15 @@
     /><br><span v-if="showAPI">Set up an OpenAI account and get an API key <a href="https://openai.com/product">here</a>.</span>
    <br><button v-if="showAPI" id="apiButton" @click="registerAPI">Set API Key</button>
     <br><br><br>
-    <input
+    <input v-if="showProcess"
       id="URLInput"
       type="input"
       v-model="urlToScrape"
       placeholder="Enter URL to Crawl"
     /><p></p>
-    <button id="startButton" @click="grabPage">Crawl Website</button>
+    <button v-if="showProcess" id="startButton" @click="grabPage">Crawl Website</button>
 <!-- 
-    <button @click="<!~~ getMoralFoundations ~~>">Analyze Moral Foundations</button>
+    <button @click="getOverallMoralFoundationScores">Overall</button>
  -->
 <!-- 
     <button @click="getEmotionStats">Analyze Emotion</button>
@@ -26,19 +34,7 @@
     <button @click="renderVisuals">Visualize</button>
  -->
 
-    <p v-if="!loading" id="loadingContainer">
-      Initializing <br /><img id="loading" src= /><br /><span
-        id="initialMessage"
-        >(Make sure your webcam is facing you.)</span
-      >
-    </p>
-    <h1 v-if="showProcess" id="mainTitle">{{ msg }}</h1>
-    <p v-if="showProcess" id="messageTwo">
-      {{ msg2 }}
-    </p>
-    <p v-if="showProcess" id="messageThree">
-      {{ msg3 }}
-    </p>
+    
     <p id="terminal"></p>
     <section id="visuals" class="visuals"></section>
     <section id="specificAnalysis"></section>
@@ -53,7 +49,7 @@
 import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
-//import Plotly from 'plotly.js-dist'
+import Plotly from 'plotly.js-dist'
 //import OpenAI from "openai";
 export default {
   name: "discourse_crawler",
@@ -74,6 +70,8 @@ export default {
       readability: 0,
       loading: true,
       showProcess: true,
+      showProcess2: true,
+      showProcess3: true, 
       showAPI: true, 
       anchorsForCrawl: [],
       secondIteration: false,
@@ -83,7 +81,8 @@ export default {
       JSON4: null,
       moralFoundationAnalysis: "",
       apiKEY: "",
-      unique: []
+      unique: [],
+      overallSummaryOutput: "" 
     };
   },
 
@@ -96,6 +95,7 @@ export default {
 	},
   
     grabPage: function () {
+    this.showProcess = false
     let img = document.createElement('img');
     img.src ='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif';
 	img.setAttribute("id", 'thinkingIMG')
@@ -279,8 +279,8 @@ export default {
           });
 
           const params = {
-							"model": "text-davinci-003",
-							"prompt": 'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format the as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' + usableText + '.',
+							"model": "gpt-3.5-turbo-instruct",
+							"prompt": 'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' + usableText + '.',
 							"temperature": 1,
 							"max_tokens": 275,
 							"top_p": 1,
@@ -295,6 +295,7 @@ export default {
 			instance.msg2 = usableURL;
               const rawResult = result.data.choices[0].text
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
+              const pageType = "subPage"
               console.log(i2 + ": " + justTheJSON);
               
               const emotionResults = JSON.parse(
@@ -310,7 +311,12 @@ export default {
               var div = document.getElementById("specificAnalysis2");
               var p = document.createElement("div");
               p.innerHTML =
-                '{"url":' +
+                '{"pageType":' +
+                '"' +
+                pageType +
+                '"' +
+                "," +
+                '"url":' +
                 '"' +
                 usableURL +
                 '"' +
@@ -385,6 +391,7 @@ export default {
           const surprised = workingJSON2[i3].surprise;
           const sad = workingJSON2[i3].sadness;
           const usableText2 = workingJSON2[i3].text;
+          const pageType2 = "subPage"
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -392,7 +399,7 @@ export default {
           });
 
           const params = {
-							"model": "text-davinci-003",
+							"model": "gpt-3.5-turbo-instruct",
 							"prompt": 'Analyze this text to identify which of the moral foundations that it represents. Include an explanation.' + usableText2 + '.',
 							"temperature": 1,
 							"max_tokens": 275,
@@ -417,7 +424,12 @@ export default {
               var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
               p.innerHTML =
-                '{"url":' +
+                '{"pageType":' +
+                '"' +
+                pageType2 +
+                '"' +
+                "," +
+                '"url":' +
                 '"' +
                 usableURL2 +
                 '"' +
@@ -493,9 +505,11 @@ export default {
 		document.getElementById('terminal').appendChild(img);
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
+      
+      
       //const usableText = JSON.stringify(this.JSON1[0].text);
-      // const dotenv = require("dotenv");
-      // dotenv.config();
+      const dotenv = require("dotenv");
+      dotenv.config();
 
       if (this.JSON4 != null) {
         console.log("test");
@@ -525,7 +539,7 @@ export default {
             "<li> Fear: " +
             fearful +
             "</li>" +
-            "<li> Surpise: " +
+            "<li> Surprise: " +
             surprised +
             "</li>" +
             "<li> Disgust: " +
@@ -545,9 +559,220 @@ export default {
 					document.getElementById("thinkingIMG").remove();
 					this.msg = "Analysis Complete"
 					this.msg2 = ""
-				}, 5000);
+					this.getOverallMoralFoundationScores()
+				}, 4000);
         }
       }
+    },
+    
+    
+    
+    getOverallMoralFoundationScores: function () {
+    this.showProcess2 = false
+    this.msg = this.urlToScrape
+    var workingJSON = document.getElementById("specificAnalysis4").innerText;
+	const test = JSON.parse(workingJSON);
+    const instance = this
+    const pageType3 = "overallMoral"
+    let overallMoralAnalysis = ""
+    
+     const  e = test.length
+            for (var i = 0; i < e; i++) {
+				overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation
+				if (i === e -1) {
+					
+					instance.overallSummaryOutput = overallMoralAnalysis
+					
+											
+					const client = axios.create({
+					headers: {
+					Authorization: "Bearer " + instance.apiKEY,
+					},
+					});
+
+					const params = {
+					"model": "gpt-3.5-turbo-instruct",
+					"prompt": 'Analyze the following text to identify the moral foundations that is represents. Give an explanation as well as scores between 1 and 10 for the care, fairness, loyalty, authority, and purity in the text. Format your response in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}.'  + overallMoralAnalysis,
+					"temperature": 0,
+					"max_tokens": 300,
+					"top_p": 1,
+					"frequency_penalty": 0,
+					"presence_penalty": 0
+					};
+
+					client
+					.post("https://api.openai.com/v1/completions", params)
+					.then((result) => {
+					instance.msg = instance.urlToScrape;
+					const rawResultA = result.data.choices[0].text
+					console.log(rawResultA)
+					const justTheTextA = rawResultA.substr(0, rawResultA.indexOf('{'));
+					const justTheJSONA = rawResultA.substring(rawResultA.indexOf("{"));
+					console.log(justTheJSONA)
+					const moralResultsA = JSON.parse(
+					justTheJSONA
+					);
+					instance.overallSummaryOutput = justTheTextA
+					const overallCare = moralResultsA.care
+					const overallFairness = moralResultsA.fairness
+					const overallLoyalty = moralResultsA.loyalty
+					const overallAuthority = moralResultsA.authority
+					const overallPurity = moralResultsA.purity
+
+					const moralFoundationResults3 = justTheTextA
+					// justTheTextA.text.replaceAll('"', "");
+// 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
+// 					instance.overallSummaryOutput = instance.moralFoundationAnalysis
+
+					var div = document.getElementById("specificAnalysis3");
+					var p = document.createElement("div");
+					p.innerHTML =
+					'{"pageType":' +
+					'"' +
+					pageType3 +
+					'"' +
+					"," +
+					'"url":' +
+					'"' +
+					instance.urlToScrape +
+					'"' +
+					"," +
+					'"overallCare":' +
+					overallCare +
+					"," +
+					'"overallFairness":' +
+					overallFairness +
+					"," +
+					'"overallLoyalty":' +
+					overallLoyalty +
+					"," +
+					'"overallAuthority":' +
+					overallAuthority +
+					"," +
+					'"overallPurity":' +
+					overallPurity +
+					"," +
+					'"moralFoundationOverall":' +
+					'"' +
+					moralFoundationResults3 +
+					'"' +
+					"},";
+					div.appendChild(p);
+					
+						var data = [
+						{
+						x: ["Care", "Fairness", "Loyalty", "Authority", "Purity"],
+						y: [overallCare, overallFairness, overallLoyalty, overallAuthority, overallPurity],
+						type: 'bar', 
+						marker: {
+							color: ['#bf4e30', '#c6ccb2', '#93ff96', '#e5eafa', '#78fecf']
+						}
+						}
+						];
+						
+						var layout = {
+						height: 450,
+						width: 450,
+						showlegend: false, 
+						paper_bgcolor:"#2b2d42",
+						plot_bgcolor:"#2b2d42",  
+						title: 'Moral Foundations',
+							font: {
+								family: 'Arial, monospace',
+								size: 25,
+								color: 'white'
+							}
+						}
+						var config = {responsive: true}
+						Plotly.newPlot('overallMoralFoundations', data, layout, config);
+						setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					this.renderOverallEmotion()
+				}, 1000);
+						
+						
+									})
+.catch((error) => {
+console.log(error);
+this.msg = error
+});				
+				}
+            }
+    
+    },
+    
+    
+    
+    renderOverallEmotion: function() {
+    
+	//var workingJSON = 
+	//this.JSON4 = JSON.parse(workingJSON);
+    
+    const test = document.getElementById("specificAnalysis4").innerText;
+    let overallAnger = 0
+    let overallFear = 0
+    let overallHappiness = 0
+    let overallSurprise = 0
+    let overallSadness = 0
+    let overallDisgust = 0
+    console.log(test.length)
+    const instance = this; 
+     const  e = test.length
+            for (var i = 0; i < e; i++) {
+				overallAnger = overallAnger + test[i].anger
+				overallFear = overallFear + test[i].fear
+				overallHappiness = overallHappiness + test[i].happiness
+				overallSurprise = overallSurprise + test[i].surprise
+				overallSadness = overallSadness + test[i].sadness
+				overallDisgust = overallDisgust+ test[i].disgust
+				if (i === e -1) {
+					overallAnger = Math.round(overallAnger/e) * 10
+					overallFear = Math.round(overallFear/e) * 10
+					overallHappiness = Math.round(overallHappiness/e) * 10
+					overallSurprise = Math.round(overallSurprise/e) * 10
+					overallSadness = Math.round(overallSadness/e) * 10
+					overallDisgust = Math.round(overallDisgust/e) * 10
+					
+					
+						var data = [{
+						type: "pie",
+						values: [overallAnger, overallFear, overallHappiness, overallSurprise, overallSadness, overallDisgust],
+						labels: ["Anger", "Fear", "Happiness", "Surprise", "Sadness", "Disgust"],
+						textinfo: "label+percent",
+						textposition: "outside",
+						marker: {
+							colors: ['#ff0022', '#ffbc42', '#0496ff', '#694d75', '#1b5299', '#40434e']
+						}
+						}]
+
+						var layout = {
+						height: 450,
+						width: 450,
+						showlegend: false, 
+						paper_bgcolor:"#2b2d42", 
+						title: 'Emotions',
+							font: {
+								family: 'Arial, monospace',
+								size: 25,
+								color: 'white'
+							}
+						}
+						var config = {responsive: true}
+						Plotly.newPlot('overallEmotions', data, layout, config)
+						
+						setTimeout(() => {
+					console.log("Delayed for 1 second.");
+					instance.returnJSON()
+				}, 1000);
+						
+				}
+				
+				
+            }
+            
+            
+				
+    
     },
 
     getReadabilityStats: function () {
@@ -666,6 +891,30 @@ export default {
 #wpm {
   display: inline-block;
 }
+
+#overallEmotions {
+display: inline-block;
+
+}
+
+#overalExplanation {
+color: orange; 
+font-size: 25px;
+margin-top: 25px;
+width: 65%;
+display: inline-block;
+}
+
+#results {
+display: flex;
+margin: auto;
+width: 65%;
+}
+#overallMoralFoundatations{
+display: inline-block;
+margin: auto;
+}
+
 #URLInput {
 width: 50%;
 font-size: 30px;
@@ -759,6 +1008,7 @@ div {
 #messageThree {
   color: white;
   font-size: 25px;
+  margin-left: 10%;
 }
 
 #begin {
