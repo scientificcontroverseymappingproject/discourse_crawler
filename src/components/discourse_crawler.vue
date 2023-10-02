@@ -1,40 +1,54 @@
 <template>
   <div id="body" class="dashboard">
-  <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
     <p v-if="showProcess2" id="messageTwo">
       {{ msg2 }}
     </p>
     <p v-if="showProcess" id="messageThree">
       {{ msg3 }}
     </p>
-    <p id="results"><span id="overallMoralFoundations"></span><span id="overallEmotions"></span></p><section v-if="!showProcess2" id="overalExplanation">{{overallSummaryOutput}}</section>
+    <p id="results">
+      <span id="overallMoralFoundations"></span
+      ><span id="overallEmotions"></span>
+    </p>
+    <section v-if="!showProcess2" id="overalExplanation">
+      {{ overallSummaryOutput }}
+    </section>
     <input
       id="APIinput"
       type="text"
       v-model="apiKEY"
       v-if="showAPI"
       placeholder="Enter OpenAI API Key"
-    /><br><span v-if="showAPI">Set up an OpenAI account and get an API key <a href="https://openai.com/product">here</a>.</span>
-   <br><button v-if="showAPI" id="apiButton" @click="registerAPI">Set API Key</button>
-    <br><br><br>
-    <input v-if="showProcess"
+    /><br /><span v-if="showAPI"
+      >Set up an OpenAI account and get an API key
+      <a href="https://openai.com/product">here</a>.</span
+    >
+    <br /><button v-if="showAPI" id="apiButton" @click="registerAPI">
+      Set API Key
+    </button>
+    <br /><br /><br />
+    <input
+      v-if="showProcess"
       id="URLInput"
       type="input"
       v-model="urlToScrape"
       placeholder="Enter URL to Crawl"
-    /><p></p>
-    <button v-if="showProcess" id="startButton" @click="grabPage">Crawl Website</button>
-<!-- 
-    <button @click="getOverallMoralFoundationScores">Overall</button>
- -->
-<!-- 
+    />
+    <p></p>
+    <button v-if="showProcess" id="startButton" @click="grabPage">
+      Crawl Website
+    </button>
+
+    <!-- <button @click="renderVisuals">Overall</button> -->
+
+    <!-- 
     <button @click="getEmotionStats">Analyze Emotion</button>
     
     <button @click="returnJSON">Return Usable JSON</button>
     <button @click="renderVisuals">Visualize</button>
  -->
 
-    
     <p id="terminal"></p>
     <section id="visuals" class="visuals"></section>
     <section id="specificAnalysis"></section>
@@ -49,7 +63,7 @@
 import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
-import Plotly from 'plotly.js-dist'
+import Plotly from "plotly.js-dist";
 //import OpenAI from "openai";
 export default {
   name: "discourse_crawler",
@@ -71,8 +85,8 @@ export default {
       loading: true,
       showProcess: true,
       showProcess2: true,
-      showProcess3: true, 
-      showAPI: true, 
+      showProcess3: true,
+      showAPI: true,
       anchorsForCrawl: [],
       secondIteration: false,
       JSON1: null,
@@ -82,25 +96,26 @@ export default {
       moralFoundationAnalysis: "",
       apiKEY: "",
       unique: [],
-      overallSummaryOutput: "" 
+      overallSummaryOutput: "",
     };
   },
 
   created: function () {},
 
   methods: {
-  
-	registerAPI: function () {
-		this.showAPI = false; 
-	},
-  
+    registerAPI: function () {
+      this.showAPI = false;
+    },
+
     grabPage: function () {
-    this.showProcess = false
-    let img = document.createElement('img');
-    img.src ='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif';
-	img.setAttribute("id", 'thinkingIMG')
-	document.getElementById('terminal').appendChild(img);
-      const url = "https://api.allorigins.win/raw?url=" +
+      this.showProcess = false;
+      let img = document.createElement("img");
+      img.src =
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif";
+      img.setAttribute("id", "thinkingIMG");
+      document.getElementById("terminal").appendChild(img);
+      const url =
+        "https://api.allorigins.win/raw?url=" +
         encodeURIComponent(this.urlToScrape) +
         "&callback=?";
 
@@ -118,160 +133,158 @@ export default {
           let htmlWithoutScripts = workingHTML
             .querySelector("body")
             .innerText.trim();
-            
 
           if (this.secondIteration == false) {
             var anchors = [],
               l = html.links;
-              const tickerA = html.links.length
+            const tickerA = html.links.length;
             for (var i = 0; i < l.length; i++) {
-				const counterTickerA = i
+              const counterTickerA = i;
               if (html.links[i].href.includes(this.urlToScrape)) {
                 anchors.push(l[i].href);
-				}
-				if (counterTickerA === tickerA -1) {
-						this.pageText = htmlWithoutScripts;
-						this.anchorsForCrawl =  anchors.filter(function(item, pos) {
-							return anchors.indexOf(item) == pos;
-							})
-						console.log(this.anchorsForCrawl)
-						
-						setTimeout(() => {
-							console.log("Delayed for 2 seconds.");
-							this.grabSubpages();
-							}, 2000);
-									
-				}
-            
-            }
-            
-          }
+              }
+              if (counterTickerA === tickerA - 1) {
+                this.pageText = htmlWithoutScripts;
+                this.anchorsForCrawl = anchors.filter(function (item, pos) {
+                  return anchors.indexOf(item) == pos;
+                });
+                console.log(this.anchorsForCrawl);
 
+                setTimeout(() => {
+                  console.log("Delayed for 2 seconds.");
+                  this.grabSubpages();
+                }, 2000);
+              }
+            }
+          }
         })
         .catch((errors) => {
-          console.log(errors); 
-           this.msg = errors// Errors and stuff
-           
+          console.log(errors);
+          this.msg = errors; // Errors and stuff
         });
-        
-        
     },
 
     grabSubpages: function () {
-    
-		let i, len = this.anchorsForCrawl.length;
-			const ticker = this.anchorsForCrawl.length;
-			const workingAnchorsArray = this.anchorsForCrawl
-			const instance = this
-			for (i = 0; i < len; i++) {
-				fire(i)
-			}
-	
-	function fire(i) {
-		setTimeout(function(){
-        const usableURL = workingAnchorsArray[i];
-        const counterTicker = i
-        
-        var url = "https://api.allorigins.win/raw?url=" +
-          encodeURIComponent(usableURL) +
-          "&callback=?";
-        axios
-          .get(url)
-          .then((response) => {
-            const data = response.data;
-            const data2 = data.replace(/\s+/g, " ").trim();
-            const parser = new DOMParser();
-            const html = parser.parseFromString(data2, "text/html");
-            const workingHTML = html;
-            workingHTML
-              .querySelectorAll("script, style")
-              .forEach((s) => s.remove());
-            let htmlWithoutScripts = workingHTML
-              .querySelector("body")
-              .innerText.trim();
-            console.log("Crawling:"+ i + " " + usableURL);
-            
-            instance.msg = "Crawling"
-			instance.msg2 = workingAnchorsArray[i]
-            
-			if (htmlWithoutScripts.length <= 1999) {
-				const workingActualText  = htmlWithoutScripts.substring(100, 0)
-				const workingActualText2  = workingActualText.replace(/"/g, " ")
-				const actualText = workingActualText2.replace(/'/g, " ")
-				var div = document.getElementById("specificAnalysis");
-				var p = document.createElement("div");
-				p.innerHTML =
-				'{"url":' +
-				'"' +
-				usableURL +
-				'"' +
-				"," +
-				'"text":' +
-				'"' +
-				actualText +
-				'"' +
-				"},";
-				div.appendChild(p);
-				
-			} else {
-					const workingActualText  = htmlWithoutScripts.substring(100, 2000)
-					const workingActualText2  = workingActualText.replaceAll('"', ' ');
-					const actualText = workingActualText2.replaceAll("'", " ");
-					var div2 = document.getElementById("specificAnalysis");
-					var p2 = document.createElement("div");
-					p2.innerHTML =
-					'{"url":' +
-					'"' +
-					usableURL +
-					'"' +
-					"," +
-					'"text":' +
-					'"' +
-					actualText +
-					'"' +
-					"},";
-					div2.appendChild(p2);
-				}
-				if (counterTicker === ticker - 1) {
-						setTimeout(() => {
-						console.log("Delayed for 2 seconds.");
-						instance.getEmotionStats()
-					}, 2000);
-				}
-          })
-          .catch((errors) => {
-            console.log(errors); 
-             this.msg = errors// Errors
-          });
-      }, 2000 * i );
-	}
+      let i,
+        len = this.anchorsForCrawl.length;
+      const ticker = this.anchorsForCrawl.length;
+      const workingAnchorsArray = this.anchorsForCrawl;
+      const instance = this;
+      for (i = 0; i < len; i++) {
+        fire(i);
+      }
+
+      function fire(i) {
+        setTimeout(function () {
+          const usableURL = workingAnchorsArray[i];
+          const counterTicker = i;
+
+          var url =
+            "https://api.allorigins.win/raw?url=" +
+            encodeURIComponent(usableURL) +
+            "&callback=?";
+          axios
+            .get(url)
+            .then((response) => {
+              const data = response.data;
+              const data2 = data.replace(/\s+/g, " ").trim();
+              const parser = new DOMParser();
+              const html = parser.parseFromString(data2, "text/html");
+              const workingHTML = html;
+              workingHTML
+                .querySelectorAll("script, style")
+                .forEach((s) => s.remove());
+              let htmlWithoutScripts = workingHTML
+                .querySelector("body")
+                .innerText.trim();
+              console.log("Crawling:" + i + " " + usableURL);
+
+              instance.msg = "Crawling";
+              instance.msg2 = workingAnchorsArray[i];
+
+              if (htmlWithoutScripts.length <= 1999) {
+                const workingActualText = htmlWithoutScripts.substring(100, 0);
+                const workingActualText2 = workingActualText.replace(/"/g, " ");
+                const actualText = workingActualText2.replace(/'/g, " ");
+                var div = document.getElementById("specificAnalysis");
+                var p = document.createElement("div");
+                p.innerHTML =
+                  '{"url":' +
+                  '"' +
+                  usableURL +
+                  '"' +
+                  "," +
+                  '"text":' +
+                  '"' +
+                  actualText +
+                  '"' +
+                  "},";
+                div.appendChild(p);
+              } else {
+                const workingActualText = htmlWithoutScripts.substring(
+                  100,
+                  2000
+                );
+                const workingActualText2 = workingActualText.replaceAll(
+                  '"',
+                  " "
+                );
+                const actualText = workingActualText2.replaceAll("'", " ");
+                var div2 = document.getElementById("specificAnalysis");
+                var p2 = document.createElement("div");
+                p2.innerHTML =
+                  '{"url":' +
+                  '"' +
+                  usableURL +
+                  '"' +
+                  "," +
+                  '"text":' +
+                  '"' +
+                  actualText +
+                  '"' +
+                  "},";
+                div2.appendChild(p2);
+              }
+              if (counterTicker === ticker - 1) {
+                setTimeout(() => {
+                  console.log("Delayed for 2 seconds.");
+                  instance.getEmotionStats();
+                }, 2000);
+              }
+            })
+            .catch((errors) => {
+              console.log(errors);
+              this.msg = errors; // Errors
+            });
+        }, 2000 * i);
+      }
     },
 
     getEmotionStats: function () {
       var workingJSON = document.getElementById("specificAnalysis").innerText;
       const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
       const workingJSON1 = JSON.parse(middleJSON);
-      let i2, len2 = workingJSON1.length;
-			const ticker2 = workingJSON1.length;
-			const instance = this
-			
-			for (i2 = 0; i2 < len2; i2++) {
-				fire(i2)
-			}
-	
-	function fire(i2) {
-		setTimeout(function(){
-      
-      //const usableText = JSON.stringify(this.JSON1[0].text);
-      // const dotenv = require("dotenv");
-      // dotenv.config();
+      let i2,
+        len2 = workingJSON1.length;
+      const ticker2 = workingJSON1.length;
+      const instance = this;
 
-        console.log("Analyzing Emotion");
+      for (i2 = 0; i2 < len2; i2++) {
+        fire(i2);
+      }
+
+      function fire(i2) {
+        setTimeout(function () {
+          //const usableText = JSON.stringify(this.JSON1[0].text);
+          // const dotenv = require("dotenv");
+          // dotenv.config();
+
+          console.log("Analyzing Emotion");
 
           const usableURL = workingJSON1[i2].url;
-          const counterTicker2 = i2
-          const usableText = workingJSON1[i2].text
-          
+          const counterTicker2 = i2;
+          const usableText = workingJSON1[i2].text;
+
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -279,28 +292,29 @@ export default {
           });
 
           const params = {
-							"model": "gpt-3.5-turbo-instruct",
-							"prompt": 'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' + usableText + '.',
-							"temperature": 1,
-							"max_tokens": 275,
-							"top_p": 1,
-							"frequency_penalty": 0,
-							"presence_penalty": 0
-						};
+            model: "gpt-3.5-turbo-instruct",
+            prompt:
+              'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' +
+              usableText +
+              ".",
+            temperature: 1,
+            max_tokens: 275,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+          };
 
           client
             .post("https://api.openai.com/v1/completions", params)
             .then((result) => {
-            instance.msg = "Analyzing emotion of";
-			instance.msg2 = usableURL;
-              const rawResult = result.data.choices[0].text
+              instance.msg = "Analyzing emotion of";
+              instance.msg2 = usableURL;
+              const rawResult = result.data.choices[0].text;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
-              const pageType = "subPage"
+              const pageType = "subPage";
               console.log(i2 + ": " + justTheJSON);
-              
-              const emotionResults = JSON.parse(
-                justTheJSON
-              );
+
+              const emotionResults = JSON.parse(justTheJSON);
               instance.anger = emotionResults.anger;
               instance.fear = emotionResults.fear;
               instance.surprise = emotionResults.surprise;
@@ -345,42 +359,37 @@ export default {
                 instance.happiness +
                 "},";
               div.appendChild(p);
-
             })
             .catch((error) => {
               console.log(error);
-			instance.msg = error
+              instance.msg = error;
             });
-        if (counterTicker2 === ticker2 - 1) {
-				setTimeout(() => {
-					console.log("Delayed for 2 seconds.");
-					instance.getMoralFoundations()
-				}, 2000);
-			}
-			
-        
-		
-       }, 25000 * i2 );
-	}
+          if (counterTicker2 === ticker2 - 1) {
+            setTimeout(() => {
+              console.log("Delayed for 2 seconds.");
+              instance.getMoralFoundations();
+            }, 2000);
+          }
+        }, 25000 * i2);
+      }
     },
 
     getMoralFoundations: function () {
       var workingJSON = document.getElementById("specificAnalysis2").innerText;
       const middleJSON2 = "[" + workingJSON.slice(0, -1) + "]";
       const workingJSON2 = JSON.parse(middleJSON2);
-      let i3, len3 = workingJSON2.length;
-			const ticker3 = workingJSON2.length;
-			const instance = this
-			
-			for (i3 = 0; i3 < len3; i3++) {
-				fire(i3)
-			}
-	
-	function fire(i3) {
-		setTimeout(function(){
-      
+      let i3,
+        len3 = workingJSON2.length;
+      const ticker3 = workingJSON2.length;
+      const instance = this;
 
-        console.log("Analyzing moral foundations");
+      for (i3 = 0; i3 < len3; i3++) {
+        fire(i3);
+      }
+
+      function fire(i3) {
+        setTimeout(function () {
+          console.log("Analyzing moral foundations");
 
           const usableURL2 = workingJSON2[i3].url;
           const counterTicker3 = i3;
@@ -391,7 +400,7 @@ export default {
           const surprised = workingJSON2[i3].surprise;
           const sad = workingJSON2[i3].sadness;
           const usableText2 = workingJSON2[i3].text;
-          const pageType2 = "subPage"
+          const pageType2 = "subPage";
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -399,27 +408,28 @@ export default {
           });
 
           const params = {
-							"model": "gpt-3.5-turbo-instruct",
-							"prompt": 'Analyze this text to identify which of the moral foundations that it represents. Include an explanation.' + usableText2 + '.',
-							"temperature": 1,
-							"max_tokens": 275,
-							"top_p": 1,
-							"frequency_penalty": 0,
-							"presence_penalty": 0
-						};
+            model: "gpt-3.5-turbo-instruct",
+            prompt:
+              "Analyze this text to identify which of the moral foundations that it represents. Include an explanation." +
+              usableText2 +
+              ".",
+            temperature: 1,
+            max_tokens: 275,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+          };
 
           client
             .post("https://api.openai.com/v1/completions", params)
             .then((result) => {
-            instance.msg = "Analyzing moral foundations of";
-			instance.msg2 = usableURL2;
+              instance.msg = "Analyzing moral foundations of";
+              instance.msg2 = usableURL2;
               console.log(result.data.choices[0].text);
               const moralFoundationResults =
                 result.data.choices[0].text.replaceAll('"', "");
-              instance.moralFoundationAnalysis = moralFoundationResults.replaceAll(
-                "'",
-                ""
-              );
+              instance.moralFoundationAnalysis =
+                moralFoundationResults.replaceAll("'", "");
 
               var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
@@ -463,21 +473,19 @@ export default {
                 happy +
                 "},";
               div.appendChild(p);
-			
             })
             .catch((error) => {
               console.log(error);
-              this.msg = error
+              this.msg = error;
             });
-            if (counterTicker3 === ticker3 - 1) {
-				setTimeout(() => {
-					console.log("Delayed for 5 seconds.");
-					instance.returnJSON()
-				}, 2000);
-				}
-        
-       }, 25000 * i3 );//timeout
-	}//fire
+          if (counterTicker3 === ticker3 - 1) {
+            setTimeout(() => {
+              console.log("Delayed for 5 seconds.");
+              instance.returnJSON();
+            }, 2000);
+          }
+        }, 25000 * i3); //timeout
+      } //fire
     },
 
     returnJSON: function () {
@@ -489,27 +497,26 @@ export default {
       var p = document.createElement("div");
       p.innerHTML = this.JSON3;
       div.appendChild(p);
-      
+
       setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					this.renderVisuals()
-				}, 2000);
+        console.log("Delayed for 1 second.");
+        this.renderVisuals();
+      }, 2000);
     },
 
     renderVisuals: function () {
-		document.getElementById("visuals").style.display="block"
-		document.getElementById("thinkingIMG").remove();
-		let img = document.createElement('img');
-		img.src ='https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif';
-		img.setAttribute("id", 'thinkingIMG')
-		document.getElementById('terminal').appendChild(img);
+      if (document.getElementById("thinkingIMG")) {
+        document.getElementById("thinkingIMG").remove();
+      }
+      document.getElementById("visuals").style.display = "block";
+      let img = document.createElement("img");
+      img.src = "https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif";
+      img.setAttribute("id", "thinkingIMG2");
+      document.getElementById("terminal").appendChild(img);
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
-      
-      
+
       //const usableText = JSON.stringify(this.JSON1[0].text);
-      const dotenv = require("dotenv");
-      dotenv.config();
 
       if (this.JSON4 != null) {
         console.log("test");
@@ -529,7 +536,8 @@ export default {
           var p = document.createElement("div");
           p.innerHTML =
             "<h2>" +
-            usableURL + "</h2>" +
+            usableURL +
+            "</h2>" +
             "<h3>Moral Foundations Analysis: </h3>" +
             moralAnalysis +
             "<h3>Emotional Analysis: </h3><ul>" +
@@ -553,226 +561,248 @@ export default {
             "</li>" +
             "</ul>";
           div.appendChild(p);
-          
-				setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					document.getElementById("thinkingIMG").remove();
-					this.msg = "Analysis Complete"
-					this.msg2 = ""
-					this.getOverallMoralFoundationScores()
-				}, 4000);
+
+          setTimeout(() => {
+            console.log("Delayed for 1 second.");
+            document.getElementById("thinkingIMG2").remove();
+            this.msg = "Analysis Complete";
+            this.msg2 = "";
+            this.getOverallMoralFoundationScores();
+          }, 4000);
         }
       }
     },
-    
-    
-    
+
     getOverallMoralFoundationScores: function () {
-    this.showProcess2 = false
-    this.msg = this.urlToScrape
-    var workingJSON = document.getElementById("specificAnalysis4").innerText;
-	const test = JSON.parse(workingJSON);
-    const instance = this
-    const pageType3 = "overallMoral"
-    let overallMoralAnalysis = ""
-    
-     const  e = test.length
-            for (var i = 0; i < e; i++) {
-				overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation
-				if (i === e -1) {
-					
-					instance.overallSummaryOutput = overallMoralAnalysis
-					
-											
-					const client = axios.create({
-					headers: {
-					Authorization: "Bearer " + instance.apiKEY,
-					},
-					});
+      this.showProcess2 = false;
+      this.msg = this.urlToScrape;
+      var workingJSON = document.getElementById("specificAnalysis4").innerText;
+      const test = JSON.parse(workingJSON);
+      const instance = this;
+      const pageType3 = "overallMoral";
+      let overallMoralAnalysis = "";
 
-					const params = {
-					"model": "gpt-3.5-turbo-instruct",
-					"prompt": 'Analyze the following text to identify the moral foundations that is represents. Give an explanation as well as scores between 1 and 10 for the care, fairness, loyalty, authority, and purity in the text. Format your response in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}.'  + overallMoralAnalysis,
-					"temperature": 0,
-					"max_tokens": 300,
-					"top_p": 1,
-					"frequency_penalty": 0,
-					"presence_penalty": 0
-					};
+      const e = test.length;
+      for (var i = 0; i < e; i++) {
+        overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation;
+        if (i === e - 1) {
+          instance.overallSummaryOutput = overallMoralAnalysis;
 
-					client
-					.post("https://api.openai.com/v1/completions", params)
-					.then((result) => {
-					instance.msg = instance.urlToScrape;
-					const rawResultA = result.data.choices[0].text
-					console.log(rawResultA)
-					const justTheTextA = rawResultA.substr(0, rawResultA.indexOf('{'));
-					const justTheJSONA = rawResultA.substring(rawResultA.indexOf("{"));
-					console.log(justTheJSONA)
-					const moralResultsA = JSON.parse(
-					justTheJSONA
-					);
-					instance.overallSummaryOutput = justTheTextA
-					const overallCare = moralResultsA.care
-					const overallFairness = moralResultsA.fairness
-					const overallLoyalty = moralResultsA.loyalty
-					const overallAuthority = moralResultsA.authority
-					const overallPurity = moralResultsA.purity
+          const client = axios.create({
+            headers: {
+              Authorization: "Bearer " + instance.apiKEY,
+            },
+          });
 
-					const moralFoundationResults3 = justTheTextA
-					// justTheTextA.text.replaceAll('"', "");
-// 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
-// 					instance.overallSummaryOutput = instance.moralFoundationAnalysis
+          const params = {
+            model: "gpt-3.5-turbo-instruct",
+            prompt:
+              'Analyze the following text to identify the moral foundations that is represents. Give an explanation as well as scores between 1 and 10 for the care, fairness, loyalty, authority, and purity in the text. Format your response in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}.' +
+              overallMoralAnalysis,
+            temperature: 0,
+            max_tokens: 300,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+          };
 
-					var div = document.getElementById("specificAnalysis3");
-					var p = document.createElement("div");
-					p.innerHTML =
-					'{"pageType":' +
-					'"' +
-					pageType3 +
-					'"' +
-					"," +
-					'"url":' +
-					'"' +
-					instance.urlToScrape +
-					'"' +
-					"," +
-					'"overallCare":' +
-					overallCare +
-					"," +
-					'"overallFairness":' +
-					overallFairness +
-					"," +
-					'"overallLoyalty":' +
-					overallLoyalty +
-					"," +
-					'"overallAuthority":' +
-					overallAuthority +
-					"," +
-					'"overallPurity":' +
-					overallPurity +
-					"," +
-					'"moralFoundationOverall":' +
-					'"' +
-					moralFoundationResults3 +
-					'"' +
-					"},";
-					div.appendChild(p);
-					
-						var data = [
-						{
-						x: ["Care", "Fairness", "Loyalty", "Authority", "Purity"],
-						y: [overallCare, overallFairness, overallLoyalty, overallAuthority, overallPurity],
-						type: 'bar', 
-						marker: {
-							color: ['#bf4e30', '#c6ccb2', '#93ff96', '#e5eafa', '#78fecf']
-						}
-						}
-						];
-						
-						var layout = {
-						height: 450,
-						width: 450,
-						showlegend: false, 
-						paper_bgcolor:"#2b2d42",
-						plot_bgcolor:"#2b2d42",  
-						title: 'Moral Foundations',
-							font: {
-								family: 'Arial, monospace',
-								size: 25,
-								color: 'white'
-							}
-						}
-						var config = {responsive: true}
-						Plotly.newPlot('overallMoralFoundations', data, layout, config);
-						setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					this.renderOverallEmotion()
-				}, 1000);
-						
-						
-									})
-.catch((error) => {
-console.log(error);
-this.msg = error
-});				
-				}
-            }
-    
+          client
+            .post("https://api.openai.com/v1/completions", params)
+            .then((result) => {
+              instance.msg = instance.urlToScrape;
+              const rawResultA = result.data.choices[0].text;
+              console.log(rawResultA);
+              const justTheTextA = rawResultA.substr(
+                0,
+                rawResultA.indexOf("{")
+              );
+              const justTheJSONA = rawResultA.substring(
+                rawResultA.indexOf("{")
+              );
+              console.log(justTheJSONA);
+              const moralResultsA = JSON.parse(justTheJSONA);
+              instance.overallSummaryOutput = justTheTextA;
+              const overallCare = moralResultsA.care;
+              const overallFairness = moralResultsA.fairness;
+              const overallLoyalty = moralResultsA.loyalty;
+              const overallAuthority = moralResultsA.authority;
+              const overallPurity = moralResultsA.purity;
+
+              const moralFoundationResults3 = justTheTextA;
+              // justTheTextA.text.replaceAll('"', "");
+              // 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
+              // 					instance.overallSummaryOutput = instance.moralFoundationAnalysis
+
+              var div = document.getElementById("specificAnalysis3");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"pageType":' +
+                '"' +
+                pageType3 +
+                '"' +
+                "," +
+                '"url":' +
+                '"' +
+                instance.urlToScrape +
+                '"' +
+                "," +
+                '"overallCare":' +
+                overallCare +
+                "," +
+                '"overallFairness":' +
+                overallFairness +
+                "," +
+                '"overallLoyalty":' +
+                overallLoyalty +
+                "," +
+                '"overallAuthority":' +
+                overallAuthority +
+                "," +
+                '"overallPurity":' +
+                overallPurity +
+                "," +
+                '"moralFoundationOverall":' +
+                '"' +
+                moralFoundationResults3 +
+                '"' +
+                "},";
+              div.appendChild(p);
+
+              var data = [
+                {
+                  x: ["Care", "Fairness", "Loyalty", "Authority", "Purity"],
+                  y: [
+                    overallCare,
+                    overallFairness,
+                    overallLoyalty,
+                    overallAuthority,
+                    overallPurity,
+                  ],
+                  type: "bar",
+                  marker: {
+                    color: [
+                      "#bf4e30",
+                      "#c6ccb2",
+                      "#93ff96",
+                      "#e5eafa",
+                      "#78fecf",
+                    ],
+                  },
+                },
+              ];
+
+              var layout = {
+                height: 450,
+                width: 450,
+                showlegend: false,
+                paper_bgcolor: "#2b2d42",
+                plot_bgcolor: "#2b2d42",
+                title: "Moral Foundations",
+                font: {
+                  family: "Arial, monospace",
+                  size: 25,
+                  color: "white",
+                },
+              };
+              var config = { responsive: true };
+              Plotly.newPlot("overallMoralFoundations", data, layout, config);
+              setTimeout(() => {
+                console.log("Delayed for 1 second.");
+                this.renderOverallEmotion();
+              }, 1000);
+            })
+            .catch((error) => {
+              console.log(error);
+              this.msg = error;
+            });
+        }
+      }
     },
-    
-    
-    
-    renderOverallEmotion: function() {
-    
-	//var workingJSON = 
-	//this.JSON4 = JSON.parse(workingJSON);
-    
-    const test = document.getElementById("specificAnalysis4").innerText;
-    let overallAnger = 0
-    let overallFear = 0
-    let overallHappiness = 0
-    let overallSurprise = 0
-    let overallSadness = 0
-    let overallDisgust = 0
-    console.log(test.length)
-    const instance = this; 
-     const  e = test.length
-            for (var i = 0; i < e; i++) {
-				overallAnger = overallAnger + test[i].anger
-				overallFear = overallFear + test[i].fear
-				overallHappiness = overallHappiness + test[i].happiness
-				overallSurprise = overallSurprise + test[i].surprise
-				overallSadness = overallSadness + test[i].sadness
-				overallDisgust = overallDisgust+ test[i].disgust
-				if (i === e -1) {
-					overallAnger = Math.round(overallAnger/e) * 10
-					overallFear = Math.round(overallFear/e) * 10
-					overallHappiness = Math.round(overallHappiness/e) * 10
-					overallSurprise = Math.round(overallSurprise/e) * 10
-					overallSadness = Math.round(overallSadness/e) * 10
-					overallDisgust = Math.round(overallDisgust/e) * 10
-					
-					
-						var data = [{
-						type: "pie",
-						values: [overallAnger, overallFear, overallHappiness, overallSurprise, overallSadness, overallDisgust],
-						labels: ["Anger", "Fear", "Happiness", "Surprise", "Sadness", "Disgust"],
-						textinfo: "label+percent",
-						textposition: "outside",
-						marker: {
-							colors: ['#ff0022', '#ffbc42', '#0496ff', '#694d75', '#1b5299', '#40434e']
-						}
-						}]
 
-						var layout = {
-						height: 450,
-						width: 450,
-						showlegend: false, 
-						paper_bgcolor:"#2b2d42", 
-						title: 'Emotions',
-							font: {
-								family: 'Arial, monospace',
-								size: 25,
-								color: 'white'
-							}
-						}
-						var config = {responsive: true}
-						Plotly.newPlot('overallEmotions', data, layout, config)
-						
-						setTimeout(() => {
-					console.log("Delayed for 1 second.");
-					instance.returnJSON()
-				}, 1000);
-						
-				}
-				
-				
-            }
-            
-            
-				
-    
+    renderOverallEmotion: function () {
+      //var workingJSON =
+      //this.JSON4 = JSON.parse(workingJSON);
+
+      const test = document.getElementById("specificAnalysis4").innerText;
+      let overallAnger = 0;
+      let overallFear = 0;
+      let overallHappiness = 0;
+      let overallSurprise = 0;
+      let overallSadness = 0;
+      let overallDisgust = 0;
+      console.log(test.length);
+      const instance = this;
+      const e = test.length;
+      for (var i = 0; i < e; i++) {
+        overallAnger = overallAnger + test[i].anger;
+        overallFear = overallFear + test[i].fear;
+        overallHappiness = overallHappiness + test[i].happiness;
+        overallSurprise = overallSurprise + test[i].surprise;
+        overallSadness = overallSadness + test[i].sadness;
+        overallDisgust = overallDisgust + test[i].disgust;
+        if (i === e - 1) {
+          overallAnger = Math.round(overallAnger / e) * 10;
+          overallFear = Math.round(overallFear / e) * 10;
+          overallHappiness = Math.round(overallHappiness / e) * 10;
+          overallSurprise = Math.round(overallSurprise / e) * 10;
+          overallSadness = Math.round(overallSadness / e) * 10;
+          overallDisgust = Math.round(overallDisgust / e) * 10;
+
+          var data = [
+            {
+              type: "pie",
+              values: [
+                overallAnger,
+                overallFear,
+                overallHappiness,
+                overallSurprise,
+                overallSadness,
+                overallDisgust,
+              ],
+              labels: [
+                "Anger",
+                "Fear",
+                "Happiness",
+                "Surprise",
+                "Sadness",
+                "Disgust",
+              ],
+              textinfo: "label+percent",
+              textposition: "outside",
+              marker: {
+                colors: [
+                  "#ff0022",
+                  "#ffbc42",
+                  "#0496ff",
+                  "#694d75",
+                  "#1b5299",
+                  "#40434e",
+                ],
+              },
+            },
+          ];
+
+          var layout = {
+            height: 450,
+            width: 450,
+            showlegend: false,
+            paper_bgcolor: "#2b2d42",
+            title: "Emotions",
+            font: {
+              family: "Arial, monospace",
+              size: 25,
+              color: "white",
+            },
+          };
+          var config = { responsive: true };
+          Plotly.newPlot("overallEmotions", data, layout, config);
+
+          setTimeout(() => {
+            console.log("Delayed for 1 second.");
+            instance.returnJSON();
+          }, 1000);
+        }
+      }
     },
 
     getReadabilityStats: function () {
@@ -893,75 +923,73 @@ this.msg = error
 }
 
 #overallEmotions {
-display: inline-block;
-
+  display: inline-block;
 }
 
 #overalExplanation {
-color: orange; 
-font-size: 25px;
-margin-top: 25px;
-width: 65%;
-display: inline-block;
+  color: orange;
+  font-size: 25px;
+  margin-top: 25px;
+  width: 65%;
+  display: inline-block;
 }
 
 #results {
-display: flex;
-margin: auto;
-width: 65%;
+  display: flex;
+  margin: auto;
+  width: 65%;
 }
-#overallMoralFoundatations{
-display: inline-block;
-margin: auto;
+#overallMoralFoundatations {
+  display: inline-block;
+  margin: auto;
 }
 
 #URLInput {
-width: 50%;
-font-size: 30px;
-text-align: center;
-background-color: #f7ec59; 
-color: #252627;
-border: none;
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #f7ec59;
+  color: #252627;
+  border: none;
 }
 
 #APIinput {
-width: 50%;
-font-size: 20px;
-text-align: center;
-background-color: hotpink; 
-color: #252627;
-border: none;
+  width: 50%;
+  font-size: 20px;
+  text-align: center;
+  background-color: hotpink;
+  color: #252627;
+  border: none;
 }
 #startButton {
-background: #2f4858;
-font-size: 30px;
-color: white; 
-border: none;
+  background: #2f4858;
+  font-size: 30px;
+  color: white;
+  border: none;
 }
 
-#startButton:hover{
-background: purple;
+#startButton:hover {
+  background: purple;
 }
 
 #apiButton {
-background: #2f4858;
-font-size: 20px;
-color: white; 
-border: none;
+  background: #2f4858;
+  font-size: 20px;
+  color: white;
+  border: none;
 }
 
-#apiButton:hover{
-background: purple;
+#apiButton:hover {
+  background: purple;
 }
 .visuals {
-color: #ff66d8;
-border: solid; 
-font-size: 20px;
-width: 75%;
-margin: auto;
-padding: 10px;
-display: none;
-
+  color: #ff66d8;
+  border: solid;
+  font-size: 20px;
+  width: 75%;
+  margin: auto;
+  padding: 10px;
+  display: none;
 }
 
 #specificAnalysis {
