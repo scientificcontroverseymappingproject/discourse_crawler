@@ -55,6 +55,7 @@
     <section id="specificAnalysis2"></section>
     <section id="specificAnalysis3"></section>
     <section id="specificAnalysis4"></section>
+    <section id="specificAnalysis5"></section>
   </div>
 </template>
 
@@ -505,9 +506,7 @@ export default {
     },
 
     renderVisuals: function () {
-      if (document.getElementById("thinkingIMG")) {
-        document.getElementById("thinkingIMG").remove();
-      }
+		document.getElementById("thinkingIMG").remove();
       document.getElementById("visuals").style.display = "block";
       let img = document.createElement("img");
       img.src = "https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif";
@@ -562,6 +561,7 @@ export default {
             "</ul>";
           div.appendChild(p);
 
+		if (i === len -1){
           setTimeout(() => {
             console.log("Delayed for 1 second.");
             document.getElementById("thinkingIMG2").remove();
@@ -569,6 +569,7 @@ export default {
             this.msg2 = "";
             this.getOverallMoralFoundationScores();
           }, 4000);
+          }
         }
       }
     },
@@ -722,8 +723,8 @@ export default {
     renderOverallEmotion: function () {
       //var workingJSON =
       //this.JSON4 = JSON.parse(workingJSON);
-
-      const test = document.getElementById("specificAnalysis4").innerText;
+      var workingJSONB = document.getElementById("specificAnalysis4").innerText;
+      const test = JSON.parse(workingJSONB);
       let overallAnger = 0;
       let overallFear = 0;
       let overallHappiness = 0;
@@ -799,11 +800,23 @@ export default {
 
           setTimeout(() => {
             console.log("Delayed for 1 second.");
-            instance.returnJSON();
+            instance.returnJSONAgain();
           }, 1000);
         }
       }
     },
+    
+    returnJSONAgain: function () {
+      var workingJSON = document.getElementById("specificAnalysis3").innerText;
+      var middleJSON = "[" + workingJSON.slice(0, -1) + "]";
+      this.JSON3 = middleJSON;
+      console.log("JSON2: " + this.JSON3);
+      var div = document.getElementById("specificAnalysis5");
+      var p = document.createElement("div");
+      p.innerHTML = this.JSON3;
+      div.appendChild(p);
+    },
+
 
     getReadabilityStats: function () {
       this.readability = rs.gunningFog(this.workingOutput);
@@ -1002,6 +1015,10 @@ export default {
 }
 #specificAnalysis4 {
   color: purple;
+}
+
+#specificAnalysis4 {
+  color: limegreen;
 }
 div {
   background-color: none;
