@@ -298,8 +298,8 @@ export default {
               'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' +
               usableText +
               ".",
-            temperature: 1,
-            max_tokens: 275,
+            temperature: 0,
+            max_tokens: 256,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -371,7 +371,7 @@ export default {
               instance.getMoralFoundations();
             }, 2000);
           }
-        }, 25000 * i2);
+        }, 500 * i2);
       }
     },
 
@@ -411,10 +411,10 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              "Analyze this text to identify which of the moral foundations that it represents. Include an explanation." +
+              "Analyze this text to identify which of the moral foundations that it represents. Include an explanation. " +
               usableText2 +
               ".",
-            temperature: 1,
+            temperature: 0,
             max_tokens: 275,
             top_p: 1,
             frequency_penalty: 0,
@@ -485,7 +485,7 @@ export default {
               instance.returnJSON();
             }, 2000);
           }
-        }, 25000 * i3); //timeout
+        }, 500 * i3); //timeout
       } //fire
     },
 
@@ -506,8 +506,9 @@ export default {
     },
 
     renderVisuals: function () {
-		document.getElementById("thinkingIMG").remove();
       document.getElementById("visuals").style.display = "block";
+      document.getElementById("thinkingIMG").remove();
+
       let img = document.createElement("img");
       img.src = "https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif";
       img.setAttribute("id", "thinkingIMG2");
@@ -561,14 +562,14 @@ export default {
             "</ul>";
           div.appendChild(p);
 
-		if (i === len -1){
-          setTimeout(() => {
-            console.log("Delayed for 1 second.");
-            document.getElementById("thinkingIMG2").remove();
-            this.msg = "Analysis Complete";
-            this.msg2 = "";
-            this.getOverallMoralFoundationScores();
-          }, 4000);
+          if (i === len - 1) {
+            setTimeout(() => {
+              console.log("Delayed for 4 seconds.");
+              document.getElementById("thinkingIMG2").remove();
+              this.msg = "Analysis Complete";
+              this.msg2 = "";
+              this.getOverallMoralFoundationScores();
+            }, 4000);
           }
         }
       }
@@ -585,7 +586,9 @@ export default {
 
       const e = test.length;
       for (var i = 0; i < e; i++) {
-        overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation;
+        overallMoralAnalysis = overallMoralAnalysis += test[
+          i
+        ].moralFoundation.substring(0, 70);
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
 
@@ -598,10 +601,11 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Analyze the following text to identify the moral foundations that is represents. Give an explanation as well as scores between 1 and 10 for the care, fairness, loyalty, authority, and purity in the text. Format your response in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}.' +
-              overallMoralAnalysis,
+              'Analyze the following text to identify the moral foundations that is represents. Give an explanation as well as scores between 1 and 10 for the care, fairness, loyalty, authority, and purity in the text. Format your response in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. ' +
+              instance.overallSummaryOutput +
+              ".",
             temperature: 0,
-            max_tokens: 300,
+            max_tokens: 256,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -613,23 +617,22 @@ export default {
               instance.msg = instance.urlToScrape;
               const rawResultA = result.data.choices[0].text;
               console.log(rawResultA);
-              const justTheTextA = rawResultA.substr(
-                0,
-                rawResultA.indexOf("{")
-              );
+              // const justTheTextA = rawResultA.substr(
+              //   0,
+              //   rawResultA.indexOf("{")
+              // );
               const justTheJSONA = rawResultA.substring(
                 rawResultA.indexOf("{")
               );
               console.log(justTheJSONA);
               const moralResultsA = JSON.parse(justTheJSONA);
-              instance.overallSummaryOutput = justTheTextA;
               const overallCare = moralResultsA.care;
               const overallFairness = moralResultsA.fairness;
               const overallLoyalty = moralResultsA.loyalty;
               const overallAuthority = moralResultsA.authority;
               const overallPurity = moralResultsA.purity;
 
-              const moralFoundationResults3 = justTheTextA;
+              //const moralFoundationResults3 = justTheTextA;
               // justTheTextA.text.replaceAll('"', "");
               // 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
               // 					instance.overallSummaryOutput = instance.moralFoundationAnalysis
@@ -664,7 +667,7 @@ export default {
                 "," +
                 '"moralFoundationOverall":' +
                 '"' +
-                moralFoundationResults3 +
+                instance.overallSummaryOutput +
                 '"' +
                 "},";
               div.appendChild(p);
@@ -805,18 +808,17 @@ export default {
         }
       }
     },
-    
+
     returnJSONAgain: function () {
       var workingJSON = document.getElementById("specificAnalysis3").innerText;
       var middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON3 = middleJSON;
-      console.log("JSON2: " + this.JSON3);
+      const middleWorkingJSON = middleJSON;
+      console.log("JSON2: " + middleWorkingJSON);
       var div = document.getElementById("specificAnalysis5");
       var p = document.createElement("div");
-      p.innerHTML = this.JSON3;
+      p.innerHTML = middleWorkingJSON;
       div.appendChild(p);
     },
-
 
     getReadabilityStats: function () {
       this.readability = rs.gunningFog(this.workingOutput);
@@ -955,6 +957,7 @@ export default {
 #overallMoralFoundatations {
   display: inline-block;
   margin: auto;
+  display: none;
 }
 
 #URLInput {
@@ -1013,8 +1016,9 @@ export default {
 #specificAnalysis3 {
   color: blue;
 }
-#specificAnalysis4 {
-  color: purple;
+#specificAnalysis5 {
+  color: orange;
+  font-size: 20px;
 }
 
 #specificAnalysis4 {
