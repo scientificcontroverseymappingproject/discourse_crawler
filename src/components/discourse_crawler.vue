@@ -587,7 +587,7 @@ export default {
 
       const e = test.length;
       for (var i = 0; i < e; i++) {
-        overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation.substring(0, 100) + ".";
+        overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation.substring(0, 70) + ".";
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
 
@@ -604,7 +604,7 @@ export default {
               instance.overallSummaryOutput +
               ".",
             temperature: 0,
-            max_tokens: 3500,
+            max_tokens: 850,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
