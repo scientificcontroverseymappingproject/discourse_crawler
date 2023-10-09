@@ -591,7 +591,7 @@ export default {
       const e = test.length;
       for (var i = 0; i < e; i++) {
         overallMoralAnalysis = overallMoralAnalysis +=
-          test[i].moralFoundation.substring(0, 150) + ".";
+          test[i].moralFoundation.substring(0, 70) + ".";
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
 
@@ -604,7 +604,7 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Give me scores between 1 and 100 for the occurrence of each moral foundation of care, fairness, loyalty, authority, and purity in the text, formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
+              'Give me scores between 1 and 100 that indicate the proportions of care, fairness, loyalty, authority, and purity as they are mentioned in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
               instance.overallSummaryOutput +
               ".",
             temperature: 0,
@@ -710,6 +710,13 @@ export default {
                   size: 25,
                   color: "white",
                 },
+                margin: {
+                  l: 50,
+                  r: 50,
+                  b: 100,
+                  t: 100,
+                  pad: 4,
+                },
               };
               var config = { responsive: true };
               Plotly.newPlot("overallMoralFoundations", data, layout, config);
@@ -799,6 +806,13 @@ export default {
               family: "Arial, monospace",
               size: 25,
               color: "white",
+            },
+            margin: {
+              l: 50,
+              r: 50,
+              b: 100,
+              t: 100,
+              pad: 4,
             },
           };
           var config = { responsive: true };
