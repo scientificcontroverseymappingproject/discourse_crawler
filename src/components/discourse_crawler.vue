@@ -604,7 +604,7 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Give me scores between 1 and 100 that indicate the proportions of care, fairness, loyalty, authority, and purity as they are mentioned in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
+              'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
               instance.overallSummaryOutput +
               ".",
             temperature: 0,
