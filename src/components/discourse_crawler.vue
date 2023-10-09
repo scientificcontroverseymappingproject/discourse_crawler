@@ -12,7 +12,7 @@
       ><span id="overallEmotions"></span>
     </p>
     <section v-if="!showProcess2" id="overalExplanation">
-      {{ overallOutputExplanation }}
+      {{ overallOutputExplanation }} {{ overallSummaryOutput }}
     </section>
     <input
       id="APIinput"
@@ -39,7 +39,9 @@
     <button v-if="showProcess" id="startButton" @click="grabPage">
       Crawl Website
     </button>
-
+    <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
+      Save Results as PDF
+    </button>
     <!-- <button @click="renderVisuals">Overall</button> 
 
    
@@ -98,7 +100,8 @@ export default {
       apiKEY: "",
       unique: [],
       overallSummaryOutput: "",
-      overallOutputExplanation: ""
+      overallOutputExplanation: "",
+      showPrint: true,
     };
   },
 
@@ -587,7 +590,8 @@ export default {
 
       const e = test.length;
       for (var i = 0; i < e; i++) {
-        overallMoralAnalysis = overallMoralAnalysis += test[i].moralFoundation.substring(0, 70) + ".";
+        overallMoralAnalysis = overallMoralAnalysis +=
+          test[i].moralFoundation.substring(0, 150) + ".";
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
 
@@ -600,7 +604,7 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Give an explantation of the moral foundations that are represented in the following text out of care, fairness, loyalty, authority, and purity in addition to that explanation, include scores between 1 and 10 for the occurence of each moral foundation of care, fairness, loyalty, authority, and purity in the text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Text:' +
+              'Give me scores between 1 and 100 for the occurrence of each moral foundation of care, fairness, loyalty, authority, and purity in the text, formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
               instance.overallSummaryOutput +
               ".",
             temperature: 0,
@@ -616,8 +620,13 @@ export default {
               instance.msg = instance.urlToScrape;
               const rawResultA = result.data.choices[0].text;
               console.log(rawResultA);
-              const justTheTextA = rawResultA.substring(rawResultA.indexOf("}") + 1);
-              const justTheJSONA = rawResultA.substring(0, rawResultA.indexOf("}")+1);
+              const justTheTextA = rawResultA.substring(
+                rawResultA.indexOf("}") + 1
+              );
+              const justTheJSONA = rawResultA.substring(
+                0,
+                rawResultA.indexOf("}") + 1
+              );
               console.log(justTheTextA + " : " + justTheJSONA);
               const moralResultsA = JSON.parse(justTheJSONA);
               const overallCare = moralResultsA.care;
@@ -625,7 +634,7 @@ export default {
               const overallLoyalty = moralResultsA.loyalty;
               const overallAuthority = moralResultsA.authority;
               const overallPurity = moralResultsA.purity;
-              instance.overallOutputExplanation = justTheTextA
+              instance.overallOutputExplanation = justTheTextA;
               //const moralFoundationResults3 = justTheTextA;
               // justTheTextA.text.replaceAll('"', "");
               // 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
@@ -665,8 +674,6 @@ export default {
                 '"' +
                 "},";
               div.appendChild(p);
-              
-              
 
               var data = [
                 {
@@ -814,6 +821,7 @@ export default {
       var p = document.createElement("div");
       p.innerHTML = middleWorkingJSON;
       div.appendChild(p);
+      this.showPrint = false;
     },
 
     getReadabilityStats: function () {
