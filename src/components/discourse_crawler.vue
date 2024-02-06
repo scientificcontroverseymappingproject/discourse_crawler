@@ -14,14 +14,18 @@
     <section v-if="!showProcess2" id="overalExplanation">
       {{ overallOutputExplanation }} {{ overallSummaryOutput }}
     </section>
-   <br> 
+    <section v-if="showPrompt">
+    <hr class="quantLine">
+    <h2 id="quant">Quantitative Module</h2>
+   Priming Text<br>
    <textarea rows="4" cols="50"
       id="promptInput"
       type="text"
       v-model="promptInput"
       v-if="showPrompt"
-      placeholder="Perform sentiment analysis on the following text, outputting scores between 1 and 100 for"/><br/>
+      placeholder="Analyze the following text, outputting scores between 1 and 10 for "/><br/>
       
+      Variables<br>
       <input
       v-if="showPrompt"
       id="variableOneInput"
@@ -62,11 +66,19 @@
       id="variableSixInput"
       type="input"
       v-model="variableSix"
-      placeholder="Variable Six"/><br>
-    
-    <button v-if="showPrompt" id="promptButton" @click="registerAPI">Set Prompt Parameters</button>
-    
-    <br /><br /><br />
+      placeholder="Variable Six"/><br><br>
+      
+    <hr class="quantLine">
+	<h2 id="qual">Qualitative Module</h2>
+	Prompt<br>
+   <textarea rows="4" cols="50"
+      id="promptInput"
+      type="text"
+      v-model="promptInput2"
+      v-if="showPrompt"
+      placeholder="Analyze the following text, outputting scores between 1 and 10 for "/><br/><br>
+    <hr class="quantLine"><br>
+    URL to Crawl<br>
     <input
       v-if="showProcess"
       id="URLInput"
@@ -77,6 +89,7 @@
     <button v-if="showProcess" id="startButton" @click="grabPage">
       Crawl Website
     </button>
+    </section>
     <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
       Save Results as PDF
     </button>
@@ -138,7 +151,8 @@ export default {
       JSON4: null,
       moralFoundationAnalysis: "",
       apiKEY: process.env.VUE_APP_ROOT_API,
-      promptInput: 'Analyze the following text, outputting scores between 1 and 10 for ', 
+      promptInput: 'Analyze the following text, outputting scores between 1 and 10 for ',
+      promptInput2: 'Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. Text:', 
       variableOne: 'anger',
       variableTwo: 'fear',
       variableThree: 'happiness',
@@ -155,14 +169,17 @@ export default {
   created: function () {},
 
   methods: {
-    registerAPI: function () {
+    registerVariables: function () {
       this.showPrompt = false;
-      if (this.variableOne == "") {
-		alert("Please enter at least one variable.")
+      if (this.variableOne == "" || this.promptInput2 == "") {
+		alert("Please fill out the prompt parameters fully.")
       }
     },
 
     grabPage: function () {
+    this.registerVariables()
+    this.msg = "Initializing"
+    this.msg2 = ""
       this.showProcess = false;
       let img = document.createElement("img");
       img.src =
@@ -486,7 +503,7 @@ export default {
           client
             .post("https://api.openai.com/v1/completions", params)
             .then((result) => {
-              instance.msg = "Analyzing emotion of";
+              instance.msg = "Running quantitative prompt on:";
               instance.msg2 = usableURL;
               const rawResult = result.data.choices[0].text;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
@@ -590,8 +607,7 @@ export default {
             model: "gpt-3.5-turbo-instruct",
             prompt:
               "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. Text:" +
-              usableText2 +
-              ".",
+              usableText2,
             temperature: 0,
             max_tokens: 275,
             top_p: 1,
@@ -602,7 +618,7 @@ export default {
           client
             .post("https://api.openai.com/v1/completions", params)
             .then((result) => {
-              instance.msg = "Analyzing moral foundations of";
+              instance.msg = "Running qualitative prompt on:";
               instance.msg2 = usableURL2;
               console.log(result.data.choices[0].text);
               const moralFoundationResults =
@@ -686,6 +702,8 @@ export default {
     renderVisuals: function () {
       document.getElementById("visuals").style.display = "block";
       document.getElementById("thinkingIMG").remove();
+      this.msg = ""
+      this.msg2 = ""
 
       let img = document.createElement("img");
       img.src = "https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif";
@@ -779,11 +797,10 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
-              instance.overallSummaryOutput +
-              ".",
+              'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores in no more than three sentences. Text:' +
+              instance.overallSummaryOutput,
             temperature: 0,
-            max_tokens: 850,
+            max_tokens: 250,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -1163,7 +1180,7 @@ export default {
 }
 
 #variableOneInput {
-  width: 50%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: #ff0022;
@@ -1172,7 +1189,7 @@ export default {
 }
 
 #variableTwoInput {
-  width: 50%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: #ffbc42;
@@ -1181,7 +1198,7 @@ export default {
 }
 
 #variableThreeInput {
-  width: 50%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: #0496ff;
@@ -1190,7 +1207,7 @@ export default {
 }
 
 #variableFourInput {
-  width: 50%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: #694d75;
@@ -1199,7 +1216,7 @@ export default {
 }
 
 #variableFiveInput {
-  width: 50%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: #1b5299;
@@ -1208,7 +1225,7 @@ export default {
 }
 
 #variableSixInput {
-  width: 50%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: #40434e;
@@ -1223,6 +1240,18 @@ export default {
   color: #252627;
   border: none;
   white-space: normal; 
+}
+
+#quant {
+color: hotpink; 
+}
+
+#quant, #qual {
+color: orange; 
+}
+
+.quantLine {
+width: 50%; 
 }
 .input-element{
 font-size: 100px; 
@@ -1241,9 +1270,12 @@ width: 400px;
 
 #promptButton {
   background: #2f4858;
-  font-size: 20px;
+  font-size: 30px;
   color: white;
   border: none;
+}
+#promptButton:hover {
+background-color: purple; 
 }
 
 #apiButton:hover {
