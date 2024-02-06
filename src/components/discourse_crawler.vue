@@ -9,7 +9,7 @@
     </p>
     <p id="results">
       <span id="overallMoralFoundations"></span
-      ><span id="overallEmotions"></span>
+      ><span id="overallVariables"></span>
     </p>
     <section v-if="!showProcess2" id="overalExplanation">
       {{ overallOutputExplanation }} {{ overallSummaryOutput }}
@@ -131,12 +131,12 @@ export default {
       msg3: "",
       urlToScrape: "https://www.milesccoleman.com/test/",
       pageText: "",
-      anger: 0,
-      fear: 0,
-      surprise: 0,
-      disgust: 0,
-      sadness: 0,
-      happiness: 0,
+      one: 0,
+      two: 0,
+      three: 0,
+      four: 0,
+      five: 0,
+      six: 0,
       readability: 0,
       loading: true,
       showProcess: true,
@@ -511,12 +511,12 @@ export default {
               console.log(i2 + ": " + justTheJSON);
 
               const emotionResults = JSON.parse(justTheJSON);
-              instance.anger = emotionResults.anger;
-              instance.fear = emotionResults.fear;
-              instance.surprise = emotionResults.surprise;
-              instance.disgust = emotionResults.disgust;
-              instance.sadness = emotionResults.sadness;
-              instance.happiness = emotionResults.happiness;
+              instance.one = emotionResults[instance.variableOne];
+              instance.two = emotionResults[instance.variableTwo];
+              instance.three = emotionResults[instance.variableThree];
+              instance.four = emotionResults[instance.variableFour];
+              instance.five = emotionResults[instance.variableFive];
+              instance.six = emotionResults[instance.variableSix];
 
               var div = document.getElementById("specificAnalysis2");
               var p = document.createElement("div");
@@ -536,23 +536,23 @@ export default {
                 usableText +
                 '"' +
                 "," +
-                '"anger":' +
-                instance.anger +
+                '"' + instance.variableOne + '":' +
+                instance.one +
                 "," +
-                '"fear":' +
-                instance.fear +
+                '"' + instance.variableTwo + '":' +
+                instance.two +
                 "," +
-                '"surprise":' +
-                instance.surprise +
+                '"' + instance.variableThree + '":' +
+                instance.three +
                 "," +
-                '"disgust":' +
-                instance.disgust +
+                '"' + instance.variableFour + '":' +
+                instance.four +
                 "," +
-                '"sadness":' +
-                instance.sadness +
+                '"' + instance.variableFive + '":' +
+                instance.five +
                 "," +
-                '"happiness":' +
-                instance.happiness +
+                '"' + instance.variableSix + '":' +
+                instance.six +
                 "},";
               div.appendChild(p);
             })
@@ -589,12 +589,12 @@ export default {
 
           const usableURL2 = workingJSON2[i3].url;
           const counterTicker3 = i3;
-          const angry = workingJSON2[i3].anger;
-          const happy = workingJSON2[i3].happiness;
-          const disgusted = workingJSON2[i3].disgust;
-          const fearful = workingJSON2[i3].fear;
-          const surprised = workingJSON2[i3].surprise;
-          const sad = workingJSON2[i3].sadness;
+          const uno = workingJSON2[i3][instance.variableOne];
+          const dos = workingJSON2[i3][instance.variableTwo];
+          const tres = workingJSON2[i3][instance.variableThree];
+          const quatro = workingJSON2[i3][instance.variableFour];
+          const cinco = workingJSON2[i3][instance.variableFive];
+          const seis = workingJSON2[i3][instance.variableSix];
           const usableText2 = workingJSON2[i3].text;
           const pageType2 = "subPage";
           const client = axios.create({
@@ -649,23 +649,23 @@ export default {
                 instance.moralFoundationAnalysis +
                 '"' +
                 "," +
-                '"anger":' +
-                angry +
+                '"' + instance.variableOne + '":' +
+                uno +
                 "," +
-                '"fear":' +
-                fearful +
+                '"' + instance.variableTwo + '":' +
+                dos +
                 "," +
-                '"surprise":' +
-                surprised +
+                '"' + instance.variableThree + '":' +
+                tres +
                 "," +
-                '"disgust":' +
-                disgusted +
+                '"' + instance.variableFour + '":' +
+                quatro +
                 "," +
-                '"sadness":' +
-                sad +
+                '"' + instance.variableFive + '":' +
+                cinco +
                 "," +
-                '"happiness":' +
-                happy +
+                '"' + instance.variableSix + '":' +
+                seis +
                 "},";
               div.appendChild(p);
             })
@@ -720,12 +720,12 @@ export default {
           len = this.JSON4.length;
         for (i = 0; i < len; i++) {
           const usableURL = this.JSON4[i].url;
-          const angry = this.JSON4[i].anger;
-          const happy = this.JSON4[i].happiness;
-          const disgusted = this.JSON4[i].disgust;
-          const fearful = this.JSON4[i].fear;
-          const surprised = this.JSON4[i].surprise;
-          const sad = this.JSON4[i].sadness;
+          const uno = this.JSON4[i][this.variableOne];
+          const dos = this.JSON4[i][this.variableTwo];
+          const tres = this.JSON4[i][this.variableThree];
+          const quatro = this.JSON4[i][this.variableFour];
+          const cinco = this.JSON4[i][this.variableFive];
+          const seis = this.JSON4[i][this.variableSix];
           const moralAnalysis = this.JSON4[i].moralFoundation;
 
           var div = document.getElementById("visuals");
@@ -737,23 +737,23 @@ export default {
             "<h3>Moral Foundations Analysis: </h3>" +
             moralAnalysis +
             "<h3>Emotional Analysis: </h3><ul>" +
-            "<li> Anger: " +
-            angry +
+            "<li>" + this.variableOne + ": " +
+            uno +
             "</li>" +
-            "<li> Fear: " +
-            fearful +
+            "<li>" + this.variableTwo + ": " +
+            dos +
             "</li>" +
-            "<li> Surprise: " +
-            surprised +
+            "<li>" + this.variableThree + ": " +
+            tres +
             "</li>" +
-            "<li> Disgust: " +
-            disgusted +
+            "<li>" + this.variableFour + ": " +
+            quatro +
             "</li>" +
-            "<li> Sadness: " +
-            sad +
+           "<li>" + this.variableFive + ": " +
+            cinco +
             "</li>" +
-            "<li> Happiness: " +
-            happy +
+            "<li>" + this.variableSix + ": " +
+            seis +
             "</li>" +
             "</ul>";
           div.appendChild(p);
@@ -930,48 +930,48 @@ export default {
       //this.JSON4 = JSON.parse(workingJSON);
       var workingJSONB = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSONB);
-      let overallAnger = 0;
-      let overallFear = 0;
-      let overallHappiness = 0;
-      let overallSurprise = 0;
-      let overallSadness = 0;
-      let overallDisgust = 0;
+      let overallOne = 0;
+      let overallTwo = 0;
+      let overallThree = 0;
+      let overallFour = 0;
+      let overallFive = 0;
+      let overallSix = 0;
       console.log(test.length);
       const instance = this;
       const e = test.length;
       for (var i = 0; i < e; i++) {
-        overallAnger = overallAnger + test[i].anger;
-        overallFear = overallFear + test[i].fear;
-        overallHappiness = overallHappiness + test[i].happiness;
-        overallSurprise = overallSurprise + test[i].surprise;
-        overallSadness = overallSadness + test[i].sadness;
-        overallDisgust = overallDisgust + test[i].disgust;
+        overallOne = overallOne + test[i][instance.variableOne];
+        overallTwo = overallTwo + test[i][instance.variableTwo];
+        overallThree = overallThree + test[i][instance.variableThree]
+        overallFour = overallFour + test[i][instance.variableFour];
+        overallFive = overallFive + test[i][instance.variableFive];
+        overallSix = overallSix + test[i][instance.variableSix];
         if (i === e - 1) {
-          overallAnger = Math.round(overallAnger / e) * 10;
-          overallFear = Math.round(overallFear / e) * 10;
-          overallHappiness = Math.round(overallHappiness / e) * 10;
-          overallSurprise = Math.round(overallSurprise / e) * 10;
-          overallSadness = Math.round(overallSadness / e) * 10;
-          overallDisgust = Math.round(overallDisgust / e) * 10;
+          overallOne = Math.round(overallOne / e) * 10;
+          overallTwo = Math.round(overallTwo / e) * 10;
+          overallThree = Math.round(overallThree / e) * 10;
+          overallFour = Math.round(overallFour / e) * 10;
+          overallFive = Math.round(overallFive / e) * 10;
+          overallSix = Math.round(overallSix / e) * 10;
 
           var data = [
             {
               type: "pie",
               values: [
-                overallAnger,
-                overallFear,
-                overallHappiness,
-                overallSurprise,
-                overallSadness,
-                overallDisgust,
+                overallOne,
+                overallTwo,
+                overallThree,
+                overallFour,
+                overallFive,
+                overallSix,
               ],
               labels: [
-                "Anger",
-                "Fear",
-                "Happiness",
-                "Surprise",
-                "Sadness",
-                "Disgust",
+				instance.variableOne  ,
+				instance.variableTwo  ,
+				instance.variableThree  ,
+				instance.variableFour  ,
+				instance.variableFive  ,
+				instance.variableSix  ,
               ],
               textinfo: "label+percent",
               textposition: "outside",
@@ -993,7 +993,7 @@ export default {
             width: 450,
             showlegend: false,
             paper_bgcolor: "#2b2d42",
-            title: "Emotions",
+            title: "Variables",
             font: {
               family: "Arial, monospace",
               size: 25,
@@ -1008,7 +1008,7 @@ export default {
             },
           };
           var config = { responsive: true };
-          Plotly.newPlot("overallEmotions", data, layout, config);
+          Plotly.newPlot("overallVariables", data, layout, config);
 
           setTimeout(() => {
             console.log("Delayed for 1 second.");
@@ -1147,7 +1147,7 @@ export default {
   display: inline-block;
 }
 
-#overallEmotions {
+#overallVariables {
   display: inline-block;
 }
 
