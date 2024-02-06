@@ -14,27 +14,65 @@
     <section v-if="!showProcess2" id="overalExplanation">
       {{ overallOutputExplanation }} {{ overallSummaryOutput }}
     </section>
-    <input
-      id="APIinput"
+   <br> 
+   <textarea rows="4" cols="50"
+      id="promptInput"
       type="text"
-      v-model="apiKEY"
-      v-if="showAPI"
-      placeholder="Enter OpenAI API Key"
-    /><br /><span v-if="showAPI"
-      >Set up an OpenAI account and get an API key
-      <a href="https://openai.com/product">here</a>.</span
-    >
-    <br /><button v-if="showAPI" id="apiButton" @click="registerAPI">
-      Set API Key
-    </button>
+      v-model="promptInput"
+      v-if="showPrompt"
+      placeholder="Perform sentiment analysis on the following text, outputting scores between 1 and 100 for"/><br/>
+      
+      <input
+      v-if="showPrompt"
+      id="variableOneInput"
+      type="input"
+      v-model="variableOne"
+      placeholder="Variable One"/><br>
+      
+      <input
+      v-if="showPrompt"
+      id="variableTwoInput"
+      type="input"
+      v-model="variableTwo"
+      placeholder="Variable Two"/><br>
+      
+      <input
+      v-if="showPrompt"
+      id="variableThreeInput"
+      type="input"
+      v-model="variableThree"
+      placeholder="Variable Three"/><br>
+      
+      <input
+      v-if="showPrompt"
+      id="variableFourInput"
+      type="input"
+      v-model="variableFour"
+      placeholder="Variable Four"/><br>
+      
+      <input
+      v-if="showPrompt"
+      id="variableFiveInput"
+      type="input"
+      v-model="variableFive"
+      placeholder="Variable Five"/><br>
+      
+      <input
+      v-if="showPrompt"
+      id="variableSixInput"
+      type="input"
+      v-model="variableSix"
+      placeholder="Variable Six"/><br>
+    
+    <button v-if="showPrompt" id="promptButton" @click="registerAPI">Set Prompt Parameters</button>
+    
     <br /><br /><br />
     <input
       v-if="showProcess"
       id="URLInput"
       type="input"
       v-model="urlToScrape"
-      placeholder="Enter URL to Crawl"
-    />
+      placeholder="Enter URL to Crawl"/>
     <p></p>
     <button v-if="showProcess" id="startButton" @click="grabPage">
       Crawl Website
@@ -67,7 +105,9 @@ import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 import Plotly from "plotly.js-dist";
+import dotenv from "dotenv"
 //import OpenAI from "openai";
+dotenv.config();
 export default {
   name: "discourse_crawler",
   props: {},
@@ -76,7 +116,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
-      urlToScrape: "",
+      urlToScrape: "https://www.milesccoleman.com/test/",
       pageText: "",
       anger: 0,
       fear: 0,
@@ -89,7 +129,7 @@ export default {
       showProcess: true,
       showProcess2: true,
       showProcess3: true,
-      showAPI: true,
+      showPrompt: true,
       anchorsForCrawl: [],
       secondIteration: false,
       JSON1: null,
@@ -97,7 +137,14 @@ export default {
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: "",
+      apiKEY: process.env.VUE_APP_ROOT_API,
+      promptInput: 'Analyze the following text, outputting scores between 1 and 10 for ', 
+      variableOne: 'anger',
+      variableTwo: 'fear',
+      variableThree: 'happiness',
+      variableFour: 'surprise',
+      variableFive: 'sadness',
+      variableSix: 'disgust', 
       unique: [],
       overallSummaryOutput: "",
       overallOutputExplanation: "",
@@ -109,7 +156,10 @@ export default {
 
   methods: {
     registerAPI: function () {
-      this.showAPI = false;
+      this.showPrompt = false;
+      if (this.variableOne == "") {
+		alert("Please enter at least one variable.")
+      }
     },
 
     grabPage: function () {
@@ -138,22 +188,27 @@ export default {
           let htmlWithoutScripts = workingHTML
             .querySelector("body")
             .innerText.trim();
-
+            
           if (this.secondIteration == false) {
             var anchors = [],
               l = html.links;
+              anchors.push(this.urlToScrape)
             const tickerA = html.links.length;
             for (var i = 0; i < l.length; i++) {
               const counterTickerA = i;
               if (html.links[i].href.includes(this.urlToScrape)) {
                 anchors.push(l[i].href);
               }
+              
+              if (html.links[i].href.includes(window.location.origin)) {
+				const htmlConstructor = this.urlToScrape + html.links[i].href.replace(window.location.origin, '')
+				anchors.push(htmlConstructor);
+              }
               if (counterTickerA === tickerA - 1) {
                 this.pageText = htmlWithoutScripts;
                 this.anchorsForCrawl = anchors.filter(function (item, pos) {
                   return anchors.indexOf(item) == pos;
                 });
-                console.log(this.anchorsForCrawl);
 
                 setTimeout(() => {
                   console.log("Delayed for 2 seconds.");
@@ -170,8 +225,8 @@ export default {
     },
 
     grabSubpages: function () {
-      let i,
-        len = this.anchorsForCrawl.length;
+      let i, len = this.anchorsForCrawl.length;
+      console.log(this.anchorsForCrawl);
       const ticker = this.anchorsForCrawl.length;
       const workingAnchorsArray = this.anchorsForCrawl;
       const instance = this;
@@ -182,6 +237,7 @@ export default {
       function fire(i) {
         setTimeout(function () {
           const usableURL = workingAnchorsArray[i];
+          console.log(usableURL)
           const counterTicker = i;
 
           var url =
@@ -206,11 +262,25 @@ export default {
 
               instance.msg = "Crawling";
               instance.msg2 = workingAnchorsArray[i];
-
+				var actualText = ""
+				const workingActualText = htmlWithoutScripts
+				const workingActualText2 = workingActualText.replace(/"/g, " ");
+                const actualText2 = workingActualText2.replace(/'/g, " ");
+				
               if (htmlWithoutScripts.length <= 1999) {
-                const workingActualText = htmlWithoutScripts.substring(100, 0);
-                const workingActualText2 = workingActualText.replace(/"/g, " ");
-                const actualText = workingActualText2.replace(/'/g, " ");
+               
+                
+                
+                if (actualText2.endsWith('.')) {
+                actualText = actualText2
+                console.log("period")
+                }
+                
+                if (!actualText2.endsWith('.')) {
+                actualText = actualText2 + '.'
+                console.log("no period")
+                }
+                
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
@@ -225,16 +295,19 @@ export default {
                   '"' +
                   "},";
                 div.appendChild(p);
-              } else {
-                const workingActualText = htmlWithoutScripts.substring(
-                  100,
-                  2000
-                );
-                const workingActualText2 = workingActualText.replaceAll(
-                  '"',
-                  " "
-                );
-                const actualText = workingActualText2.replaceAll("'", " ");
+              } if (htmlWithoutScripts.length >= 1999) {
+
+
+				if (actualText2.endsWith('.')) {
+					actualText = actualText2.substring(1999, 0)
+					console.log("period")
+				}
+
+				if (!actualText2.endsWith('.')) {
+					actualText = actualText2.substring(1999, 0) + '.'
+					console.log("no period")
+				}
+                
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
                 p2.innerHTML =
@@ -273,6 +346,75 @@ export default {
         len2 = workingJSON1.length;
       const ticker2 = workingJSON1.length;
       const instance = this;
+      
+			var commaOne = ''
+			var commaTwo = ''
+			var commaThree = ''
+			var commaFour = ''
+			var commaFive = ''
+			var jsonOne = ''
+
+
+			//all six variables
+			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour != '' && instance.variableFive != '' && instance.variableSix!= ''){
+			commaOne = ', '
+			commaTwo = ', '
+			commaThree = ', '
+			commaFour = ', '
+			commaFive = ', and '
+			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score,' + '"' + instance.variableFour + '": number score,' + '"' + instance.variableFive + '": number score,' + '"' + instance.variableSix + '": number score} '
+			}
+
+			//five variables
+			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour != '' && instance.variableFive != '' && instance.variableSix == ''){
+			commaOne = ', '
+			commaTwo = ', '
+			commaThree = ', '
+			commaFour = ', and '
+			commaFive = ''
+			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score,' + '"' + instance.variableFour + '": number score,' + '"' + instance.variableFive + '": number score} '
+			}
+
+			//four variables
+			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour != '' && instance.variableFive == '' && instance.variableSix == ''){
+			commaOne = ', '
+			commaTwo = ', '
+			commaThree = ', and '
+			commaFour = ''
+			commaFive = ''
+			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score,' + '"' + instance.variableFour + '": number score} '
+			}
+
+			//three variables
+			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour == '' && instance.variableFive == '' && instance.variableSix == ''){
+			commaOne = ', '
+			commaTwo = ', and '
+			commaThree = ''
+			commaFour = ''
+			commaFive = ''
+			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score} '
+			}
+
+			//two variables
+			if (instance.variableTwo != '' && instance.variableThree == '' && instance.variableFour == '' && instance.variableFive == '' && instance.variableSix == ''){
+			commaOne = ' and '
+			commaTwo = ''
+			commaThree = ''
+			commaFour = ''
+			commaFive = ''
+			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score} '
+			}
+
+			//one variable
+			if (instance.variableTwo == '' && instance.variableThree == '' && instance.variableFour == '' && instance.variableFive == '' && instance.variableSix == ''){
+			commaOne = ''
+			commaTwo = ''
+			commaThree = ''
+			commaFour = ''
+			commaFive = ''
+			jsonOne = '{"' + instance.variableOne + '": number score}'
+			}
+
 
       for (i2 = 0; i2 < len2; i2++) {
         fire(i2);
@@ -290,6 +432,25 @@ export default {
           const counterTicker2 = i2;
           const usableText = workingJSON1[i2].text;
 
+
+          
+          console.log(instance.promptInput 
+				+ instance.variableOne 
+				+ commaOne 
+				+ instance.variableTwo 
+				+ commaTwo
+				+ instance.variableThree
+				+ commaThree
+				+ instance.variableFour
+				+ commaFour 
+				+ instance.variableFive
+				+ commaFive
+				+ instance.variableSix
+				+ ', returning the response in JSON only. Format as '
+				+ jsonOne
+				+ usableText)
+          
+
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -299,9 +460,22 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Perform sentiment analysis on the following text, outputting scores between 1 and 10 for anger, fear, happiness, surprise, sadness, and disgust, returning the response in JSON only. Format as {"anger": number score,"fear": number score,"happiness": number score,"surprise": number score,"sadness": number score,"disgust": number score}. ' +
-              usableText +
-              ".",
+              instance.promptInput 
+				+ instance.variableOne 
+				+ commaOne 
+				+ instance.variableTwo 
+				+ commaTwo
+				+ instance.variableThree
+				+ commaThree
+				+ instance.variableFour
+				+ commaFour 
+				+ instance.variableFive
+				+ commaFive
+				+ instance.variableSix
+				+ ', returning the response in JSON only. Format as'
+				+ jsonOne
+				+ '.'
+				+ usableText,
             temperature: 0,
             max_tokens: 256,
             top_p: 1,
@@ -572,6 +746,7 @@ export default {
               document.getElementById("thinkingIMG2").remove();
               this.msg = "Analysis Complete";
               this.msg2 = "";
+              this.renderOverallEmotion()
               this.getOverallMoralFoundationScores();
             }, 4000);
           }
@@ -987,13 +1162,71 @@ export default {
   border: none;
 }
 
-#APIinput {
+#variableOneInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #ff0022;
+  color: #252627;
+  border: none;
+}
+
+#variableTwoInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #ffbc42;
+  color: #252627;
+  border: none;
+}
+
+#variableThreeInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #0496ff;
+  color: #252627;
+  border: none;
+}
+
+#variableFourInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #694d75;
+  color: #252627;
+  border: none;
+}
+
+#variableFiveInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #1b5299;
+  color: #252627;
+  border: none;
+}
+
+#variableSixInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: #40434e;
+  color: #252627;
+  border: none;
+}
+
+#promptInput {
   width: 50%;
   font-size: 20px;
-  text-align: center;
   background-color: hotpink;
   color: #252627;
   border: none;
+  white-space: normal; 
+}
+.input-element{
+font-size: 100px; 
+width: 400px;
 }
 #startButton {
   background: #2f4858;
@@ -1006,7 +1239,7 @@ export default {
   background: purple;
 }
 
-#apiButton {
+#promptButton {
   background: #2f4858;
   font-size: 20px;
   color: white;
