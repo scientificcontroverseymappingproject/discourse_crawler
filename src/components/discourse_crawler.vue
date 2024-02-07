@@ -15,80 +15,94 @@
       {{ overallOutputExplanation }} {{ overallSummaryOutput }}
     </section>
     <section v-if="showPrompt">
-    <hr class="quantLine">
-    <h2 id="quant">Quantitative Module</h2>
-   Priming Text<br>
-   <textarea rows="4" cols="50"
-      id="promptInput"
-      type="text"
-      v-model="promptInput"
-      v-if="showPrompt"
-      placeholder="Analyze the following text, outputting scores between 1 and 10 for "/><br/>
-      
-      Variables<br>
+      <hr class="quantLine" />
+      <h2 id="quant">Quantitative Module</h2>
+      Priming Text<br />
+      <textarea
+        rows="4"
+        cols="50"
+        id="promptInput"
+        type="text"
+        v-model="promptInput"
+        v-if="showPrompt"
+        placeholder="Analyze the following text, outputting scores between 1 and 10 for "
+      /><br />
+
+      Variables<br />
       <input
-      v-if="showPrompt"
-      id="variableOneInput"
-      type="input"
-      v-model="variableOne"
-      placeholder="Variable One"/><br>
-      
+        v-if="showPrompt"
+        id="variableOneInput"
+        type="input"
+        v-model="variableOne"
+        placeholder="Variable One"
+      /><br />
+
       <input
-      v-if="showPrompt"
-      id="variableTwoInput"
-      type="input"
-      v-model="variableTwo"
-      placeholder="Variable Two"/><br>
-      
+        v-if="showPrompt"
+        id="variableTwoInput"
+        type="input"
+        v-model="variableTwo"
+        placeholder="Variable Two"
+      /><br />
+
       <input
-      v-if="showPrompt"
-      id="variableThreeInput"
-      type="input"
-      v-model="variableThree"
-      placeholder="Variable Three"/><br>
-      
+        v-if="showPrompt"
+        id="variableThreeInput"
+        type="input"
+        v-model="variableThree"
+        placeholder="Variable Three"
+      /><br />
+
       <input
-      v-if="showPrompt"
-      id="variableFourInput"
-      type="input"
-      v-model="variableFour"
-      placeholder="Variable Four"/><br>
-      
+        v-if="showPrompt"
+        id="variableFourInput"
+        type="input"
+        v-model="variableFour"
+        placeholder="Variable Four"
+      /><br />
+
       <input
-      v-if="showPrompt"
-      id="variableFiveInput"
-      type="input"
-      v-model="variableFive"
-      placeholder="Variable Five"/><br>
-      
+        v-if="showPrompt"
+        id="variableFiveInput"
+        type="input"
+        v-model="variableFive"
+        placeholder="Variable Five"
+      /><br />
+
       <input
-      v-if="showPrompt"
-      id="variableSixInput"
-      type="input"
-      v-model="variableSix"
-      placeholder="Variable Six"/><br><br>
-      
-    <hr class="quantLine">
-	<h2 id="qual">Qualitative Module</h2>
-	Prompt<br>
-   <textarea rows="4" cols="50"
-      id="promptInput"
-      type="text"
-      v-model="promptInput2"
-      v-if="showPrompt"
-      placeholder="Analyze the following text, outputting scores between 1 and 10 for "/><br/><br>
-    <hr class="quantLine"><br>
-    URL to Crawl<br>
-    <input
-      v-if="showProcess"
-      id="URLInput"
-      type="input"
-      v-model="urlToScrape"
-      placeholder="Enter URL to Crawl"/>
-    <p></p>
-    <button v-if="showProcess" id="startButton" @click="grabPage">
-      Crawl Website
-    </button>
+        v-if="showPrompt"
+        id="variableSixInput"
+        type="input"
+        v-model="variableSix"
+        placeholder="Variable Six"
+      /><br /><br />
+
+      <hr class="quantLine" />
+      <h2 id="qual">Qualitative Module</h2>
+      Prompt<br />
+      <textarea
+        rows="4"
+        cols="50"
+        id="promptInput"
+        type="text"
+        v-model="promptInput2"
+        v-if="showPrompt"
+        placeholder="Analyze the following text, outputting scores between 1 and 10 for "
+      /><br /><br />
+      <hr class="quantLine" />
+      <br />
+      URL to Crawl<br />
+      <input
+        v-if="showProcess"
+        id="URLInput"
+        type="input"
+        v-model="urlToScrape"
+        placeholder="Enter URL to Crawl"
+      />
+      <p></p>
+      <button v-if="showProcess" id="startButton" @click="grabPage">
+        Crawl Website
+      </button>
     </section>
     <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
       Save Results as PDF
@@ -118,7 +132,7 @@ import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 import Plotly from "plotly.js-dist";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 //import OpenAI from "openai";
 dotenv.config();
 export default {
@@ -151,14 +165,16 @@ export default {
       JSON4: null,
       moralFoundationAnalysis: "",
       apiKEY: process.env.VUE_APP_ROOT_API,
-      promptInput: 'Analyze the following text, outputting scores between 1 and 10 for ',
-      promptInput2: 'Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. Text:', 
-      variableOne: 'anger',
-      variableTwo: 'fear',
-      variableThree: 'happiness',
-      variableFour: 'surprise',
-      variableFive: 'sadness',
-      variableSix: 'disgust', 
+      promptInput:
+        "Analyze the following text, outputting scores between 1 and 10 for ",
+      promptInput2:
+        "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include explnation. Text: ",
+      variableOne: "anger",
+      variableTwo: "fear",
+      variableThree: "happiness",
+      variableFour: "surprise",
+      variableFive: "sadness",
+      variableSix: "disgust",
       unique: [],
       overallSummaryOutput: "",
       overallOutputExplanation: "",
@@ -172,14 +188,14 @@ export default {
     registerVariables: function () {
       this.showPrompt = false;
       if (this.variableOne == "" || this.promptInput2 == "") {
-		alert("Please fill out the prompt parameters fully.")
+        alert("Please fill out the prompt parameters fully.");
       }
     },
 
     grabPage: function () {
-    this.registerVariables()
-    this.msg = "Initializing"
-    this.msg2 = ""
+      this.registerVariables();
+      this.msg = "Initializing";
+      this.msg2 = "";
       this.showProcess = false;
       let img = document.createElement("img");
       img.src =
@@ -205,21 +221,23 @@ export default {
           let htmlWithoutScripts = workingHTML
             .querySelector("body")
             .innerText.trim();
-            
+
           if (this.secondIteration == false) {
             var anchors = [],
               l = html.links;
-              anchors.push(this.urlToScrape)
+            anchors.push(this.urlToScrape);
             const tickerA = html.links.length;
             for (var i = 0; i < l.length; i++) {
               const counterTickerA = i;
               if (html.links[i].href.includes(this.urlToScrape)) {
                 anchors.push(l[i].href);
               }
-              
+
               if (html.links[i].href.includes(window.location.origin)) {
-				const htmlConstructor = this.urlToScrape + html.links[i].href.replace(window.location.origin, '')
-				anchors.push(htmlConstructor);
+                const htmlConstructor =
+                  this.urlToScrape +
+                  html.links[i].href.replace(window.location.origin, "");
+                anchors.push(htmlConstructor);
               }
               if (counterTickerA === tickerA - 1) {
                 this.pageText = htmlWithoutScripts;
@@ -242,7 +260,8 @@ export default {
     },
 
     grabSubpages: function () {
-      let i, len = this.anchorsForCrawl.length;
+      let i,
+        len = this.anchorsForCrawl.length;
       console.log(this.anchorsForCrawl);
       const ticker = this.anchorsForCrawl.length;
       const workingAnchorsArray = this.anchorsForCrawl;
@@ -254,7 +273,7 @@ export default {
       function fire(i) {
         setTimeout(function () {
           const usableURL = workingAnchorsArray[i];
-          console.log(usableURL)
+          console.log(usableURL);
           const counterTicker = i;
 
           var url =
@@ -279,25 +298,22 @@ export default {
 
               instance.msg = "Crawling";
               instance.msg2 = workingAnchorsArray[i];
-				var actualText = ""
-				const workingActualText = htmlWithoutScripts
-				const workingActualText2 = workingActualText.replace(/"/g, " ");
-                const actualText2 = workingActualText2.replace(/'/g, " ");
-				
+              var actualText = "";
+              const workingActualText = htmlWithoutScripts;
+              const workingActualText2 = workingActualText.replace(/"/g, " ");
+              const actualText2 = workingActualText2.replace(/'/g, " ");
+
               if (htmlWithoutScripts.length <= 1999) {
-               
-                
-                
-                if (actualText2.endsWith('.')) {
-                actualText = actualText2
-                console.log("period")
+                if (actualText2.endsWith(".")) {
+                  actualText = actualText2;
+                  console.log("period");
                 }
-                
-                if (!actualText2.endsWith('.')) {
-                actualText = actualText2 + '.'
-                console.log("no period")
+
+                if (!actualText2.endsWith(".")) {
+                  actualText = actualText2 + ".";
+                  console.log("no period");
                 }
-                
+
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
@@ -312,19 +328,18 @@ export default {
                   '"' +
                   "},";
                 div.appendChild(p);
-              } if (htmlWithoutScripts.length >= 1999) {
+              }
+              if (htmlWithoutScripts.length >= 1999) {
+                if (actualText2.endsWith(".")) {
+                  actualText = actualText2.substring(1999, 0);
+                  console.log("period");
+                }
 
+                if (!actualText2.endsWith(".")) {
+                  actualText = actualText2.substring(1999, 0) + ".";
+                  console.log("no period");
+                }
 
-				if (actualText2.endsWith('.')) {
-					actualText = actualText2.substring(1999, 0)
-					console.log("period")
-				}
-
-				if (!actualText2.endsWith('.')) {
-					actualText = actualText2.substring(1999, 0) + '.'
-					console.log("no period")
-				}
-                
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
                 p2.innerHTML =
@@ -363,75 +378,169 @@ export default {
         len2 = workingJSON1.length;
       const ticker2 = workingJSON1.length;
       const instance = this;
-      
-			var commaOne = ''
-			var commaTwo = ''
-			var commaThree = ''
-			var commaFour = ''
-			var commaFive = ''
-			var jsonOne = ''
 
+      var commaOne = "";
+      var commaTwo = "";
+      var commaThree = "";
+      var commaFour = "";
+      var commaFive = "";
+      var jsonOne = "";
 
-			//all six variables
-			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour != '' && instance.variableFive != '' && instance.variableSix!= ''){
-			commaOne = ', '
-			commaTwo = ', '
-			commaThree = ', '
-			commaFour = ', '
-			commaFive = ', and '
-			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score,' + '"' + instance.variableFour + '": number score,' + '"' + instance.variableFive + '": number score,' + '"' + instance.variableSix + '": number score} '
-			}
+      //all six variables
+      if (
+        instance.variableTwo != "" &&
+        instance.variableThree != "" &&
+        instance.variableFour != "" &&
+        instance.variableFive != "" &&
+        instance.variableSix != ""
+      ) {
+        commaOne = ", ";
+        commaTwo = ", ";
+        commaThree = ", ";
+        commaFour = ", ";
+        commaFive = ", and ";
+        jsonOne =
+          '{"' +
+          instance.variableOne +
+          '": number score,' +
+          '"' +
+          instance.variableTwo +
+          '": number score,' +
+          '"' +
+          instance.variableThree +
+          '": number score,' +
+          '"' +
+          instance.variableFour +
+          '": number score,' +
+          '"' +
+          instance.variableFive +
+          '": number score,' +
+          '"' +
+          instance.variableSix +
+          '": number score} ';
+      }
 
-			//five variables
-			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour != '' && instance.variableFive != '' && instance.variableSix == ''){
-			commaOne = ', '
-			commaTwo = ', '
-			commaThree = ', '
-			commaFour = ', and '
-			commaFive = ''
-			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score,' + '"' + instance.variableFour + '": number score,' + '"' + instance.variableFive + '": number score} '
-			}
+      //five variables
+      if (
+        instance.variableTwo != "" &&
+        instance.variableThree != "" &&
+        instance.variableFour != "" &&
+        instance.variableFive != "" &&
+        instance.variableSix == ""
+      ) {
+        commaOne = ", ";
+        commaTwo = ", ";
+        commaThree = ", ";
+        commaFour = ", and ";
+        commaFive = "";
+        jsonOne =
+          '{"' +
+          instance.variableOne +
+          '": number score,' +
+          '"' +
+          instance.variableTwo +
+          '": number score,' +
+          '"' +
+          instance.variableThree +
+          '": number score,' +
+          '"' +
+          instance.variableFour +
+          '": number score,' +
+          '"' +
+          instance.variableFive +
+          '": number score} ';
+      }
 
-			//four variables
-			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour != '' && instance.variableFive == '' && instance.variableSix == ''){
-			commaOne = ', '
-			commaTwo = ', '
-			commaThree = ', and '
-			commaFour = ''
-			commaFive = ''
-			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score,' + '"' + instance.variableFour + '": number score} '
-			}
+      //four variables
+      if (
+        instance.variableTwo != "" &&
+        instance.variableThree != "" &&
+        instance.variableFour != "" &&
+        instance.variableFive == "" &&
+        instance.variableSix == ""
+      ) {
+        commaOne = ", ";
+        commaTwo = ", ";
+        commaThree = ", and ";
+        commaFour = "";
+        commaFive = "";
+        jsonOne =
+          '{"' +
+          instance.variableOne +
+          '": number score,' +
+          '"' +
+          instance.variableTwo +
+          '": number score,' +
+          '"' +
+          instance.variableThree +
+          '": number score,' +
+          '"' +
+          instance.variableFour +
+          '": number score} ';
+      }
 
-			//three variables
-			if (instance.variableTwo != '' && instance.variableThree != '' && instance.variableFour == '' && instance.variableFive == '' && instance.variableSix == ''){
-			commaOne = ', '
-			commaTwo = ', and '
-			commaThree = ''
-			commaFour = ''
-			commaFive = ''
-			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score,' + '"' + instance.variableThree + '": number score} '
-			}
+      //three variables
+      if (
+        instance.variableTwo != "" &&
+        instance.variableThree != "" &&
+        instance.variableFour == "" &&
+        instance.variableFive == "" &&
+        instance.variableSix == ""
+      ) {
+        commaOne = ", ";
+        commaTwo = ", and ";
+        commaThree = "";
+        commaFour = "";
+        commaFive = "";
+        jsonOne =
+          '{"' +
+          instance.variableOne +
+          '": number score,' +
+          '"' +
+          instance.variableTwo +
+          '": number score,' +
+          '"' +
+          instance.variableThree +
+          '": number score} ';
+      }
 
-			//two variables
-			if (instance.variableTwo != '' && instance.variableThree == '' && instance.variableFour == '' && instance.variableFive == '' && instance.variableSix == ''){
-			commaOne = ' and '
-			commaTwo = ''
-			commaThree = ''
-			commaFour = ''
-			commaFive = ''
-			jsonOne = '{"' + instance.variableOne + '": number score,' + '"' + instance.variableTwo + '": number score} '
-			}
+      //two variables
+      if (
+        instance.variableTwo != "" &&
+        instance.variableThree == "" &&
+        instance.variableFour == "" &&
+        instance.variableFive == "" &&
+        instance.variableSix == ""
+      ) {
+        commaOne = " and ";
+        commaTwo = "";
+        commaThree = "";
+        commaFour = "";
+        commaFive = "";
+        jsonOne =
+          '{"' +
+          instance.variableOne +
+          '": number score,' +
+          '"' +
+          instance.variableTwo +
+          '": number score} ';
+      }
 
-			//one variable
-			if (instance.variableTwo == '' && instance.variableThree == '' && instance.variableFour == '' && instance.variableFive == '' && instance.variableSix == ''){
-			commaOne = ''
-			commaTwo = ''
-			commaThree = ''
-			commaFour = ''
-			commaFive = ''
-			jsonOne = '{"' + instance.variableOne + '": number score}'
-			}
-
+      //one variable
+      if (
+        instance.variableTwo == "" &&
+        instance.variableThree == "" &&
+        instance.variableFour == "" &&
+        instance.variableFive == "" &&
+        instance.variableSix == ""
+      ) {
+        commaOne = "";
+        commaTwo = "";
+        commaThree = "";
+        commaFour = "";
+        commaFive = "";
+        jsonOne = '{"' + instance.variableOne + '": number score}';
+      }
 
       for (i2 = 0; i2 < len2; i2++) {
         fire(i2);
@@ -449,24 +558,23 @@ export default {
           const counterTicker2 = i2;
           const usableText = workingJSON1[i2].text;
 
-
-          
-          console.log(instance.promptInput 
-				+ instance.variableOne 
-				+ commaOne 
-				+ instance.variableTwo 
-				+ commaTwo
-				+ instance.variableThree
-				+ commaThree
-				+ instance.variableFour
-				+ commaFour 
-				+ instance.variableFive
-				+ commaFive
-				+ instance.variableSix
-				+ ', returning the response in JSON only. Format as '
-				+ jsonOne
-				+ usableText)
-          
+          console.log(
+            instance.promptInput +
+              instance.variableOne +
+              commaOne +
+              instance.variableTwo +
+              commaTwo +
+              instance.variableThree +
+              commaThree +
+              instance.variableFour +
+              commaFour +
+              instance.variableFive +
+              commaFive +
+              instance.variableSix +
+              ", returning the response in JSON only. Format as " +
+              jsonOne +
+              usableText
+          );
 
           const client = axios.create({
             headers: {
@@ -477,22 +585,22 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              instance.promptInput 
-				+ instance.variableOne 
-				+ commaOne 
-				+ instance.variableTwo 
-				+ commaTwo
-				+ instance.variableThree
-				+ commaThree
-				+ instance.variableFour
-				+ commaFour 
-				+ instance.variableFive
-				+ commaFive
-				+ instance.variableSix
-				+ ', returning the response in JSON only. Format as'
-				+ jsonOne
-				+ '.'
-				+ usableText,
+              instance.promptInput +
+              instance.variableOne +
+              commaOne +
+              instance.variableTwo +
+              commaTwo +
+              instance.variableThree +
+              commaThree +
+              instance.variableFour +
+              commaFour +
+              instance.variableFive +
+              commaFive +
+              instance.variableSix +
+              ", returning the response in JSON only. Format as" +
+              jsonOne +
+              "." +
+              usableText,
             temperature: 0,
             max_tokens: 256,
             top_p: 1,
@@ -536,22 +644,34 @@ export default {
                 usableText +
                 '"' +
                 "," +
-                '"' + instance.variableOne + '":' +
+                '"' +
+                instance.variableOne +
+                '":' +
                 instance.one +
                 "," +
-                '"' + instance.variableTwo + '":' +
+                '"' +
+                instance.variableTwo +
+                '":' +
                 instance.two +
                 "," +
-                '"' + instance.variableThree + '":' +
+                '"' +
+                instance.variableThree +
+                '":' +
                 instance.three +
                 "," +
-                '"' + instance.variableFour + '":' +
+                '"' +
+                instance.variableFour +
+                '":' +
                 instance.four +
                 "," +
-                '"' + instance.variableFive + '":' +
+                '"' +
+                instance.variableFive +
+                '":' +
                 instance.five +
                 "," +
-                '"' + instance.variableSix + '":' +
+                '"' +
+                instance.variableSix +
+                '":' +
                 instance.six +
                 "},";
               div.appendChild(p);
@@ -605,9 +725,7 @@ export default {
 
           const params = {
             model: "gpt-3.5-turbo-instruct",
-            prompt:
-              "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. Text:" +
-              usableText2,
+            prompt: instance.promptInput2 + usableText2,
             temperature: 0,
             max_tokens: 275,
             top_p: 1,
@@ -644,27 +762,39 @@ export default {
                 usableText2 +
                 '"' +
                 "," +
-                '"moralFoundation":' +
+                '"qualResponse":' +
                 '"' +
                 instance.moralFoundationAnalysis +
                 '"' +
                 "," +
-                '"' + instance.variableOne + '":' +
+                '"' +
+                instance.variableOne +
+                '":' +
                 uno +
                 "," +
-                '"' + instance.variableTwo + '":' +
+                '"' +
+                instance.variableTwo +
+                '":' +
                 dos +
                 "," +
-                '"' + instance.variableThree + '":' +
+                '"' +
+                instance.variableThree +
+                '":' +
                 tres +
                 "," +
-                '"' + instance.variableFour + '":' +
+                '"' +
+                instance.variableFour +
+                '":' +
                 quatro +
                 "," +
-                '"' + instance.variableFive + '":' +
+                '"' +
+                instance.variableFive +
+                '":' +
                 cinco +
                 "," +
-                '"' + instance.variableSix + '":' +
+                '"' +
+                instance.variableSix +
+                '":' +
                 seis +
                 "},";
               div.appendChild(p);
@@ -702,8 +832,8 @@ export default {
     renderVisuals: function () {
       document.getElementById("visuals").style.display = "block";
       document.getElementById("thinkingIMG").remove();
-      this.msg = ""
-      this.msg2 = ""
+      this.msg = "";
+      this.msg2 = "";
 
       let img = document.createElement("img");
       img.src = "https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif";
@@ -726,7 +856,7 @@ export default {
           const quatro = this.JSON4[i][this.variableFour];
           const cinco = this.JSON4[i][this.variableFive];
           const seis = this.JSON4[i][this.variableSix];
-          const moralAnalysis = this.JSON4[i].moralFoundation;
+          const moralAnalysis = this.JSON4[i].qualResponse;
 
           var div = document.getElementById("visuals");
           var p = document.createElement("div");
@@ -737,22 +867,34 @@ export default {
             "<h3>Moral Foundations Analysis: </h3>" +
             moralAnalysis +
             "<h3>Emotional Analysis: </h3><ul>" +
-            "<li>" + this.variableOne + ": " +
+            "<li>" +
+            this.variableOne +
+            ": " +
             uno +
             "</li>" +
-            "<li>" + this.variableTwo + ": " +
+            "<li>" +
+            this.variableTwo +
+            ": " +
             dos +
             "</li>" +
-            "<li>" + this.variableThree + ": " +
+            "<li>" +
+            this.variableThree +
+            ": " +
             tres +
             "</li>" +
-            "<li>" + this.variableFour + ": " +
+            "<li>" +
+            this.variableFour +
+            ": " +
             quatro +
             "</li>" +
-           "<li>" + this.variableFive + ": " +
+            "<li>" +
+            this.variableFive +
+            ": " +
             cinco +
             "</li>" +
-            "<li>" + this.variableSix + ": " +
+            "<li>" +
+            this.variableSix +
+            ": " +
             seis +
             "</li>" +
             "</ul>";
@@ -764,7 +906,7 @@ export default {
               document.getElementById("thinkingIMG2").remove();
               this.msg = "Analysis Complete";
               this.msg2 = "";
-              this.renderOverallEmotion()
+              this.renderOverallEmotion();
               this.getOverallMoralFoundationScores();
             }, 4000);
           }
@@ -783,10 +925,16 @@ export default {
 
       const e = test.length;
       for (var i = 0; i < e; i++) {
-        overallMoralAnalysis = overallMoralAnalysis +=
-          test[i].moralFoundation.substring(0, 70) + ".";
+        overallMoralAnalysis = overallMoralAnalysis += test[i].qualResponse; //.substring(0, 70);
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
+          if (!instance.overallSummaryOutput.endsWith(".")) {
+            instance.overallSummaryOutput = instance.overallSummaryOutput + ".";
+          }
+
+          if (instance.overallSummaryOutput.endsWith(".")) {
+            instance.overallSummaryOutput = instance.overallSummaryOutput + "";
+          }
 
           const client = axios.create({
             headers: {
@@ -797,10 +945,10 @@ export default {
           const params = {
             model: "gpt-3.5-turbo-instruct",
             prompt:
-              'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores in no more than three sentences. Text:' +
+              'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
               instance.overallSummaryOutput,
             temperature: 0,
-            max_tokens: 250,
+            max_tokens: 100,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -942,7 +1090,7 @@ export default {
       for (var i = 0; i < e; i++) {
         overallOne = overallOne + test[i][instance.variableOne];
         overallTwo = overallTwo + test[i][instance.variableTwo];
-        overallThree = overallThree + test[i][instance.variableThree]
+        overallThree = overallThree + test[i][instance.variableThree];
         overallFour = overallFour + test[i][instance.variableFour];
         overallFive = overallFive + test[i][instance.variableFive];
         overallSix = overallSix + test[i][instance.variableSix];
@@ -966,12 +1114,12 @@ export default {
                 overallSix,
               ],
               labels: [
-				instance.variableOne  ,
-				instance.variableTwo  ,
-				instance.variableThree  ,
-				instance.variableFour  ,
-				instance.variableFive  ,
-				instance.variableSix  ,
+                instance.variableOne,
+                instance.variableTwo,
+                instance.variableThree,
+                instance.variableFour,
+                instance.variableFive,
+                instance.variableSix,
               ],
               textinfo: "label+percent",
               textposition: "outside",
@@ -1239,23 +1387,24 @@ export default {
   background-color: hotpink;
   color: #252627;
   border: none;
-  white-space: normal; 
+  white-space: normal;
 }
 
 #quant {
-color: hotpink; 
+  color: hotpink;
 }
 
-#quant, #qual {
-color: orange; 
+#quant,
+#qual {
+  color: orange;
 }
 
 .quantLine {
-width: 50%; 
+  width: 50%;
 }
-.input-element{
-font-size: 100px; 
-width: 400px;
+.input-element {
+  font-size: 100px;
+  width: 400px;
 }
 #startButton {
   background: #2f4858;
@@ -1275,7 +1424,7 @@ width: 400px;
   border: none;
 }
 #promptButton:hover {
-background-color: purple; 
+  background-color: purple;
 }
 
 #apiButton:hover {
