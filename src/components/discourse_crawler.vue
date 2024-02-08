@@ -143,7 +143,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
-      urlToScrape: "https://www.milesccoleman.com/test/",
+      urlToScrape: "https://www.milesccoleman.com/test",
       pageText: "",
       one: 0,
       two: 0,
@@ -189,6 +189,11 @@ export default {
       this.showPrompt = false;
       if (this.variableOne == "" || this.promptInput2 == "") {
         alert("Please fill out the prompt parameters fully.");
+      }
+      const workingUrl = this.urlToScrape;
+      if (!workingUrl.endsWith("/")) {
+        this.urlToScrape = this.urlToScrape + "/";
+        console.log("added slash");
       }
     },
 
