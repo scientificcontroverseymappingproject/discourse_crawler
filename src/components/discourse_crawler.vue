@@ -100,7 +100,11 @@
         placeholder="Enter URL to Crawl"
       />
       <p></p>
-      <button v-if="showProcess" id="startButton" @click="grabPage">
+      <button
+        v-if="showProcess"
+        id="startButton"
+        @click="checkForQualQuantSummary"
+      >
         Crawl Website
       </button>
     </section>
@@ -143,7 +147,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
-      urlToScrape: "https://www.milesccoleman.com/test",
+      urlToScrape: "https://www.milesccoleman.com/test$",
       pageText: "",
       one: 0,
       two: 0,
@@ -179,6 +183,7 @@ export default {
       overallSummaryOutput: "",
       overallOutputExplanation: "",
       showPrint: true,
+      qualQuantSummary: false,
     };
   },
 
@@ -194,6 +199,19 @@ export default {
       if (!workingUrl.endsWith("/")) {
         this.urlToScrape = this.urlToScrape + "/";
         console.log("added slash");
+      }
+    },
+
+    checkForQualQuantSummary: function () {
+      const workingUrl2 = this.urlToScrape;
+      console.log(workingUrl2);
+      if (workingUrl2.endsWith("$")) {
+        this.qualQuantSummary = true;
+        this.urlToScrape = workingUrl2.slice(0, -1);
+        console.log("qualquant summary for " + this.urlToScrape);
+        this.grabPage();
+      } else {
+        this.grabPage();
       }
     },
 
@@ -869,7 +887,7 @@ export default {
             "<h2>" +
             usableURL +
             "</h2>" +
-            "<h3>Moral Foundations Analysis: </h3>" +
+            "<h3>Qualitative: </h3>" +
             moralAnalysis +
             "<h3>Emotional Analysis: </h3><ul>" +
             "<li>" +
@@ -912,9 +930,92 @@ export default {
               this.msg = "Analysis Complete";
               this.msg2 = "";
               this.renderOverallEmotion();
-              this.getOverallMoralFoundationScores();
+              if (this.qualQuantSummary == true) {
+                this.getOverallMoralFoundationScores();
+              }
+              if (this.qualQuantSummary == false) {
+                this.getOverallQualSummary();
+              }
             }, 4000);
           }
+        }
+      }
+    },
+    getOverallQualSummary: function () {
+      this.showProcess2 = false;
+      this.msg = this.urlToScrape;
+      var workingJSON = document.getElementById("specificAnalysis4").innerText;
+      const test = JSON.parse(workingJSON);
+      const instance = this;
+      const pageType3 = "overallQual";
+      let overallMoralAnalysis = "";
+
+      const e = test.length;
+      for (var i = 0; i < e; i++) {
+        overallMoralAnalysis = overallMoralAnalysis += test[i].qualResponse; //.substring(0, 70);
+        if (i === e - 1) {
+          instance.overallSummaryOutput = overallMoralAnalysis;
+          if (!instance.overallSummaryOutput.endsWith(".")) {
+            instance.overallSummaryOutput = instance.overallSummaryOutput + ".";
+          }
+
+          if (instance.overallSummaryOutput.endsWith(".")) {
+            instance.overallSummaryOutput = instance.overallSummaryOutput + "";
+          }
+
+          const client = axios.create({
+            headers: {
+              Authorization: "Bearer " + instance.apiKEY,
+            },
+          });
+
+          const params = {
+            model: "gpt-3.5-turbo-instruct",
+            prompt:
+              "Synthesize the following statements into a brief analytic summary. Statements:" +
+              instance.overallSummaryOutput,
+            temperature: 0,
+            max_tokens: 100,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+          };
+
+          client
+            .post("https://api.openai.com/v1/completions", params)
+            .then((result) => {
+              instance.msg = instance.urlToScrape;
+              const rawResultA = result.data.choices[0].text;
+              instance.overallOutputExplanation = rawResultA;
+              var div = document.getElementById("specificAnalysis3");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"pageType":' +
+                '"' +
+                pageType3 +
+                '"' +
+                "," +
+                '"url":' +
+                '"' +
+                instance.urlToScrape +
+                '"' +
+                "," +
+                '"qualResponse":' +
+                '"' +
+                rawResultA +
+                '"' +
+                "},";
+              div.appendChild(p);
+
+              setTimeout(() => {
+                console.log("Delayed for 1 second.");
+                this.renderOverallEmotion();
+              }, 1000);
+            })
+            .catch((error) => {
+              console.log(error);
+              this.msg = error;
+            });
         }
       }
     },
@@ -925,7 +1026,7 @@ export default {
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
-      const pageType3 = "overallMoral";
+      const pageType3 = "subPage";
       let overallMoralAnalysis = "";
 
       const e = test.length;
@@ -1013,7 +1114,7 @@ export default {
                 '"overallPurity":' +
                 overallPurity +
                 "," +
-                '"moralFoundationOverall":' +
+                '"qualOverall":' +
                 '"' +
                 justTheTextA +
                 '"' +
