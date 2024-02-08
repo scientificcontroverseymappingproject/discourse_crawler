@@ -7,111 +7,124 @@
     <p v-if="showProcess" id="messageThree">
       {{ msg3 }}
     </p>
-    <p id="results">
-      <span id="overallMoralFoundations"></span
-      ><span id="overallVariables"></span>
-    </p>
-    <section v-if="!showProcess2" id="overalExplanation">
-      {{ overallOutputExplanation }} {{ overallSummaryOutput }}
-    </section>
-    <section v-if="showPrompt">
-      <hr class="quantLine" />
-      <h2 id="quant">Quantitative Module</h2>
-      Priming Text<br />
-      <textarea
-        rows="4"
-        cols="50"
-        id="promptInput"
-        type="text"
-        v-model="promptInput"
-        v-if="showPrompt"
-        placeholder="Analyze the following text, outputting scores between 1 and 10 for "
-      /><br />
 
-      Variables<br />
-      <input
-        v-if="showPrompt"
-        id="variableOneInput"
-        type="input"
-        v-model="variableOne"
-        placeholder="Variable One"
-      /><br />
-
-      <input
-        v-if="showPrompt"
-        id="variableTwoInput"
-        type="input"
-        v-model="variableTwo"
-        placeholder="Variable Two"
-      /><br />
-
-      <input
-        v-if="showPrompt"
-        id="variableThreeInput"
-        type="input"
-        v-model="variableThree"
-        placeholder="Variable Three"
-      /><br />
-
-      <input
-        v-if="showPrompt"
-        id="variableFourInput"
-        type="input"
-        v-model="variableFour"
-        placeholder="Variable Four"
-      /><br />
-
-      <input
-        v-if="showPrompt"
-        id="variableFiveInput"
-        type="input"
-        v-model="variableFive"
-        placeholder="Variable Five"
-      /><br />
-
-      <input
-        v-if="showPrompt"
-        id="variableSixInput"
-        type="input"
-        v-model="variableSix"
-        placeholder="Variable Six"
-      /><br /><br />
-
-      <hr class="quantLine" />
-      <h2 id="qual">Qualitative Module</h2>
-      Prompt<br />
-      <textarea
-        rows="4"
-        cols="50"
-        id="promptInput"
-        type="text"
-        v-model="promptInput2"
-        v-if="showPrompt"
-        placeholder="Analyze the following text, outputting scores between 1 and 10 for "
-      /><br /><br />
-      <hr class="quantLine" />
-      <br />
-      URL to Crawl<br />
-      <input
-        v-if="showProcess"
-        id="URLInput"
-        type="input"
-        v-model="urlToScrape"
-        placeholder="Enter URL to Crawl"
-      />
-      <p></p>
-      <button
-        v-if="showProcess"
-        id="startButton"
-        @click="checkForQualQuantSummary"
-      >
-        Crawl Website
-      </button>
-    </section>
-    <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
-      Save Results as PDF
+    <input
+      v-if="showPassword2"
+      id="variableSixInput"
+      type="input"
+      v-model="userPassword"
+      placeholder="PWord"
+    /><br />
+    <button v-if="showPassword2" id="startButton" @click="checkPassWord">
+      Submit
     </button>
-    <!-- <button @click="renderVisuals">Overall</button> 
+
+    <section v-if="showPassword">
+      <p id="results">
+        <span id="overallMoralFoundations"></span
+        ><span id="overallVariables"></span>
+      </p>
+      <section v-if="!showProcess2" id="overalExplanation">
+        {{ overallOutputExplanation }}
+      </section>
+      <section v-if="showPrompt">
+        <hr class="quantLine" />
+        <h2 id="quant">Quantitative Module</h2>
+        Priming Text<br />
+        <textarea
+          rows="4"
+          cols="50"
+          id="promptInput"
+          type="text"
+          v-model="promptInput"
+          v-if="showPrompt"
+          placeholder="Analyze the following text, outputting scores between 1 and 10 for "
+        /><br />
+
+        Variables<br />
+        <input
+          v-if="showPrompt"
+          id="variableOneInput"
+          type="input"
+          v-model="variableOne"
+          placeholder="Variable One"
+        /><br />
+
+        <input
+          v-if="showPrompt"
+          id="variableTwoInput"
+          type="input"
+          v-model="variableTwo"
+          placeholder="Variable Two"
+        /><br />
+
+        <input
+          v-if="showPrompt"
+          id="variableThreeInput"
+          type="input"
+          v-model="variableThree"
+          placeholder="Variable Three"
+        /><br />
+
+        <input
+          v-if="showPrompt"
+          id="variableFourInput"
+          type="input"
+          v-model="variableFour"
+          placeholder="Variable Four"
+        /><br />
+
+        <input
+          v-if="showPrompt"
+          id="variableFiveInput"
+          type="input"
+          v-model="variableFive"
+          placeholder="Variable Five"
+        /><br />
+
+        <input
+          v-if="showPrompt"
+          id="variableSixInput"
+          type="input"
+          v-model="variableSix"
+          placeholder="Variable Six"
+        /><br /><br />
+
+        <hr class="quantLine" />
+        <h2 id="qual">Qualitative Module</h2>
+        Prompt<br />
+        <textarea
+          rows="4"
+          cols="50"
+          id="promptInput"
+          type="text"
+          v-model="promptInput2"
+          v-if="showPrompt"
+          placeholder="Analyze the following text, outputting scores between 1 and 10 for "
+        /><br /><br />
+        <hr class="quantLine" />
+        <br />
+        URL to Crawl<br />
+        <input
+          v-if="showProcess"
+          id="URLInput"
+          type="input"
+          v-model="urlToScrape"
+          placeholder="Enter URL to Crawl"
+        />
+        <p></p>
+        <button
+          v-if="showProcess"
+          id="startButton"
+          @click="checkForQualQuantSummary"
+        >
+          Crawl Website
+        </button>
+      </section>
+      <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
+        Save Results as PDF
+      </button>
+      <!-- <button @click="renderVisuals">Overall</button> 
 
    
     <button @click="getEmotionStats">Analyze Emotion</button>
@@ -120,13 +133,14 @@
     <button @click="renderVisuals">Visualize</button>
  -->
 
-    <p id="terminal"></p>
-    <section id="visuals" class="visuals"></section>
-    <section id="specificAnalysis"></section>
-    <section id="specificAnalysis2"></section>
-    <section id="specificAnalysis3"></section>
-    <section id="specificAnalysis4"></section>
-    <section id="specificAnalysis5"></section>
+      <p id="terminal"></p>
+      <section id="visuals" class="visuals"></section>
+      <section id="specificAnalysis"></section>
+      <section id="specificAnalysis2"></section>
+      <section id="specificAnalysis3"></section>
+      <section id="specificAnalysis4"></section>
+      <section id="specificAnalysis5"></section>
+    </section>
   </div>
 </template>
 
@@ -155,6 +169,10 @@ export default {
       four: 0,
       five: 0,
       six: 0,
+      showPassword: false,
+      password: process.env.VUE_APP_ROOT_PASSWORD,
+      showPassword2: true,
+      userPassword: "",
       readability: 0,
       loading: true,
       showProcess: true,
@@ -200,6 +218,11 @@ export default {
         this.urlToScrape = this.urlToScrape + "/";
         console.log("added slash");
       }
+    },
+
+    checkPassWord: function () {
+      if (this.userPassword == this.password) this.showPassword = true;
+      this.showPassword2 = false;
     },
 
     checkForQualQuantSummary: function () {
