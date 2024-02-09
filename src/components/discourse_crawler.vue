@@ -190,7 +190,7 @@ export default {
       promptInput:
         "Analyze the following text, outputting scores between 1 and 10 for ",
       promptInput2:
-        "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include explnation. Text: ",
+        "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. If a moral foundation is not identified in the text do not mention it. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -282,7 +282,7 @@ export default {
               if (html.links[i].href.includes(window.location.origin)) {
                 const htmlConstructor =
                   this.urlToScrape +
-                  html.links[i].href.replace(window.location.origin, "");
+                  html.links[i].href.replace(window.location.origin + "/", "");
                 anchors.push(htmlConstructor);
               }
               if (counterTickerA === tickerA - 1) {
@@ -292,9 +292,9 @@ export default {
                 });
 
                 setTimeout(() => {
-                  console.log("Delayed for 2 seconds.");
+                  console.log("Delayed for 3 seconds.");
                   this.grabSubpages();
-                }, 2000);
+                }, 3000);
               }
             }
           }
@@ -349,7 +349,7 @@ export default {
               const workingActualText2 = workingActualText.replace(/"/g, " ");
               const actualText2 = workingActualText2.replace(/'/g, " ");
 
-              if (htmlWithoutScripts.length <= 1999) {
+              if (htmlWithoutScripts.length <= 49999) {
                 if (actualText2.endsWith(".")) {
                   actualText = actualText2;
                   console.log("period");
@@ -375,14 +375,14 @@ export default {
                   "},";
                 div.appendChild(p);
               }
-              if (htmlWithoutScripts.length >= 1999) {
+              if (htmlWithoutScripts.length >= 49999) {
                 if (actualText2.endsWith(".")) {
-                  actualText = actualText2.substring(1999, 0);
+                  actualText = actualText2.substring(49999, 0);
                   console.log("period");
                 }
 
                 if (!actualText2.endsWith(".")) {
-                  actualText = actualText2.substring(1999, 0) + ".";
+                  actualText = actualText2.substring(49999, 0) + ".";
                   console.log("no period");
                 }
 
@@ -405,14 +405,14 @@ export default {
                 setTimeout(() => {
                   console.log("Delayed for 2 seconds.");
                   instance.getEmotionStats();
-                }, 2000);
+                }, 3000);
               }
             })
             .catch((errors) => {
               console.log(errors);
               this.msg = errors; // Errors
             });
-        }, 2000 * i);
+        }, 3000 * i);
       }
     },
 
@@ -653,8 +653,8 @@ export default {
               },
             ],
             temperature: 0,
-            max_tokens: 256,
-            top_p: 1,
+            max_tokens: 500,
+            top_p: 0,
             frequency_penalty: 0,
             presence_penalty: 0,
           };
@@ -733,11 +733,11 @@ export default {
             });
           if (counterTicker2 === ticker2 - 1) {
             setTimeout(() => {
-              console.log("Delayed for 2 seconds.");
+              console.log("Quant delayed for 3 seconds.");
               instance.getMoralFoundations();
-            }, 2000);
+            }, 5000);
           }
-        }, 500 * i2);
+        }, 3000 * i2);
       }
     },
 
@@ -783,8 +783,8 @@ export default {
               },
             ],
             temperature: 0,
-            max_tokens: 275,
-            top_p: 1,
+            max_tokens: 500,
+            top_p: 0,
             frequency_penalty: 0,
             presence_penalty: 0,
           };
@@ -861,11 +861,11 @@ export default {
             });
           if (counterTicker3 === ticker3 - 1) {
             setTimeout(() => {
-              console.log("Delayed for 5 seconds.");
+              console.log("Qual delayed for 5 seconds.");
               instance.returnJSON();
             }, 5000);
           }
-        }, 500 * i3); //timeout
+        }, 3000 * i3); //timeout
       } //fire
     },
 
@@ -1008,13 +1008,13 @@ export default {
               {
                 role: "user",
                 content:
-                  "Synthesize the following statements into a brief analytic summary. Statements:" +
+                  "Synthesize the following statements into a brief analytic summary about the overall text that those statements are referring to. Statements:" +
                   instance.overallSummaryOutput,
               },
             ],
             temperature: 0,
-            max_tokens: 100,
-            top_p: 1,
+            max_tokens: 500,
+            top_p: 0,
             frequency_penalty: 0,
             presence_penalty: 0,
           };
@@ -1097,8 +1097,8 @@ export default {
               },
             ],
             temperature: 0,
-            max_tokens: 100,
-            top_p: 1,
+            max_tokens: 500,
+            top_p: 0,
             frequency_penalty: 0,
             presence_penalty: 0,
           };
