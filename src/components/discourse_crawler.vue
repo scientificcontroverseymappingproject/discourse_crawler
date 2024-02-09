@@ -629,24 +629,29 @@ export default {
           });
 
           const params = {
-            model: "gpt-3.5-turbo-instruct",
-            prompt:
-              instance.promptInput +
-              instance.variableOne +
-              commaOne +
-              instance.variableTwo +
-              commaTwo +
-              instance.variableThree +
-              commaThree +
-              instance.variableFour +
-              commaFour +
-              instance.variableFive +
-              commaFive +
-              instance.variableSix +
-              ", returning the response in JSON only. Format as" +
-              jsonOne +
-              "." +
-              usableText,
+            model: "gpt-3.5-turbo-16k",
+            messages: [
+              {
+                role: "user",
+                content:
+                  instance.promptInput +
+                  instance.variableOne +
+                  commaOne +
+                  instance.variableTwo +
+                  commaTwo +
+                  instance.variableThree +
+                  commaThree +
+                  instance.variableFour +
+                  commaFour +
+                  instance.variableFive +
+                  commaFive +
+                  instance.variableSix +
+                  ", returning the response in JSON only. Format as" +
+                  jsonOne +
+                  "." +
+                  usableText,
+              },
+            ],
             temperature: 0,
             max_tokens: 256,
             top_p: 1,
@@ -655,11 +660,11 @@ export default {
           };
 
           client
-            .post("https://api.openai.com/v1/completions", params)
+            .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
               instance.msg = "Running quantitative prompt on:";
               instance.msg2 = usableURL;
-              const rawResult = result.data.choices[0].text;
+              const rawResult = result.data.choices[0].message.content;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
               const pageType = "subPage";
               console.log(i2 + ": " + justTheJSON);
@@ -770,8 +775,13 @@ export default {
           });
 
           const params = {
-            model: "gpt-3.5-turbo-instruct",
-            prompt: instance.promptInput2 + usableText2,
+            model: "gpt-3.5-turbo-16k",
+            messages: [
+              {
+                role: "user",
+                content: instance.promptInput2 + usableText2,
+              },
+            ],
             temperature: 0,
             max_tokens: 275,
             top_p: 1,
@@ -780,13 +790,13 @@ export default {
           };
 
           client
-            .post("https://api.openai.com/v1/completions", params)
+            .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
               instance.msg = "Running qualitative prompt on:";
               instance.msg2 = usableURL2;
-              console.log(result.data.choices[0].text);
+              console.log(result.data.choices[0].message.content);
               const moralFoundationResults =
-                result.data.choices[0].text.replaceAll('"', "");
+                result.data.choices[0].message.content.replaceAll('"', "");
               instance.moralFoundationAnalysis =
                 moralFoundationResults.replaceAll("'", "");
 
@@ -853,7 +863,7 @@ export default {
             setTimeout(() => {
               console.log("Delayed for 5 seconds.");
               instance.returnJSON();
-            }, 2000);
+            }, 5000);
           }
         }, 500 * i3); //timeout
       } //fire
@@ -993,10 +1003,15 @@ export default {
           });
 
           const params = {
-            model: "gpt-3.5-turbo-instruct",
-            prompt:
-              "Synthesize the following statements into a brief analytic summary. Statements:" +
-              instance.overallSummaryOutput,
+            model: "gpt-3.5-turbo-16k",
+            messages: [
+              {
+                role: "user",
+                content:
+                  "Synthesize the following statements into a brief analytic summary. Statements:" +
+                  instance.overallSummaryOutput,
+              },
+            ],
             temperature: 0,
             max_tokens: 100,
             top_p: 1,
@@ -1005,10 +1020,10 @@ export default {
           };
 
           client
-            .post("https://api.openai.com/v1/completions", params)
+            .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
               instance.msg = instance.urlToScrape;
-              const rawResultA = result.data.choices[0].text;
+              const rawResultA = result.data.choices[0].message.content;
               instance.overallOutputExplanation = rawResultA;
               var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
@@ -1072,10 +1087,15 @@ export default {
           });
 
           const params = {
-            model: "gpt-3.5-turbo-instruct",
-            prompt:
-              'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
-              instance.overallSummaryOutput,
+            model: "gpt-3.5-turbo-16k",
+            messages: [
+              {
+                role: "user",
+                content:
+                  'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
+                  instance.overallSummaryOutput,
+              },
+            ],
             temperature: 0,
             max_tokens: 100,
             top_p: 1,
@@ -1084,10 +1104,10 @@ export default {
           };
 
           client
-            .post("https://api.openai.com/v1/completions", params)
+            .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
               instance.msg = instance.urlToScrape;
-              const rawResultA = result.data.choices[0].text;
+              const rawResultA = result.data.choices[0].message.content;
               console.log(rawResultA);
               const justTheTextA = rawResultA.substring(
                 rawResultA.indexOf("}") + 1
