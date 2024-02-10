@@ -188,7 +188,7 @@ export default {
       moralFoundationAnalysis: "",
       apiKEY: process.env.VUE_APP_ROOT_API,
       promptInput:
-        "Analyze the following text, outputting scores between 1 and 10 for ",
+        "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
       promptInput2:
         "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. If a moral foundation is not identified in the text do not mention it. Text: ",
       variableOne: "anger",
@@ -619,6 +619,7 @@ export default {
               instance.variableSix +
               ", returning the response in JSON only. Format as " +
               jsonOne +
+              "Text:" +
               usableText
           );
 
