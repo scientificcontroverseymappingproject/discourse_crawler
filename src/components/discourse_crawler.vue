@@ -250,8 +250,7 @@ export default {
       document.getElementById("terminal").appendChild(img);
       const url =
         "https://api.allorigins.win/raw?url=" +
-        encodeURIComponent(this.urlToScrape) +
-        "&callback=?";
+        encodeURIComponent(this.urlToScrape); //+"&callback=?";
 
       axios
         .get(url)
@@ -324,8 +323,7 @@ export default {
 
           var url =
             "https://api.allorigins.win/raw?url=" +
-            encodeURIComponent(usableURL) +
-            "&callback=?";
+            encodeURIComponent(usableURL); //+ "&callback=?";
           axios
             .get(url)
             .then((response) => {
