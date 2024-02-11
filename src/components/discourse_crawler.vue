@@ -381,7 +381,8 @@ export default {
               console.log("Crawling:" + i + " " + usableURL);
 
               instance.msg = "Crawling";
-              instance.msg2 = workingAnchorsArray[i];
+              const numberA = i + 1;
+              instance.msg2 = numberA + ": " + workingAnchorsArray[i];
               var actualText = "";
               const workingActualText = htmlWithoutScripts;
               const workingActualText2 = workingActualText.replace(/"/g, " ");
@@ -995,6 +996,10 @@ export default {
             this.variableSix +
             ": " +
             seis +
+            "</li>" +
+            "<h3>Whole Or Partial</h3><ul>" +
+            "<li>" +
+            this.pageType +
             "</li>" +
             "</ul>";
           div.appendChild(p);
