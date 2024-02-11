@@ -112,13 +112,20 @@
           v-model="urlToScrape"
           placeholder="Enter URL to Crawl"
         />
+        <br />
+
+        <input id="fileUpload" v-if="dataInput" type="file" />
+
         <p></p>
         <button
           v-if="showProcess"
           id="startButton"
           @click="checkForQualQuantSummary"
         >
-          Crawl Website
+          Crawl Website</button
+        ><br />
+        <button v-if="showDataButon" id="startButton" @click="runPromptsOnData">
+          Run Prompts on Data
         </button>
       </section>
       <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
@@ -163,6 +170,7 @@ export default {
       msg3: "",
       urlToScrape: "https://www.milesccoleman.com/test$",
       pageText: "",
+      pageType: "whole",
       one: 0,
       two: 0,
       three: 0,
@@ -202,6 +210,10 @@ export default {
       overallOutputExplanation: "",
       showPrint: true,
       qualQuantSummary: false,
+      dataSet: "",
+      JSONHolder: "",
+      dataInput: false,
+      showDataButon: false,
     };
   },
 
@@ -210,10 +222,10 @@ export default {
   methods: {
     registerVariables: function () {
       this.showPrompt = false;
+      const workingUrl = this.urlToScrape;
       if (this.variableOne == "" || this.promptInput2 == "") {
         alert("Please fill out the prompt parameters fully.");
       }
-      const workingUrl = this.urlToScrape;
       if (!workingUrl.endsWith("/")) {
         this.urlToScrape = this.urlToScrape + "/";
         console.log("added slash");
@@ -228,14 +240,47 @@ export default {
     checkForQualQuantSummary: function () {
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
-      if (workingUrl2.endsWith("$")) {
-        this.qualQuantSummary = true;
-        this.urlToScrape = workingUrl2.slice(0, -1);
-        console.log("qualquant summary for " + this.urlToScrape);
-        this.grabPage();
-      } else {
-        this.grabPage();
+
+      if (workingUrl2 == "data") {
+        this.dataInput = true;
+        this.showDataButon = true;
       }
+
+      if (workingUrl2 != "data") {
+        if (workingUrl2.endsWith("$")) {
+          this.qualQuantSummary = true;
+          this.urlToScrape = workingUrl2.slice(0, -1);
+          console.log("qualquant summary for " + this.urlToScrape);
+          this.grabPage();
+        } else {
+          this.grabPage();
+        }
+      }
+    },
+
+    runPromptsOnData: function () {
+      this.registerData();
+
+      setTimeout(() => {
+        this.getEmotionStats();
+      }, 3000);
+    },
+
+    registerData: function () {
+      const instance = this;
+      var files = document.getElementById("fileUpload").files;
+      if (files.length <= 0) {
+        return false;
+      }
+
+      var fr = new FileReader();
+
+      fr.onload = function (e) {
+        var result = JSON.parse(e.target.result);
+        instance.dataSet = result;
+      };
+
+      fr.readAsText(files.item(0));
     },
 
     grabPage: function () {
@@ -243,11 +288,6 @@ export default {
       this.msg = "Initializing";
       this.msg2 = "";
       this.showProcess = false;
-      let img = document.createElement("img");
-      img.src =
-        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3dqdTFidnN6enl2bmZ0b2RndGl0Y29oMWJiOHo0bDc2d3d6YnF3bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/HN6GLlUsMvue652b2w/giphy.gif";
-      img.setAttribute("id", "thinkingIMG");
-      document.getElementById("terminal").appendChild(img);
       const url =
         "https://api.allorigins.win/raw?url=" +
         encodeURIComponent(this.urlToScrape); //+"&callback=?";
@@ -357,11 +397,11 @@ export default {
                   actualText = actualText2 + ".";
                   console.log("no period");
                 }
-
+                this.pageType = "whole";
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
-                  '{"url":' +
+                  '{"name":' +
                   '"' +
                   usableURL +
                   '"' +
@@ -383,11 +423,11 @@ export default {
                   actualText = actualText2.substring(49999, 0) + ".";
                   console.log("no period");
                 }
-
+                this.pageType = "partial";
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
                 p2.innerHTML =
-                  '{"url":' +
+                  '{"name":' +
                   '"' +
                   usableURL +
                   '"' +
@@ -415,9 +455,17 @@ export default {
     },
 
     getEmotionStats: function () {
-      var workingJSON = document.getElementById("specificAnalysis").innerText;
-      const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      const workingJSON1 = JSON.parse(middleJSON);
+      if (this.dataInput === false) {
+        var workingJSON = document.getElementById("specificAnalysis").innerText;
+        const middleJSON = "[" + workingJSON.slice(0, -1) + "]";
+        this.JSONHolder = JSON.parse(middleJSON);
+      }
+
+      if (this.dataInput === true) {
+        this.JSONHolder = this.dataSet;
+      }
+      const workingJSON1 = this.JSONHolder;
+      console.log(workingJSON1.length);
       let i2,
         len2 = workingJSON1.length;
       const ticker2 = workingJSON1.length;
@@ -598,7 +646,7 @@ export default {
 
           console.log("Analyzing Emotion");
 
-          const usableURL = workingJSON1[i2].url;
+          const usableURL = workingJSON1[i2].name;
           const counterTicker2 = i2;
           const usableText = workingJSON1[i2].text;
 
@@ -662,10 +710,10 @@ export default {
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
               instance.msg = "Running quantitative prompt on:";
-              instance.msg2 = usableURL;
+              const number = i2 + 1;
+              instance.msg2 = number + ": " + usableURL;
               const rawResult = result.data.choices[0].message.content;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
-              const pageType = "subPage";
               console.log(i2 + ": " + justTheJSON);
 
               const emotionResults = JSON.parse(justTheJSON);
@@ -681,10 +729,10 @@ export default {
               p.innerHTML =
                 '{"pageType":' +
                 '"' +
-                pageType +
+                instance.pageType +
                 '"' +
                 "," +
-                '"url":' +
+                '"name":' +
                 '"' +
                 usableURL +
                 '"' +
@@ -757,7 +805,7 @@ export default {
         setTimeout(function () {
           console.log("Analyzing moral foundations");
 
-          const usableURL2 = workingJSON2[i3].url;
+          const usableURL2 = workingJSON2[i3].name;
           const counterTicker3 = i3;
           const uno = workingJSON2[i3][instance.variableOne];
           const dos = workingJSON2[i3][instance.variableTwo];
@@ -792,7 +840,8 @@ export default {
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
               instance.msg = "Running qualitative prompt on:";
-              instance.msg2 = usableURL2;
+              const number2 = i3 + 1;
+              instance.msg2 = number2 + ": " + usableURL2;
               console.log(result.data.choices[0].message.content);
               const moralFoundationResults =
                 result.data.choices[0].message.content.replaceAll('"', "");
@@ -807,7 +856,7 @@ export default {
                 pageType2 +
                 '"' +
                 "," +
-                '"url":' +
+                '"name":' +
                 '"' +
                 usableURL2 +
                 '"' +
@@ -886,14 +935,9 @@ export default {
 
     renderVisuals: function () {
       document.getElementById("visuals").style.display = "block";
-      document.getElementById("thinkingIMG").remove();
       this.msg = "";
       this.msg2 = "";
 
-      let img = document.createElement("img");
-      img.src = "https://media.giphy.com/media/QIRDfKwRFXz6nBCQkF/giphy.gif";
-      img.setAttribute("id", "thinkingIMG2");
-      document.getElementById("terminal").appendChild(img);
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
 
@@ -904,7 +948,7 @@ export default {
         var i,
           len = this.JSON4.length;
         for (i = 0; i < len; i++) {
-          const usableURL = this.JSON4[i].url;
+          const usableURL = this.JSON4[i].name;
           const uno = this.JSON4[i][this.variableOne];
           const dos = this.JSON4[i][this.variableTwo];
           const tres = this.JSON4[i][this.variableThree];
@@ -958,7 +1002,6 @@ export default {
           if (i === len - 1) {
             setTimeout(() => {
               console.log("Delayed for 4 seconds.");
-              document.getElementById("thinkingIMG2").remove();
               this.msg = "Analysis Complete";
               this.msg2 = "";
               this.renderOverallEmotion();
@@ -1032,7 +1075,7 @@ export default {
                 pageType3 +
                 '"' +
                 "," +
-                '"url":' +
+                '"name":' +
                 '"' +
                 instance.urlToScrape +
                 '"' +
@@ -1136,7 +1179,7 @@ export default {
                 pageType3 +
                 '"' +
                 "," +
-                '"url":' +
+                '"name":' +
                 '"' +
                 instance.urlToScrape +
                 '"' +
