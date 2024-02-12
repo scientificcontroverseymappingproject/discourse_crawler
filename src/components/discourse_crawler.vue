@@ -245,7 +245,7 @@ export default {
       if (workingUrl2 == "data") {
         this.dataInput = true;
         this.showDataButon = true;
-        this.delayTime = 660;
+        this.delayTime = 3000;
       }
 
       if (workingUrl2 != "data") {
