@@ -100,7 +100,7 @@
           type="text"
           v-model="promptInput2"
           v-if="showPrompt"
-          placeholder="Analyze the following text, outputting scores between 1 and 10 for "
+          placeholder="Perform sentiment analysis on the following text, outputting scores between 1 and 10 for "
         /><br /><br />
         <hr class="quantLine" />
         <br />
@@ -214,6 +214,7 @@ export default {
       JSONHolder: "",
       dataInput: false,
       showDataButon: false,
+      delayTime: 3000,
     };
   },
 
@@ -244,6 +245,7 @@ export default {
       if (workingUrl2 == "data") {
         this.dataInput = true;
         this.showDataButon = true;
+        this.delayTime = 660;
       }
 
       if (workingUrl2 != "data") {
@@ -388,7 +390,7 @@ export default {
               const workingActualText2 = workingActualText.replace(/"/g, " ");
               const actualText2 = workingActualText2.replace(/'/g, " ");
 
-              if (htmlWithoutScripts.length <= 49999) {
+              if (actualText2.length <= 49999) {
                 if (actualText2.endsWith(".")) {
                   actualText = actualText2;
                   console.log("period");
@@ -414,7 +416,7 @@ export default {
                   "},";
                 div.appendChild(p);
               }
-              if (htmlWithoutScripts.length >= 49999) {
+              if (actualText2.length >= 49999) {
                 if (actualText2.endsWith(".")) {
                   actualText = actualText2.substring(49999, 0);
                   console.log("period");
@@ -510,7 +512,7 @@ export default {
           '": number score,' +
           '"' +
           instance.variableSix +
-          '": number score} ';
+          '": number score}';
       }
 
       //five variables
@@ -541,7 +543,7 @@ export default {
           '": number score,' +
           '"' +
           instance.variableFive +
-          '": number score} ';
+          '": number score}';
       }
 
       //four variables
@@ -569,7 +571,7 @@ export default {
           '": number score,' +
           '"' +
           instance.variableFour +
-          '": number score} ';
+          '": number score}';
       }
 
       //three variables
@@ -594,7 +596,7 @@ export default {
           '": number score,' +
           '"' +
           instance.variableThree +
-          '": number score} ';
+          '": number score}';
       }
 
       //two variables
@@ -616,7 +618,7 @@ export default {
           '": number score,' +
           '"' +
           instance.variableTwo +
-          '": number score} ';
+          '": number score}';
       }
 
       //one variable
@@ -664,9 +666,10 @@ export default {
               instance.variableFive +
               commaFive +
               instance.variableSix +
-              ", returning the response in JSON only. Format as " +
+              ", returning the response in JSON only. Format as" +
               jsonOne +
-              "Text:" +
+              ". " +
+              "Text: " +
               usableText
           );
 
@@ -696,7 +699,8 @@ export default {
                   instance.variableSix +
                   ", returning the response in JSON only. Format as" +
                   jsonOne +
-                  "." +
+                  ". " +
+                  "Text: " +
                   usableText,
               },
             ],
@@ -785,7 +789,7 @@ export default {
               instance.getMoralFoundations();
             }, 5000);
           }
-        }, 3000 * i2);
+        }, instance.delayTime * i2);
       }
     },
 
@@ -815,7 +819,6 @@ export default {
           const cinco = workingJSON2[i3][instance.variableFive];
           const seis = workingJSON2[i3][instance.variableSix];
           const usableText2 = workingJSON2[i3].text;
-          const pageType2 = "subPage";
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -854,7 +857,7 @@ export default {
               p.innerHTML =
                 '{"pageType":' +
                 '"' +
-                pageType2 +
+                instance.pageType +
                 '"' +
                 "," +
                 '"name":' +
@@ -914,7 +917,7 @@ export default {
               instance.returnJSON();
             }, 5000);
           }
-        }, 3000 * i3); //timeout
+        }, instance.delayTime * i3); //timeout
       } //fire
     },
 
@@ -1111,7 +1114,7 @@ export default {
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
-      const pageType3 = "subPage";
+      const pageType3 = "overallCount";
       let overallMoralAnalysis = "";
 
       const e = test.length;
