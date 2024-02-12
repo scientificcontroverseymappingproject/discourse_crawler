@@ -1,4 +1,4 @@
-# publicspeakingdashboard
+# discourse_crawler
 
 ## Project setup
 ```
