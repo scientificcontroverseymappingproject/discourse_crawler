@@ -214,7 +214,7 @@ export default {
       JSONHolder: "",
       dataInput: false,
       showDataButon: false,
-      delayTime: 3000,
+      delayTime: 1000,
     };
   },
 
@@ -317,14 +317,21 @@ export default {
             for (var i = 0; i < l.length; i++) {
               const counterTickerA = i;
               if (html.links[i].href.includes(this.urlToScrape)) {
-                anchors.push(l[i].href);
+                if (!html.links[i].href.includes(".pdf")) {
+                  anchors.push(l[i].href);
+                }
               }
 
               if (html.links[i].href.includes(window.location.origin)) {
-                const htmlConstructor =
-                  this.urlToScrape +
-                  html.links[i].href.replace(window.location.origin + "/", "");
-                anchors.push(htmlConstructor);
+                if (!html.links[i].href.includes(".pdf")) {
+                  const htmlConstructor =
+                    this.urlToScrape +
+                    html.links[i].href.replace(
+                      window.location.origin + "/",
+                      ""
+                    );
+                  anchors.push(htmlConstructor);
+                }
               }
               if (counterTickerA === tickerA - 1) {
                 this.pageText = htmlWithoutScripts;
