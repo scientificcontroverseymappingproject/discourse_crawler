@@ -234,8 +234,16 @@ export default {
     },
 
     checkPassWord: function () {
-      if (this.userPassword == this.password) this.showPassword = true;
-      this.showPassword2 = false;
+      if (this.userPassword == this.password) {
+        this.showPassword = true;
+        this.showPassword2 = false;
+        this.msg = "Discourse Crawler";
+        this.msg2 =
+          "An AI-powered tool for performing top-level analysis of websites.";
+      } else {
+        this.msg = "incorrect password";
+        this.msg2 = "try again";
+      }
     },
 
     checkForQualQuantSummary: function () {
