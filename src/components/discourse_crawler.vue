@@ -129,7 +129,7 @@
         </button>
       </section>
       <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
-        Save Results as PDF
+        Save Results as JSON and PDF
       </button>
       <!-- <button @click="renderVisuals">Overall</button> 
 
@@ -148,6 +148,7 @@
       <section id="specificAnalysis4"></section>
       <section id="specificAnalysis5"></section>
     </section>
+    <a id="downloadAnchorElem" style="display: none"></a>
   </div>
 </template>
 
@@ -1493,7 +1494,21 @@ export default {
     },
 
     pdfResults: function () {
+      this.saveJSON();
       window.print();
+    },
+
+    saveJSON: function () {
+      const storageObj2 =
+        document.getElementById("specificAnalysis3").innerText;
+      const storageObj = "[" + storageObj2.slice(0, -1) + "]";
+      console.log("downloadable data?" + storageObj);
+      var dataStr =
+        "data:text/json;charset=utf-8," + encodeURIComponent(storageObj);
+      var dlAnchorElem = document.getElementById("downloadAnchorElem");
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", this.urlToScrape + ".json");
+      dlAnchorElem.click();
     },
   }, //
 }; //
