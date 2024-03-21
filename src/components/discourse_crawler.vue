@@ -391,7 +391,7 @@ export default {
               const html = parser.parseFromString(data2, "text/html");
               const workingHTML = html;
               workingHTML
-                .querySelectorAll("script, style")
+                .querySelectorAll("script, style, br, footer, nav, iframe")
                 .forEach((s) => s.remove());
               let htmlWithoutScripts = workingHTML
                 .querySelector("body")
@@ -400,11 +400,18 @@ export default {
 
               instance.msg = "Crawling";
               const numberA = i + 1;
-              instance.msg2 = numberA + ": " + workingAnchorsArray[i];
+              instance.msg2 =
+                numberA +
+                "/" +
+                workingAnchorsArray.length +
+                ": " +
+                workingAnchorsArray[i];
               var actualText = "";
               const workingActualText = htmlWithoutScripts;
               const workingActualText2 = workingActualText.replace(/"/g, " ");
               const actualText2 = workingActualText2.replace(/'/g, " ");
+              // const actualText4 = actualText3.replace(/\r?\n?/g, "");
+              // const actualText2 = actualText4.trim();
 
               if (actualText2.length <= 49999) {
                 if (actualText2.endsWith(".")) {
