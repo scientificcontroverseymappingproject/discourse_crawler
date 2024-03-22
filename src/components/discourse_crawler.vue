@@ -216,6 +216,7 @@ export default {
       dataInput: false,
       showDataButon: false,
       delayTime: 1000,
+      overallNumber: "",
     };
   },
 
@@ -400,10 +401,11 @@ export default {
 
               instance.msg = "Crawling";
               const numberA = i + 1;
+              instance.overallNumber = workingAnchorsArray.length;
               instance.msg2 =
                 numberA +
                 "/" +
-                workingAnchorsArray.length +
+                instance.overallNumber +
                 ": " +
                 workingAnchorsArray[i];
               var actualText = "";
@@ -739,7 +741,8 @@ export default {
             .then((result) => {
               instance.msg = "Running quantitative prompt on:";
               const number = i2 + 1;
-              instance.msg2 = number + ": " + usableURL;
+              instance.msg2 =
+                number + "/" + instance.overallNumber + ": " + usableURL;
               const rawResult = result.data.choices[0].message.content;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
               console.log(i2 + ": " + justTheJSON);
@@ -868,7 +871,8 @@ export default {
             .then((result) => {
               instance.msg = "Running qualitative prompt on:";
               const number2 = i3 + 1;
-              instance.msg2 = number2 + ": " + usableURL2;
+              instance.msg2 =
+                number2 + "/" + instance.overallNumber + ": " + usableURL2;
               console.log(result.data.choices[0].message.content);
               const moralFoundationResults =
                 result.data.choices[0].message.content.replaceAll('"', "");
@@ -1530,7 +1534,10 @@ export default {
 #wpm {
   display: inline-block;
 }
-
+h1,
+h2 {
+  text-wrap: wrap;
+}
 #overallVariables {
   display: inline-block;
 }
