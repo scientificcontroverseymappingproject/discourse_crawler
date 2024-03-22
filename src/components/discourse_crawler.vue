@@ -1,6 +1,10 @@
 <template>
   <div id="body" class="dashboard">
+    <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
+      Save Results as JSON and PDF
+    </button>
     <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
     <p v-if="showProcess2" id="messageTwo">
       {{ msg2 }}
     </p>
@@ -10,7 +14,7 @@
 
     <input
       v-if="showPassword2"
-      id="variableSixInput"
+      id="passWordInput"
       type="input"
       v-model="userPassword"
       placeholder="PWord"
@@ -25,6 +29,8 @@
         ><span id="overallVariables"></span>
       </p>
       <section v-if="!showProcess2" id="overalExplanation">
+        <h2>Summary of Qualitative Analysis</h2>
+        <br />
         {{ overallOutputExplanation }}
       </section>
       <section v-if="showPrompt">
@@ -128,9 +134,6 @@
           Run Prompts on Data
         </button>
       </section>
-      <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
-        Save Results as JSON and PDF
-      </button>
       <!-- <button @click="renderVisuals">Overall</button> 
 
    
@@ -142,6 +145,7 @@
 
       <p id="terminal"></p>
       <section id="visuals" class="visuals"></section>
+      <br />
       <section id="specificAnalysis"></section>
       <section id="specificAnalysis2"></section>
       <section id="specificAnalysis3"></section>
@@ -169,6 +173,7 @@ export default {
       msg: "Discourse Crawler",
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
+      msg5: "",
       urlToScrape: "https://www.milesccoleman.com/test$",
       pageText: "",
       pageType: "whole",
@@ -987,51 +992,58 @@ export default {
           const cinco = this.JSON4[i][this.variableFive];
           const seis = this.JSON4[i][this.variableSix];
           const moralAnalysis = this.JSON4[i].qualResponse;
+          const itemNumber = i + 1;
 
           var div = document.getElementById("visuals");
           var p = document.createElement("div");
           p.innerHTML =
-            "<h2>" +
+            "<h2 style='color:#66FF79;font-size:46px;'>" +
+            itemNumber +
+            "/" +
+            this.overallNumber +
+            "</h2>" +
+            "<h2 style='color:hotpink;font-size:46px;'>" +
             usableURL +
             "</h2>" +
-            "<h3>Qualitative: </h3>" +
+            "<h3 style='color:orange;'>Qualitative Analysis </h3><p style='color:white;'>" +
             moralAnalysis +
-            "<h3>Emotional Analysis: </h3><ul>" +
-            "<li>" +
+            "</p><h3 style='color:orange;'>Quantitative Analysis </h3><ul style='color:orange;list-style:none;margin:0;'>" +
+            "<li style='color:#ff0022;'>" +
             this.variableOne +
             ": " +
             uno +
             "</li>" +
-            "<li>" +
+            "<li style='color:#ffbc42;'>" +
             this.variableTwo +
             ": " +
             dos +
             "</li>" +
-            "<li>" +
+            "<li style='color:#0496ff;'>" +
             this.variableThree +
             ": " +
             tres +
             "</li>" +
-            "<li>" +
+            "<li style='color:#694d75;'>" +
             this.variableFour +
             ": " +
             quatro +
             "</li>" +
-            "<li>" +
+            "<li style='color:#1b5299;'>" +
             this.variableFive +
             ": " +
             cinco +
             "</li>" +
-            "<li>" +
+            "<li style='color:lightgray;'>" +
             this.variableSix +
             ": " +
             seis +
             "</li>" +
-            "<h3>Whole Or Partial</h3><ul>" +
+            "<h3 >Whole Or Partial Page</h3><ul style='color:white;list-style:none;margin:0;'>" +
             "<li>" +
             this.pageType +
             "</li>" +
-            "</ul>";
+            "</ul>" +
+            "<hr>";
           div.appendChild(p);
 
           if (i === len - 1) {
@@ -1053,7 +1065,7 @@ export default {
     },
     getOverallQualSummary: function () {
       this.showProcess2 = false;
-      this.msg = this.urlToScrape;
+      this.msg5 = this.urlToScrape;
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
@@ -1099,7 +1111,7 @@ export default {
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
-              instance.msg = instance.urlToScrape;
+              instance.msg5 = instance.urlToScrape;
               const rawResultA = result.data.choices[0].message.content;
               instance.overallOutputExplanation = rawResultA;
               var div = document.getElementById("specificAnalysis3");
@@ -1137,7 +1149,7 @@ export default {
 
     getOverallMoralFoundationScores: function () {
       this.showProcess2 = false;
-      this.msg = this.urlToScrape;
+      this.msg5 = this.urlToScrape;
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
@@ -1183,7 +1195,7 @@ export default {
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
-              instance.msg = instance.urlToScrape;
+              instance.msg5 = instance.urlToScrape;
               const rawResultA = result.data.choices[0].message.content;
               console.log(rawResultA);
               const justTheTextA = rawResultA.substring(
@@ -1505,8 +1517,18 @@ export default {
     },
 
     pdfResults: function () {
+      this.showPrint = true;
+      this.msg = "";
+      setTimeout(() => {
+        this.prepForPrinting();
+      }, 500);
+    },
+
+    prepForPrinting: function () {
       this.saveJSON();
       window.print();
+      this.showPrint = false;
+      this.msg = "Analysis Complete";
     },
 
     saveJSON: function () {
@@ -1534,9 +1556,9 @@ export default {
 #wpm {
   display: inline-block;
 }
-h1,
-h2 {
-  text-wrap: wrap;
+#mainTitle2 {
+  word-break: break-word;
+  color: hotpink;
 }
 #overallVariables {
   display: inline-block;
@@ -1551,14 +1573,16 @@ h2 {
 }
 
 #results {
-  display: flex;
   margin: auto;
-  width: 65%;
 }
-#overallMoralFoundatations {
+#overallMoralFoundations {
   display: inline-block;
-  margin: auto;
-  display: none;
+  text-align: center;
+}
+
+#overallVariables {
+  display: inline-block;
+  text-align: center;
 }
 
 #URLInput {
@@ -1614,12 +1638,20 @@ h2 {
   color: #252627;
   border: none;
 }
-
+#passWordInput {
+  width: 30%;
+  font-size: 30px;
+  text-align: center;
+  background-color: lightgray;
+  color: #252627;
+  border: none;
+  margin-bottom: 1px;
+}
 #variableSixInput {
   width: 20%;
   font-size: 30px;
   text-align: center;
-  background-color: #40434e;
+  background-color: lightgray;
   color: #252627;
   border: none;
 }
@@ -1669,27 +1701,42 @@ h2 {
 #promptButton:hover {
   background-color: purple;
 }
-
-#apiButton:hover {
-  background: purple;
+#apiButton {
+  background: orange;
+  font-size: 25px;
+  border-style: none;
 }
-.visuals {
+#apiButton:hover {
+  background: hotpink;
+}
+#visuals {
   color: #ff66d8;
   border: solid;
   font-size: 20px;
   width: 75%;
   margin: auto;
   padding: 10px;
+  word-break: break-word;
+  list-style: none;
   display: none;
+}
+#analysisContent {
+  color: white;
+}
+h2 {
+  color: white;
 }
 
 #specificAnalysis {
+  display: none;
 }
 #specificAnalysis2 {
   color: pink;
+  display: none;
 }
 #specificAnalysis3 {
   color: blue;
+  display: none;
 }
 #specificAnalysis5 {
   color: orange;
@@ -1698,6 +1745,7 @@ h2 {
 
 #specificAnalysis4 {
   color: limegreen;
+  display: none;
 }
 div {
   background-color: none;
