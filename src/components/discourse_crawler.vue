@@ -5,6 +5,18 @@
     </button>
     <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
     <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
+    <div v-if="!loader" class="loader"></div>
+    <div v-if="!loader2" class="loader2"></div>
+
+    <div v-if="!progress" class="progress">
+      <div class="color"></div>
+    </div>
+    <div v-if="!pacman" class="pacman">
+      <!-- <div class="pacman__eye"></div> -->
+      <div class="pacman__mouth"></div>
+      <!-- <div class="pacman__food">{{ msg6 }}</div> -->
+    </div>
+
     <p v-if="showProcess2" id="messageTwo">
       {{ msg2 }}
     </p>
@@ -24,13 +36,19 @@
     </button>
 
     <section v-if="showPassword">
-      <p id="results">
-        <span id="overallMoralFoundations"></span
-        ><span id="overallVariables"></span>
-      </p>
+      <p id="results"><span id="overallMoralFoundations"></span><br /></p>
+      <section id="overalExplanation2">
+        <h2 v-if="overallQuant">
+          Summary of
+          <span style="color: hotpink">Quantitative</span>
+          Analysis
+        </h2>
+        <span id="overallVariables"></span>
+      </section>
       <section v-if="!showProcess2" id="overalExplanation">
-        <h2>Summary of Qualitative Analysis</h2>
-        <br />
+        <h2>
+          Summary of <span style="color: orange">Qualitative</span> Analysis
+        </h2>
         {{ overallOutputExplanation }}
       </section>
       <section v-if="showPrompt">
@@ -144,8 +162,18 @@
  -->
 
       <p id="terminal"></p>
+      <section v-if="!showProcess2">
+        <h2 id="overalExplanation3">
+          <span style="color: white"
+            ><span style="color: rgb(113, 198, 139)">Individual</span> Page
+            Summaries</span
+          >
+        </h2>
+        <br />
+      </section>
       <section id="visuals" class="visuals"></section>
       <br />
+      <section id="rawData2"></section>
       <section id="specificAnalysis"></section>
       <section id="specificAnalysis2"></section>
       <section id="specificAnalysis3"></section>
@@ -174,6 +202,13 @@ export default {
       msg2: "An AI-powered tool for performing top-level analysis of websites.",
       msg3: "",
       msg5: "",
+      msg6: "",
+      pacman: true,
+      progress: true,
+      rawData: true,
+      loader: true,
+      loader2: true,
+      overallQuant: false,
       urlToScrape: "https://www.milesccoleman.com/test$",
       pageText: "",
       pageType: "whole",
@@ -256,7 +291,7 @@ export default {
     checkForQualQuantSummary: function () {
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
-
+      this.progress = false;
       if (workingUrl2 == "data") {
         this.dataInput = true;
         this.showDataButon = true;
@@ -383,6 +418,9 @@ export default {
         setTimeout(function () {
           const usableURL = workingAnchorsArray[i];
           console.log(usableURL);
+          instance.progress = true;
+          instance.pacman = false;
+          instance.msg6 = usableURL;
           const counterTicker = i;
 
           var url =
@@ -744,7 +782,10 @@ export default {
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
-              instance.msg = "Running quantitative prompt on:";
+              instance.pacman = true;
+              document.getElementById("mainTitle").style.color = "hotpink";
+              instance.msg = "Running Quantitative Analysis";
+              instance.loader = false;
               const number = i2 + 1;
               instance.msg2 =
                 number + "/" + instance.overallNumber + ": " + usableURL;
@@ -874,7 +915,10 @@ export default {
           client
             .post("https://api.openai.com/v1/chat/completions", params)
             .then((result) => {
-              instance.msg = "Running qualitative prompt on:";
+              instance.loader = true;
+              document.getElementById("mainTitle").style.color = "orange";
+              instance.msg = "Running Qualitative Analysis";
+              instance.loader2 = false;
               const number2 = i3 + 1;
               instance.msg2 =
                 number2 + "/" + instance.overallNumber + ": " + usableURL2;
@@ -970,6 +1014,8 @@ export default {
     },
 
     renderVisuals: function () {
+      document.getElementById("mainTitle").style.color = "#71c68b";
+      this.loader2 = true;
       document.getElementById("visuals").style.display = "block";
       this.msg = "";
       this.msg2 = "";
@@ -1005,7 +1051,7 @@ export default {
             "<h2 style='color:hotpink;font-size:46px;'>" +
             usableURL +
             "</h2>" +
-            "<h3 style='color:orange;'>Qualitative Analysis </h3><p style='color:white;'>" +
+            "<h3 style='color:hotpink;'>Qualitative Analysis </h3><p style='color:white;'>" +
             moralAnalysis +
             "</p><h3 style='color:orange;'>Quantitative Analysis </h3><ul style='color:orange;list-style:none;margin:0;'>" +
             "<li style='color:#ff0022;'>" +
@@ -1038,7 +1084,7 @@ export default {
             ": " +
             seis +
             "</li>" +
-            "<h3 >Whole Or Partial Page</h3><ul style='color:white;list-style:none;margin:0;'>" +
+            "<h3 style='color:#71c68b;'>Whole Or Partial Page</h3><ul style='color:white;list-style:none;margin:0;'>" +
             "<li>" +
             this.pageType +
             "</li>" +
@@ -1051,6 +1097,11 @@ export default {
               console.log("Delayed for 4 seconds.");
               this.msg = "Analysis Complete";
               this.msg2 = "";
+              var div7 = document.getElementById("rawData2");
+              var p7 = document.createElement("h2");
+              p7.setAttribute("id", "overalExplanation3");
+              p7.innerHTML = "Raw Data";
+              div7.appendChild(p7);
               this.renderOverallEmotion();
               if (this.qualQuantSummary == true) {
                 this.getOverallMoralFoundationScores();
@@ -1324,6 +1375,7 @@ export default {
       let overallSix = 0;
       console.log(test.length);
       const instance = this;
+      instance.overallQuant = true;
       const e = test.length;
       for (var i = 0; i < e; i++) {
         overallOne = overallOne + test[i][instance.variableOne];
@@ -1379,11 +1431,12 @@ export default {
             width: 450,
             showlegend: false,
             paper_bgcolor: "#2b2d42",
-            title: "Variables",
+            title: "",
             font: {
-              family: "Arial, monospace",
-              size: 25,
+              family: "Avenir, Helvetica, Arial, sans-serif",
+              size: 30,
               color: "white",
+              weight: "bold",
             },
             margin: {
               l: 50,
@@ -1395,7 +1448,7 @@ export default {
           };
           var config = { responsive: true };
           Plotly.newPlot("overallVariables", data, layout, config);
-
+          instance.rawData = false;
           setTimeout(() => {
             console.log("Delayed for 1 second.");
             instance.returnJSONAgain();
@@ -1566,7 +1619,31 @@ export default {
 
 #overalExplanation {
   color: orange;
-  font-size: 25px;
+  font-size: 30px;
+  margin-top: 25px;
+  width: 65%;
+  display: inline-block;
+}
+
+#overalExplanation2 {
+  color: orange;
+  font-size: 30px;
+  margin-top: 25px;
+  width: 65%;
+  display: inline-block;
+}
+
+#overalExplanation3 {
+  color: white;
+  font-size: 45px;
+  margin-top: 25px;
+  width: 65%;
+  display: inline-block;
+}
+
+#rawData2 {
+  color: white;
+  font-size: 30px;
   margin-top: 25px;
   width: 65%;
   display: inline-block;
@@ -1595,7 +1672,7 @@ export default {
 }
 
 #variableOneInput {
-  width: 20%;
+  width: 25%;
   font-size: 30px;
   text-align: center;
   background-color: #ff0022;
@@ -1604,7 +1681,7 @@ export default {
 }
 
 #variableTwoInput {
-  width: 20%;
+  width: 25%;
   font-size: 30px;
   text-align: center;
   background-color: #ffbc42;
@@ -1613,7 +1690,7 @@ export default {
 }
 
 #variableThreeInput {
-  width: 20%;
+  width: 25%;
   font-size: 30px;
   text-align: center;
   background-color: #0496ff;
@@ -1622,7 +1699,7 @@ export default {
 }
 
 #variableFourInput {
-  width: 20%;
+  width: 25%;
   font-size: 30px;
   text-align: center;
   background-color: #694d75;
@@ -1631,7 +1708,7 @@ export default {
 }
 
 #variableFiveInput {
-  width: 20%;
+  width: 25%;
   font-size: 30px;
   text-align: center;
   background-color: #1b5299;
@@ -1648,7 +1725,7 @@ export default {
   margin-bottom: 1px;
 }
 #variableSixInput {
-  width: 20%;
+  width: 25%;
   font-size: 30px;
   text-align: center;
   background-color: lightgray;
@@ -2136,5 +2213,203 @@ video {
   size: A3 landscape;
   counter-increment: page;
   margin: none;
+}
+
+@import url("https://fonts.googleapis.com/css?family=Slabo+27px&display=swap");
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  font-family: "Slabo 27px", serif;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.pacman {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: hotpink;
+  position: relative;
+  margin-left: 45%;
+}
+
+/* .pacman__eye {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  top: 20px;
+  right: 40px;
+  background: #333333;
+} */
+
+.pacman__mouth {
+  background: #2b2d42;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(100% 74%, 44% 48%, 100% 21%);
+  animation-name: eat;
+  animation-duration: 0.7s;
+  animation-iteration-count: infinite;
+}
+
+/* .pacman__food {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  font-size: 10px;
+  background: #fff;
+  border-radius: 0%;
+  color: white;
+  top: 40%;
+  left: 120px;
+  animation-name: food;
+  animation-duration: 0.7s;
+  animation-iteration-count: infinite;
+} */
+
+@keyframes eat {
+  0% {
+    clip-path: polygon(100% 74%, 44% 48%, 100% 21%);
+  }
+  25% {
+    clip-path: polygon(100% 60%, 44% 48%, 100% 40%);
+  }
+  50% {
+    clip-path: polygon(100% 50%, 44% 48%, 100% 50%);
+  }
+  75% {
+    clip-path: polygon(100% 59%, 44% 48%, 100% 35%);
+  }
+  100% {
+    clip-path: polygon(100% 74%, 44% 48%, 100% 21%);
+  }
+}
+
+@keyframes food {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+}
+
+.progress {
+  position: relative;
+  height: 10px;
+  width: 100%;
+}
+.progress .color {
+  position: absolute;
+  background-color: orange;
+  width: 0px;
+  height: 10px;
+  border-radius: 15px;
+  animation: progres 4s infinite linear;
+  margin-bottom: 10%;
+}
+@keyframes progres {
+  0% {
+    width: 0%;
+  }
+  10% {
+    width: 10%;
+  }
+  20% {
+    width: 20%;
+  }
+  30% {
+    width: 30%;
+  }
+  40% {
+    width: 40%;
+  }
+  50% {
+    width: 50%;
+  }
+  60% {
+    width: 60%;
+  }
+  70% {
+    width: 70%;
+  }
+  80% {
+    width: 80%;
+  }
+  90% {
+    width: 90%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 50%;
+  height: 20px;
+  box-shadow: 0 3px 0 orange;
+  display: grid;
+  margin-left: 25%;
+}
+.loader:before,
+.loader:after {
+  content: "";
+  grid-area: 1/1;
+  background: radial-gradient(circle closest-side, var(--c, hotpink) 92%, #0000)
+    0 0 / calc(100% / 4) 100%;
+  animation: l4 1s infinite linear;
+}
+.loader:after {
+  --c: #000;
+  background-color: #92dce5;
+  box-shadow: 0 -2px 0 0 #fff;
+  clip-path: inset(-2px calc(50% - 10px));
+}
+@keyframes l4 {
+  100% {
+    background-position: calc(100% / 3) 0;
+  }
+}
+
+.loader2 {
+  width: 50%;
+  height: 20px;
+  box-shadow: 0 3px 0 hotpink;
+  display: grid;
+  margin-left: 25%;
+}
+.loader2:before,
+.loader2:after {
+  content: "";
+  grid-area: 1/1;
+  background: radial-gradient(circle closest-side, var(--c, orange) 92%, #0000)
+    0 0 / calc(100% / 4) 100%;
+  animation: l4 1s infinite linear;
+}
+.loader2:after {
+  --c: #000;
+  background-color: #71c68b;
+  box-shadow: 0 -2px 0 0 #fff;
+  clip-path: inset(-2px calc(50% - 10px));
+}
+@keyframes l4 {
+  100% {
+    background-position: calc(100% / 3) 0;
+  }
 }
 </style>
