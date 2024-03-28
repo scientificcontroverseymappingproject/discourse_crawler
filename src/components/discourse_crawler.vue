@@ -2237,12 +2237,12 @@ body {
 }
 
 .pacman {
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: hotpink;
   position: relative;
-  margin-left: 45%;
+  margin: auto;
 }
 
 /* .pacman__eye {
