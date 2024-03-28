@@ -1459,9 +1459,11 @@ export default {
 
     returnJSONAgain: function () {
       var workingJSON = document.getElementById("specificAnalysis3").innerText;
-      var middleJSON = "[" + workingJSON.slice(0, -1) + "]";
+      var middleJSON = workingJSON;
       const middleWorkingJSON = middleJSON;
       console.log("JSON2: " + middleWorkingJSON);
+      const clearNode = document.getElementById("specificAnalysis5");
+      clearNode.innerHTML = "";
       var div = document.getElementById("specificAnalysis5");
       var p = document.createElement("div");
       p.innerHTML = middleWorkingJSON;
@@ -1586,7 +1588,7 @@ export default {
 
     saveJSON: function () {
       const storageObj2 =
-        document.getElementById("specificAnalysis3").innerText;
+        document.getElementById("specificAnalysis5").innerText;
       const storageObj = "[" + storageObj2.slice(0, -1) + "]";
       console.log("downloadable data?" + storageObj);
       var dataStr =
