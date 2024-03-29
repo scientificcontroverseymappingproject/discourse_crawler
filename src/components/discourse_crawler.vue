@@ -35,8 +35,9 @@
       Submit
     </button>
 
-    <section v-if="showPassword">
-      <p id="results"><span id="overallMoralFoundations"></span><br /></p>
+    <section id="overallVariables2" v-if="showPassword">
+      <p id="results">
+      <span id="overallMoralFoundations"></span><br />
       <section id="overalExplanation2">
         <h2 v-if="overallQuant">
           Summary of
@@ -45,6 +46,7 @@
         </h2>
         <span id="overallVariables"></span>
       </section>
+      </p>
       <section v-if="!showProcess2" id="overalExplanation">
         <h2>
           Summary of <span style="color: orange">Qualitative</span> Analysis
@@ -239,7 +241,7 @@ export default {
       promptInput:
         "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
       promptInput2:
-        "Analyze this text to identify which of these five moral foundations that it best represents: care, fairness, loyalty, authority, and purity. Include an explanation. If a moral foundation is not identified in the text do not mention it. Text: ",
+        "Analyze this text to identify which of the five moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation. Include in your response only identified moral foundations. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -1428,7 +1430,7 @@ export default {
 
           var layout = {
             height: 450,
-            width: 450,
+            width: 550,
             showlegend: false,
             paper_bgcolor: "#2b2d42",
             title: "",
@@ -1616,7 +1618,11 @@ export default {
   color: hotpink;
 }
 #overallVariables {
-  display: inline-block;
+margin: 0 auto;
+}
+
+#overallVariables2 {
+    
 }
 
 #overalExplanation {
