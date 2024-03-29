@@ -1234,7 +1234,7 @@ export default {
               {
                 role: "user",
                 content:
-                  'Give me scores between 1 and 100 that indicate the mentions of care, fairness, loyalty, authority, and purity in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
+                  'Give me numerical scores that indicate proportions of care, fairness, loyalty, authority, and purity represented in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
                   instance.overallSummaryOutput,
               },
             ],
