@@ -1025,7 +1025,6 @@ export default {
 
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
-      this.msg = this.JSON4
 
       //const usableText = JSON.stringify(this.JSON1[0].text);
 
