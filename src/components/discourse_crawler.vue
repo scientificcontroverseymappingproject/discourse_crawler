@@ -43,6 +43,7 @@
           Summary of
           <span style="color: hotpink">Quantitative</span>
           Analysis
+          
         </h2>
         <span id="overallVariables"></span>
       </section>
@@ -1024,6 +1025,7 @@ export default {
 
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
+      this.msg = this.JSON4
 
       //const usableText = JSON.stringify(this.JSON1[0].text);
 
@@ -1441,7 +1443,7 @@ export default {
               weight: "bold",
             },
             margin: {
-              l: 50,
+              l: 0,
               r: 50,
               b: 100,
               t: 100,
@@ -1471,6 +1473,7 @@ export default {
       p.innerHTML = middleWorkingJSON;
       div.appendChild(p);
       this.showPrint = false;
+      document.getElementById("specificAnalysis4").style.display = "none";
     },
 
     getReadabilityStats: function () {
@@ -1622,7 +1625,6 @@ margin: 0 auto;
 }
 
 #overallVariables2 {
-    
 }
 
 #overalExplanation {
@@ -1830,7 +1832,7 @@ h2 {
 
 #specificAnalysis4 {
   color: limegreen;
-  display: none;
+  display: block;
 }
 div {
   background-color: none;
