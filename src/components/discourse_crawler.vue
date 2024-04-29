@@ -258,7 +258,7 @@ export default {
       JSONHolder: "",
       dataInput: false,
       showDataButon: false,
-      delayTime: 1000,
+      delayTime: 3000,
       overallNumber: "",
     };
   },
@@ -298,7 +298,6 @@ export default {
       if (workingUrl2 == "data") {
         this.dataInput = true;
         this.showDataButon = true;
-        this.delayTime = 3000;
       }
 
       if (workingUrl2 != "data") {
@@ -522,7 +521,22 @@ export default {
             })
             .catch((errors) => {
               console.log(errors);
-              this.msg = errors; // Errors
+              this.msg = errors; 
+              this.pageType = "whole";
+                var div = document.getElementById("specificAnalysis");
+                var p = document.createElement("div");
+                p.innerHTML =
+                  '{"name":' +
+                  '"' +
+                  usableURL +
+                  '"' +
+                  "," +
+                  '"text":' +
+                  '"' +
+                  null +
+                  '"' +
+                  "},";
+                div.appendChild(p);// Errors
             });
         }, 3000 * i);
       }
@@ -743,7 +757,7 @@ export default {
               "Text: " +
               usableText
           );
-
+        if (usableText != null) {
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -864,6 +878,59 @@ export default {
               instance.getMoralFoundations();
             }, 5000);
           }
+        }
+        if (usableText == null ) {
+var div = document.getElementById("specificAnalysis2");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"pageType":' +
+                '"' +
+                "not crawled" +
+                '"' +
+                "," +
+                '"name":' +
+                '"' +
+                usableURL +
+                '"' +
+                "," +
+                '"text":' +
+                '"' +
+                null +
+                '"' +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "},";
+              div.appendChild(p);
+
+        }
         }, instance.delayTime * i2);
       }
     },
@@ -894,6 +961,8 @@ export default {
           const cinco = workingJSON2[i3][instance.variableFive];
           const seis = workingJSON2[i3][instance.variableSix];
           const usableText2 = workingJSON2[i3].text;
+          
+          if (usableText2 != null) {
           const client = axios.create({
             headers: {
               Authorization: "Bearer " + instance.apiKEY,
@@ -995,6 +1064,64 @@ export default {
               console.log("Qual delayed for 5 seconds.");
               instance.returnJSON();
             }, 5000);
+          }
+          }
+          if (usableText2 == null) {
+var div = document.getElementById("specificAnalysis3");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"pageType":' +
+                '"' +
+                "not crawled" +
+                '"' +
+                "," +
+                '"name":' +
+                '"' +
+                usableURL2 +
+                '"' +
+                "," +
+                '"text":' +
+                '"' +
+                null +
+                '"' +
+                "," +
+                '"qualResponse":' +
+                '"' +
+                null +
+                '"' +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                dos +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "," +
+                '"' +
+                null +
+                '":' +
+                null +
+                "},";
+              div.appendChild(p);
+
           }
         }, instance.delayTime * i3); //timeout
       } //fire
