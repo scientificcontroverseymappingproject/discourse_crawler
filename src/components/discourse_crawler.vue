@@ -474,7 +474,12 @@ export default {
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
-                  '{"name":' +
+                  '{"pageType":' +
+                '"' +
+                "whole" +
+                '"' +
+                "," +
+                '"name":' +
                   '"' +
                   usableURL +
                   '"' +
@@ -500,7 +505,12 @@ export default {
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
                 p2.innerHTML =
-                  '{"name":' +
+                  '{"pageType":' +
+                '"' +
+                "partial" +
+                '"' +
+                "," +
+                '"name":' +
                   '"' +
                   usableURL +
                   '"' +
@@ -526,7 +536,12 @@ export default {
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
-                  '{"name":' +
+                  '{"pageType":' +
+                '"' +
+                "not_crawled" +
+                '"' +
+                "," +
+                '"name":' +
                   '"' +
                   usableURL +
                   '"' +
@@ -737,6 +752,7 @@ export default {
           const usableURL = workingJSON1[i2].name;
           const counterTicker2 = i2;
           const usableText = workingJSON1[i2].text;
+          const pType = workingJSON1[i2].pageType;
 
           console.log(
             instance.promptInput +
@@ -823,7 +839,7 @@ export default {
               p.innerHTML =
                 '{"pageType":' +
                 '"' +
-                instance.pageType +
+                pType +
                 '"' +
                 "," +
                 '"name":' +
@@ -885,7 +901,7 @@ var div = document.getElementById("specificAnalysis2");
               p.innerHTML =
                 '{"pageType":' +
                 '"' +
-                "not crawled" +
+                "not_crawled" +
                 '"' +
                 "," +
                 '"name":' +
@@ -961,6 +977,7 @@ var div = document.getElementById("specificAnalysis2");
           const cinco = workingJSON2[i3][instance.variableFive];
           const seis = workingJSON2[i3][instance.variableSix];
           const usableText2 = workingJSON2[i3].text;
+          const pType2 = workingJSON2[i3].pageType;
           
           if (usableText2 != null) {
           const client = axios.create({
@@ -1005,7 +1022,7 @@ var div = document.getElementById("specificAnalysis2");
               p.innerHTML =
                 '{"pageType":' +
                 '"' +
-                instance.pageType +
+                pType2 +
                 '"' +
                 "," +
                 '"name":' +
@@ -1072,7 +1089,7 @@ var div = document.getElementById("specificAnalysis3");
               p.innerHTML =
                 '{"pageType":' +
                 '"' +
-                "not crawled" +
+                "not_crawled" +
                 '"' +
                 "," +
                 '"name":' +
@@ -1168,6 +1185,7 @@ var div = document.getElementById("specificAnalysis3");
           const cinco = this.JSON4[i][this.variableFive];
           const seis = this.JSON4[i][this.variableSix];
           const moralAnalysis = this.JSON4[i].qualResponse;
+          const pType3 = this.JSON4[i].pageType;
           const itemNumber = i + 1;
 
           var div = document.getElementById("visuals");
@@ -1214,9 +1232,9 @@ var div = document.getElementById("specificAnalysis3");
             ": " +
             seis +
             "</li>" +
-            "<h3 style='color:#71c68b;'>Whole Or Partial Page</h3><ul style='color:white;list-style:none;margin:0;'>" +
+            "<h3 style='color:#71c68b;'>Whole (crawled text is <49999 Characters), Partial (crawled text is >49999 characters, so only the first 49999 characters are included in analysis), Or Not Crawled (non-html/text content, or failed page fetch)</h3><ul style='color:white;list-style:none;margin:0;'>" +
             "<li>" +
-            this.pageType +
+            pType3 +
             "</li>" +
             "</ul>" +
             "<hr>";
