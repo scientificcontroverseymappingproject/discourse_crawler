@@ -194,6 +194,7 @@ import * as rs from "text-readability";
 import axios from "axios";
 import Plotly from "plotly.js-dist";
 import dotenv from "dotenv";
+import robotsParser from 'robots-txt-parser'
 //import OpenAI from "openai";
 dotenv.config();
 export default {
@@ -260,6 +261,10 @@ export default {
       showDataButon: false,
       delayTime: 3000,
       overallNumber: "",
+      goAhead: false, 
+      robotsDomain: "", 
+      robotsDotText: "", 
+      proxyRobotsUrl: ""
     };
   },
 
@@ -291,6 +296,51 @@ export default {
       }
     },
 
+    checkBots: function () {
+
+
+      var pathArray = this.urlToScrape.split( '/' );
+var protocol = pathArray[0];
+var host = pathArray[2];
+this.robotsDomain = protocol + '//' + host;
+this.proxyRobotsUrl =   "https://api.allorigins.win/raw?url=" +
+        encodeURIComponent(this.robotsDomain + "/robots.txt")
+const robotsUrl = this.proxyRobotsUrl
+console.log(robotsUrl)
+
+axios
+        .get(robotsUrl)
+        .then((response) => {
+          this.robotsDotText = response.data
+          console.log(this.robotsDotText)
+
+      const robots = robotsParser(
+        {
+          userAgent: 'Googlebot', // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
+          allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
+        },
+      );
+      robots.parseRobots(this.robotsDomain, this.robotsDotText)
+
+          robots.canCrawlSync(this.robotsDomain); // Returns true if the link can be crawled, false if not.
+          robots.canCrawl(this.robotsDomain, (value) => {
+            console.log(this.robotsDomain + ': main Page Crawlable: ', value);
+            this.goAhead = value
+
+            if (this.goAhead == true) {
+              this.grabPage()
+              this.goAhead = false
+            }else {
+              this.msg = "cannot crawl page as per robots.txt"
+              this.goAhead = false
+            }
+          }); 
+})
+            .catch((errors) => {
+              console.log(errors);
+              })
+    },
+
     checkForQualQuantSummary: function () {
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
@@ -305,9 +355,9 @@ export default {
           this.qualQuantSummary = true;
           this.urlToScrape = workingUrl2.slice(0, -1);
           console.log("qualquant summary for " + this.urlToScrape);
-          this.grabPage();
+          this.checkBots()
         } else {
-          this.grabPage();
+          this.checkBots()
         }
       }
     },
@@ -345,7 +395,12 @@ export default {
       const url =
         "https://api.allorigins.win/raw?url=" +
         encodeURIComponent(this.urlToScrape); //+"&callback=?";
-
+      const robots = robotsParser(
+        {
+          userAgent: 'Googlebot', // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
+          allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
+        },
+      );
       axios
         .get(url)
         .then((response) => {
@@ -368,9 +423,42 @@ export default {
             const tickerA = html.links.length;
             for (var i = 0; i < l.length; i++) {
               const counterTickerA = i;
+
+              
+
+
+
               if (html.links[i].href.includes(this.urlToScrape)) {
                 if (!html.links[i].href.includes(".pdf" || "%")) {
-                  anchors.push(l[i].href);
+robots.parseRobots(this.robotsDomain, this.robotsDotText)
+                  robots.useRobotsFor(this.robotsDomain)
+          robots.canCrawlSync(html.links[i].href); // Returns true if the link can be crawled, false if not.
+          robots.canCrawl(html.links[i].href, (value) => {
+            
+            this.goAhead = value
+
+            if (this.goAhead == true) {
+              anchors.push(l[i].href);
+              console.log(html.links[i].href + ': crawlable: ', value);
+              this.goAhead = false
+            }else {
+              console.log(l[i].href + ": cannot crawl page as per robots.txt")
+              this.goAhead = false
+            }
+
+            if (counterTickerA === tickerA - 1) {
+                this.pageText = htmlWithoutScripts;
+                this.anchorsForCrawl = anchors.filter(function (item, pos) {
+                  return anchors.indexOf(item) == pos;
+                });
+
+                setTimeout(() => {
+                  console.log("Delayed for 3 seconds.");
+                  this.grabSubpages();
+                }, 3000);
+              }
+          }); 
+
                 }
               }
 
@@ -382,10 +470,22 @@ export default {
                       window.location.origin + "/",
                       ""
                     );
-                  anchors.push(htmlConstructor);
-                }
-              }
-              if (counterTickerA === tickerA - 1) {
+robots.parseRobots(this.robotsDomain, this.robotsDotText)
+                    robots.useRobotsFor(this.robotsDomain)
+          robots.canCrawlSync(htmlConstructor); // Returns true if the link can be crawled, false if not.
+          robots.canCrawl(htmlConstructor, (value) => {
+            this.goAhead = value
+
+            if (this.goAhead == true) {
+              anchors.push(htmlConstructor);
+              console.log(htmlConstructor + ': crawlable: ', value);
+              this.goAhead = false
+            }else {
+              console.log(htmlConstructor + ": cannot crawl page as per robots.txt")
+              this.goAhead = false
+            }
+
+            if (counterTickerA === tickerA - 1) {
                 this.pageText = htmlWithoutScripts;
                 this.anchorsForCrawl = anchors.filter(function (item, pos) {
                   return anchors.indexOf(item) == pos;
@@ -395,6 +495,10 @@ export default {
                   console.log("Delayed for 3 seconds.");
                   this.grabSubpages();
                 }, 3000);
+              }
+        });
+                  
+                }
               }
             }
           }
@@ -533,12 +637,13 @@ export default {
               console.log(errors);
               this.msg = errors; 
               this.pageType = "whole";
+              const pType = "not_crawled"
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
                   '{"pageType":' +
                 '"' +
-                "not_crawled" +
+                pType +
                 '"' +
                 "," +
                 '"name":' +
@@ -547,9 +652,9 @@ export default {
                   '"' +
                   "," +
                   '"text":' +
-                  '"' +
+                  
                   null +
-                  '"' +
+                  
                   "},";
                 div.appendChild(p);// Errors
             });
@@ -910,37 +1015,37 @@ var div = document.getElementById("specificAnalysis2");
                 '"' +
                 "," +
                 '"text":' +
-                '"' +
+                
                 null +
-                '"' +
+                
                 "," +
                 '"' +
-                null +
+                instance.variableOne +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableTwo +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableThree +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableFour +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableFive +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableSix +
                 '":' +
                 null +
                 "},";
@@ -1102,38 +1207,37 @@ var div = document.getElementById("specificAnalysis3");
                 null +
                 '"' +
                 "," +
-                '"qualResponse":' +
-                '"' +
+                 '"qualResponse":' +
                 null +
-                '"' +
+
                 "," +
                 '"' +
-                null +
+                instance.variableOne +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
-                '":' +
-                dos +
-                "," +
-                '"' +
-                null +
+                instance.variableTwo +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableThree +
                 '":' +
                 null +
                 "," +
                 '"' +
-                null +
+                instance.variableFour +
                 '":' +
                 null +
                 "," +
                 '"' +
+                instance.variableFive +
+                '":' +
                 null +
+                "," +
+                '"' +
+                instance.variableSix +
                 '":' +
                 null +
                 "},";

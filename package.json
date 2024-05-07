@@ -16,6 +16,7 @@
     "paralleldots": "^3.2.6",
     "plotly": "^1.0.6",
     "plotly.js-dist": "^2.24.3",
+    "robots-txt-parser": "^2.0.3",
     "text-readability": "^1.0.5",
     "vue": "^2.6.11"
   },
