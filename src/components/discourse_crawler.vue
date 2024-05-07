@@ -1721,6 +1721,7 @@ var div = document.getElementById("specificAnalysis3");
       div.appendChild(p);
       this.showPrint = false;
       document.getElementById("specificAnalysis4").style.display = "none";
+      document.getElementById("specificAnalysis").style.display = "none";
     },
 
     getReadabilityStats: function () {
