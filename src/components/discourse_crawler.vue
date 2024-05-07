@@ -580,19 +580,19 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
                 p.innerHTML =
                   '{"pageType":' +
                 '"' +
-                "whole" +
+                'whole' +
                 '"' +
-                "," +
+                ',' +
                 '"name":' +
                   '"' +
                   usableURL +
                   '"' +
-                  "," +
+                  ',' +
                   '"text":' +
                   '"' +
                   actualText +
                   '"' +
-                  "},";
+                  '},';
                 div.appendChild(p);
               }
               if (actualText2.length >= 49999) {
@@ -611,19 +611,19 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
                 p2.innerHTML =
                   '{"pageType":' +
                 '"' +
-                "partial" +
+                'partial' +
                 '"' +
-                "," +
+                ',' +
                 '"name":' +
                   '"' +
                   usableURL +
                   '"' +
-                  "," +
+                  ',' +
                   '"text":' +
                   '"' +
                   actualText +
                   '"' +
-                  "},";
+                  '},';
                 div2.appendChild(p2);
               }
               if (counterTicker === ticker - 1) {
@@ -637,25 +637,24 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
               console.log(errors);
               this.msg = errors; 
               this.pageType = "whole";
-              const pType = "not_crawled"
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                 p.innerHTML =
                   '{"pageType":' +
                 '"' +
-                pType +
+                'not_crawled' +
                 '"' +
-                "," +
+                ',' +
                 '"name":' +
                   '"' +
                   usableURL +
                   '"' +
-                  "," +
+                  ',' +
                   '"text":' +
                   
                   null +
                   
-                  "},";
+                  '},';
                 div.appendChild(p);// Errors
             });
         }, 3000 * i);
@@ -2063,7 +2062,7 @@ h2 {
 }
 
 #specificAnalysis {
-  display: none;
+  display: block;
 }
 #specificAnalysis2 {
   color: pink;
