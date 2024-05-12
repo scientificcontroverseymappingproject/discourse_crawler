@@ -297,35 +297,33 @@ export default {
     },
 
     checkBots: function () {
-
-
       var pathArray = this.urlToScrape.split( '/' );
-var protocol = pathArray[0];
-var host = pathArray[2];
-this.robotsDomain = protocol + '//' + host;
-this.proxyRobotsUrl =   "https://api.allorigins.win/raw?url=" +
-        encodeURIComponent(this.robotsDomain + "/robots.txt")
-const robotsUrl = this.proxyRobotsUrl
-console.log(robotsUrl)
+      var protocol = pathArray[0];
+      var host = pathArray[2];
+      this.robotsDomain = protocol + '//' + host;
+      this.proxyRobotsUrl =   "https://api.allorigins.win/raw?url=" +
+              encodeURIComponent(this.robotsDomain + "/robots.txt")
+      const robotsUrl = this.proxyRobotsUrl
+      console.log(robotsUrl)
 
-axios
+      axios
         .get(robotsUrl)
         .then((response) => {
           this.robotsDotText = response.data
           console.log(this.robotsDotText)
 
-      const robots = robotsParser(
-        {
-          userAgent: 'Googlebot', // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
-          allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
-        },
-      );
-      robots.parseRobots(this.robotsDomain, this.robotsDotText)
-
+          const robots = robotsParser(
+            {
+              userAgent: 'Googlebot', // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
+              allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
+            },
+          );
+        
+          robots.parseRobots(this.robotsDomain, this.robotsDotText)
           robots.canCrawlSync(this.robotsDomain); // Returns true if the link can be crawled, false if not.
           robots.canCrawl(this.robotsDomain, (value) => {
-            console.log(this.robotsDomain + ': main Page Crawlable: ', value);
-            this.goAhead = value
+          console.log(this.robotsDomain + ': main Page Crawlable: ', value);
+          this.goAhead = value
 
             if (this.goAhead == true) {
               this.grabPage()
@@ -335,19 +333,23 @@ axios
               this.goAhead = false
             }
           }); 
-})
-            .catch((errors) => {
+        })
+        .catch((errors) => {
               console.log(errors);
-              })
+         })
     },
 
     checkForQualQuantSummary: function () {
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
       this.progress = false;
+      
       if (workingUrl2 == "data") {
         this.dataInput = true;
         this.showDataButon = true;
+        this.msg = "Initializing";
+        this.msg2 = "";
+        this.showProcess = false;
       }
 
       if (workingUrl2 != "data") {
@@ -364,8 +366,10 @@ axios
 
     runPromptsOnData: function () {
       this.registerData();
+      this.registerVariables();
 
       setTimeout(() => {
+        this.progress = true;
         this.getEmotionStats();
       }, 3000);
     },
@@ -373,17 +377,17 @@ axios
     registerData: function () {
       const instance = this;
       var files = document.getElementById("fileUpload").files;
+      
       if (files.length <= 0) {
         return false;
       }
 
       var fr = new FileReader();
-
       fr.onload = function (e) {
         var result = JSON.parse(e.target.result);
         instance.dataSet = result;
+        instance.overallNumber = result.length
       };
-
       fr.readAsText(files.item(0));
     },
 
@@ -418,48 +422,45 @@ axios
 
           if (this.secondIteration == false) {
             var anchors = [],
-              l = html.links;
+            l = html.links;
             anchors.push(this.urlToScrape);
             const tickerA = html.links.length;
+            
             for (var i = 0; i < l.length; i++) {
               const counterTickerA = i;
 
-              
-
-
-
               if (html.links[i].href.includes(this.urlToScrape)) {
+                
                 if (!html.links[i].href.includes(".pdf" || "%")) {
-robots.parseRobots(this.robotsDomain, this.robotsDotText)
+                  robots.parseRobots(this.robotsDomain, this.robotsDotText)
                   robots.useRobotsFor(this.robotsDomain)
-          robots.canCrawlSync(html.links[i].href); // Returns true if the link can be crawled, false if not.
-          robots.canCrawl(html.links[i].href, (value) => {
-            
-            this.goAhead = value
+                  robots.canCrawlSync(html.links[i].href); // Returns true if the link can be crawled, false if not.
+                  robots.canCrawl(html.links[i].href, (value) => {
+                  this.goAhead = value
 
-            if (this.goAhead == true) {
-              anchors.push(l[i].href);
-              console.log(html.links[i].href + ': crawlable: ', value);
-              this.goAhead = false
-            }else {
-              console.log(l[i].href + ": cannot crawl page as per robots.txt")
-              this.goAhead = false
-            }
+                  if (this.goAhead == true) {
+                    anchors.push(l[i].href);
+                    console.log(html.links[i].href + ': crawlable: ', value);
+                    this.goAhead = false
+                  } else {
+                    console.log(l[i].href + ": cannot crawl page as per robots.txt")
+                    this.goAhead = false
+                  }
 
-            if (counterTickerA === tickerA - 1) {
-                this.pageText = htmlWithoutScripts;
-                this.anchorsForCrawl = anchors.filter(function (item, pos) {
-                  return anchors.indexOf(item) == pos;
-                });
+                  if (counterTickerA === tickerA - 1) {
+                      this.pageText = htmlWithoutScripts;
+                      this.anchorsForCrawl = anchors.filter(function (item, pos) {
+                        return anchors.indexOf(item) == pos;
+                      });
 
-                setTimeout(() => {
-                  console.log("Delayed for 3 seconds.");
-                  this.grabSubpages();
-                }, 3000);
-              }
-          }); 
+                      setTimeout(() => {
+                        console.log("Delayed for 3 seconds.");
+                        this.grabSubpages();
+                      }, 3000);
+                  }
+        }); 
 
-                }
+          }
               }
 
               if (html.links[i].href.includes(window.location.origin)) {
@@ -470,34 +471,34 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
                       window.location.origin + "/",
                       ""
                     );
-robots.parseRobots(this.robotsDomain, this.robotsDotText)
-                    robots.useRobotsFor(this.robotsDomain)
-          robots.canCrawlSync(htmlConstructor); // Returns true if the link can be crawled, false if not.
-          robots.canCrawl(htmlConstructor, (value) => {
-            this.goAhead = value
 
-            if (this.goAhead == true) {
-              anchors.push(htmlConstructor);
-              console.log(htmlConstructor + ': crawlable: ', value);
-              this.goAhead = false
-            }else {
-              console.log(htmlConstructor + ": cannot crawl page as per robots.txt")
-              this.goAhead = false
-            }
+                  robots.parseRobots(this.robotsDomain, this.robotsDotText)
+                  robots.useRobotsFor(this.robotsDomain)
+                  robots.canCrawlSync(htmlConstructor); // Returns true if the link can be crawled, false if not.
+                  robots.canCrawl(htmlConstructor, (value) => {
+                    this.goAhead = value
 
-            if (counterTickerA === tickerA - 1) {
-                this.pageText = htmlWithoutScripts;
-                this.anchorsForCrawl = anchors.filter(function (item, pos) {
-                  return anchors.indexOf(item) == pos;
-                });
+                    if (this.goAhead == true) {
+                      anchors.push(htmlConstructor);
+                      console.log(htmlConstructor + ': crawlable: ', value);
+                      this.goAhead = false
+                    } else {
+                      console.log(htmlConstructor + ": cannot crawl page as per robots.txt")
+                      this.goAhead = false
+                    }
 
-                setTimeout(() => {
-                  console.log("Delayed for 3 seconds.");
-                  this.grabSubpages();
-                }, 3000);
-              }
-        });
-                  
+                    if (counterTickerA === tickerA - 1) {
+                        this.pageText = htmlWithoutScripts;
+                        this.anchorsForCrawl = anchors.filter(function (item, pos) {
+                          return anchors.indexOf(item) == pos;
+                        });
+
+                        setTimeout(() => {
+                          console.log("Delayed for 3 seconds.");
+                          this.grabSubpages();
+                        }, 3000);
+                      }
+                      });
                 }
               }
             }
@@ -560,9 +561,9 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
               var actualText = "";
               const workingActualText = htmlWithoutScripts;
               const workingActualText2 = workingActualText.replace(/"/g, " ");
-              const actualText2 = workingActualText2.replace(/'/g, " ");
-              // const actualText4 = actualText3.replace(/\r?\n?/g, "");
-              // const actualText2 = actualText4.trim();
+              const actualText3 = workingActualText2.replace(/'/g, " ");
+              const actualText4 = actualText3.replace(/(\r\n|\r|\n)/g, '');
+              const actualText2 = actualText4.trim();
 
               if (actualText2.length <= 49999) {
                 if (actualText2.endsWith(".")) {
@@ -577,23 +578,23 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
                 this.pageType = "whole";
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
-                p.innerHTML =
-                  '{"pageType":' +
-                '"' +
-                'whole' +
-                '"' +
-                ',' +
-                '"name":' +
-                  '"' +
-                  usableURL +
-                  '"' +
-                  ',' +
-                  '"text":' +
-                  '"' +
-                  actualText +
-                  '"' +
-                  '},';
-                div.appendChild(p);
+                  p.innerHTML =
+                    '{"pageType":' +
+                    '"' +
+                    'whole' +
+                    '"' +
+                    ',' +
+                    '"name":' +
+                    '"' +
+                    usableURL +
+                    '"' +
+                    ',' +
+                    '"text":' +
+                    '"' +
+                    actualText +
+                    '"' +
+                    '},';
+                  div.appendChild(p);
               }
               if (actualText2.length >= 49999) {
                 if (actualText2.endsWith(".")) {
@@ -608,23 +609,23 @@ robots.parseRobots(this.robotsDomain, this.robotsDotText)
                 this.pageType = "partial";
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
-                p2.innerHTML =
-                  '{"pageType":' +
-                '"' +
-                'partial' +
-                '"' +
-                ',' +
-                '"name":' +
-                  '"' +
-                  usableURL +
-                  '"' +
-                  ',' +
-                  '"text":' +
-                  '"' +
-                  actualText +
-                  '"' +
-                  '},';
-                div2.appendChild(p2);
+                  p2.innerHTML =
+                    '{"pageType":' +
+                    '"' +
+                    'partial' +
+                    '"' +
+                    ',' +
+                    '"name":' +
+                    '"' +
+                    usableURL +
+                    '"' +
+                    ',' +
+                    '"text":' +
+                    '"' +
+                    actualText +
+                    '"' +
+                    '},';
+                  div2.appendChild(p2);
               }
               if (counterTicker === ticker - 1) {
                 setTimeout(() => {
@@ -1250,7 +1251,9 @@ var div = document.getElementById("specificAnalysis3");
     returnJSON: function () {
       var workingJSON = document.getElementById("specificAnalysis3").innerText;
       var middleJSON = "[" + workingJSON.slice(0, -1) + "]";
-      this.JSON3 = middleJSON;
+      const middleJSON2 = middleJSON.replace(/(\r\n|\r|\n)/g, '');
+      const middleJSON3 = middleJSON2.trim();
+      this.JSON3 = middleJSON3;
       console.log("JSON2: " + this.JSON3);
       var div = document.getElementById("specificAnalysis4");
       var p = document.createElement("div");
@@ -1836,6 +1839,7 @@ var div = document.getElementById("specificAnalysis3");
       this.saveJSON();
       window.print();
       this.showPrint = false;
+      robotsParser.clearCache()
       this.msg = "Analysis Complete";
     },
 
@@ -1870,6 +1874,7 @@ var div = document.getElementById("specificAnalysis3");
 }
 #overallVariables {
 margin: 0 auto;
+
 }
 
 #overallVariables2 {
@@ -1887,7 +1892,7 @@ margin: 0 auto;
   color: orange;
   font-size: 30px;
   margin-top: 25px;
-  width: 65%;
+  width: 100%;
   display: inline-block;
 }
 
