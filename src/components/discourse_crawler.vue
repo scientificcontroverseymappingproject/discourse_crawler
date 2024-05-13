@@ -613,7 +613,7 @@ export default {
                   
                 }
                 this.pageType = "whole";
-                instance.logContent = "discourse_crawler: " + usableURL + "Page Type: Whole: " + actualText2.substring(100, 0)
+                instance.logContent = "discourse_crawler: " + usableURL + ": Page Type: Whole: " + actualText2.substring(100, 0)
                 instance.outputToLog()
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
@@ -646,7 +646,7 @@ export default {
                   console.log("no period");
                 }
                 this.pageType = "partial";
-                this.logContent = "discourse_crawler: " + usableURL + "Page Type: Partial: " + actualText2.substring(100, 0)
+                this.logContent = "discourse_crawler: " + usableURL + ": Page Type: Partial: " + actualText2.substring(100, 0)
                 this.outputToLog()
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
@@ -1777,6 +1777,8 @@ var div = document.getElementById("specificAnalysis3");
       this.showPrint = false;
       document.getElementById("specificAnalysis4").style.display = "none";
       document.getElementById("specificAnalysis").style.display = "none";
+      this.logContent = "discourse_crawler: Analysis complete" 
+      this.outputToLog()
     },
 
     getReadabilityStats: function () {
@@ -1892,8 +1894,6 @@ var div = document.getElementById("specificAnalysis3");
       window.print();
       this.showPrint = false;
       robotsParser.clearCache()
-      this.logContent = "discourse_crawler: Analysis complete" 
-      this.outputToLog()
       this.msg = "Analysis Complete";
     },
 
@@ -2123,6 +2123,7 @@ h2 {
 
 #specificAnalysis {
   display: block;
+  color: #2b2d42;
 }
 #specificAnalysis2 {
   color: pink;
@@ -2731,14 +2732,13 @@ body {
 }
 
 #log {
-margin: auto; 
 color: lawngreen; 
 background-color: #2b2d42; 
 width: 80%;  
 text-align: left; 
 overflow: scroll; 
-height: 600px; 
-font-size: 18px;
+height: 180px; 
+font-size: 10px;
 
 }
 </style>
