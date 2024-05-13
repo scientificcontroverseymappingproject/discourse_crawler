@@ -23,7 +23,6 @@
     <p v-if="showProcess" id="messageThree">
       {{ msg3 }}
     </p>
-
     <input
       v-if="showPassword2"
       id="passWordInput"
@@ -164,6 +163,8 @@
     <button @click="renderVisuals">Visualize</button>
  -->
 
+
+
       <p id="terminal"></p>
       <section v-if="!showProcess2">
         <h2 id="overalExplanation3">
@@ -175,13 +176,16 @@
         <br />
       </section>
       <section id="visuals" class="visuals"></section>
+      
       <br />
       <section id="rawData2"></section>
+      <section id="specificAnalysis5"></section><br><br>
+      <section v-if="log"><hr>Crawl and Analysis Log<hr></section><section id="log"><ul id="logItems"></ul></section>
       <section id="specificAnalysis"></section>
       <section id="specificAnalysis2"></section>
       <section id="specificAnalysis3"></section>
       <section id="specificAnalysis4"></section>
-      <section id="specificAnalysis5"></section>
+     
     </section>
     <a id="downloadAnchorElem" style="display: none"></a>
   </div>
@@ -264,13 +268,24 @@ export default {
       goAhead: false, 
       robotsDomain: "", 
       robotsDotText: "", 
-      proxyRobotsUrl: ""
+      proxyRobotsUrl: "", 
+      log: false, 
+      logContent: ""
     };
   },
 
   created: function () {},
 
   methods: {
+
+    outputToLog: function() {
+      var node = document.createElement('li');
+			node.appendChild(document.createTextNode(this.logContent));
+			document.getElementById("logItems").appendChild(node);
+			var elem = document.getElementById('log');
+			elem.scrollTop = elem.scrollHeight;
+    },
+
     registerVariables: function () {
       this.showPrompt = false;
       const workingUrl = this.urlToScrape;
@@ -306,11 +321,16 @@ export default {
       const robotsUrl = this.proxyRobotsUrl
       console.log(robotsUrl)
 
+      this.logContent = "discourse_crawler: Checking robots.txt at: " + this.robotsDomain
+      this.outputToLog()
+
       axios
         .get(robotsUrl)
         .then((response) => {
           this.robotsDotText = response.data
           console.log(this.robotsDotText)
+          this.logContent = "discourse_crawler: " + this.robotsDotText
+          this.outputToLog()
 
           const robots = robotsParser(
             {
@@ -325,11 +345,16 @@ export default {
           console.log(this.robotsDomain + ': main Page Crawlable: ', value);
           this.goAhead = value
 
+          this.logContent = "discourse_crawler: " + this.robotsDomain + ': main Page Crawlable: ' + value
+          this.outputToLog()
+
             if (this.goAhead == true) {
               this.grabPage()
               this.goAhead = false
             }else {
-              this.msg = "cannot crawl page as per robots.txt"
+              this.msg = "discourse_crawler: Cannot crawl page as per robots.txt"
+              this.logContent = "cannot crawl page as per robots.txt"
+              this.outputToLog()
               this.goAhead = false
             }
           }); 
@@ -340,6 +365,7 @@ export default {
     },
 
     checkForQualQuantSummary: function () {
+      this.log = true
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
       this.progress = false;
@@ -442,9 +468,13 @@ export default {
                     anchors.push(l[i].href);
                     console.log(html.links[i].href + ': crawlable: ', value);
                     this.goAhead = false
+                    this.logContent = "discourse_crawler: " + html.links[i].href + ': crawlable: ' + value
+                    this.outputToLog()
                   } else {
                     console.log(l[i].href + ": cannot crawl page as per robots.txt")
                     this.goAhead = false
+                    this.logContent = "discourse_crawler: " + l[i].href + ": Cannot crawl page as per robots.txt"
+                    this.outputToLog()
                   }
 
                   if (counterTickerA === tickerA - 1) {
@@ -482,9 +512,13 @@ export default {
                       anchors.push(htmlConstructor);
                       console.log(htmlConstructor + ': crawlable: ', value);
                       this.goAhead = false
+                      this.logContent = "discourse_crawler: " + html.links[i].href + ': crawlable: ' + value
+                      this.outputToLog()
                     } else {
                       console.log(htmlConstructor + ": cannot crawl page as per robots.txt")
                       this.goAhead = false
+                      this.logContent = "discourse_crawler: " + l[i].href + ": Cannot crawl page as per robots.txt"
+                      this.outputToLog()
                     }
 
                     if (counterTickerA === tickerA - 1) {
@@ -514,6 +548,8 @@ export default {
       let i,
         len = this.anchorsForCrawl.length;
       console.log(this.anchorsForCrawl);
+      this.logContent = "discourse_crawler: URLs to be scraped: " + this.anchorsForCrawl.length + ": " + this.anchorsForCrawl
+      this.outputToLog()
       const ticker = this.anchorsForCrawl.length;
       const workingAnchorsArray = this.anchorsForCrawl;
       const instance = this;
@@ -574,8 +610,11 @@ export default {
                 if (!actualText2.endsWith(".")) {
                   actualText = actualText2 + ".";
                   console.log("no period");
+                  
                 }
                 this.pageType = "whole";
+                instance.logContent = "discourse_crawler: " + usableURL + "Page Type: Whole: " + actualText2.substring(100, 0)
+                instance.outputToLog()
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
                   p.innerHTML =
@@ -607,6 +646,8 @@ export default {
                   console.log("no period");
                 }
                 this.pageType = "partial";
+                this.logContent = "discourse_crawler: " + usableURL + "Page Type: Partial: " + actualText2.substring(100, 0)
+                this.outputToLog()
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
                   p2.innerHTML =
@@ -638,8 +679,10 @@ export default {
               console.log(errors);
               this.msg = errors; 
               this.pageType = "whole";
-                var div = document.getElementById("specificAnalysis");
-                var p = document.createElement("div");
+              this.logContent = "discourse_crawler: Page Type: Not Crawled: " + usableURL
+              this.outputToLog()
+              var div = document.getElementById("specificAnalysis");
+              var p = document.createElement("div");
                 p.innerHTML =
                   '{"pageType":' +
                 '"' +
@@ -929,6 +972,8 @@ export default {
                 number + "/" + instance.overallNumber + ": " + usableURL;
               const rawResult = result.data.choices[0].message.content;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
+              instance.logContent = "discourse_crawler: Variables for: " + usableURL + ": " + justTheJSON
+              instance.outputToLog()
               console.log(i2 + ": " + justTheJSON);
 
               const emotionResults = JSON.parse(justTheJSON);
@@ -992,6 +1037,8 @@ export default {
             .catch((error) => {
               console.log(error);
               instance.msg = error;
+              instance.logContent = "discourse_crawler: Variables error: " + error
+              instance.outputToLog()
             });
           if (counterTicker2 === ticker2 - 1) {
             setTimeout(() => {
@@ -1122,6 +1169,9 @@ var div = document.getElementById("specificAnalysis2");
               instance.moralFoundationAnalysis =
                 moralFoundationResults.replaceAll("'", "");
 
+              instance.logContent = "discourse_crawler: Qualitative analysis for: " + usableURL2 + instance.moralFoundationAnalysis
+              instance.outputToLog()
+
               var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
               p.innerHTML =
@@ -1179,7 +1229,9 @@ var div = document.getElementById("specificAnalysis2");
             })
             .catch((error) => {
               console.log(error);
-              this.msg = error;
+              instance.msg = error;
+              instance.logContent = "discourse_crawler: Qualitative error: " + error
+              instance.outputToLog()
             });
           if (counterTicker3 === ticker3 - 1) {
             setTimeout(() => {
@@ -1840,6 +1892,8 @@ var div = document.getElementById("specificAnalysis3");
       window.print();
       this.showPrint = false;
       robotsParser.clearCache()
+      this.logContent = "discourse_crawler: Analysis complete" 
+      this.outputToLog()
       this.msg = "Analysis Complete";
     },
 
@@ -2674,5 +2728,17 @@ body {
   100% {
     background-position: calc(100% / 3) 0;
   }
+}
+
+#log {
+margin: auto; 
+color: lawngreen; 
+background-color: #2b2d42; 
+width: 80%;  
+text-align: left; 
+overflow: scroll; 
+height: 600px; 
+font-size: 18px;
+
 }
 </style>
