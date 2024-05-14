@@ -247,7 +247,7 @@ export default {
       promptInput:
         "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
       promptInput2:
-        "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation. Include in your response only identified moral foundations. Text: ",
+        "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 100 words. Include in your response only identified moral foundations. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -1543,7 +1543,7 @@ var div = document.getElementById("specificAnalysis3");
               },
             ],
             temperature: 0,
-            max_tokens: 500,
+            max_tokens: 3000,
             top_p: 0,
             frequency_penalty: 0,
             presence_penalty: 0,
