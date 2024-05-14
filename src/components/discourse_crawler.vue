@@ -247,7 +247,7 @@ export default {
       promptInput:
         "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
       promptInput2:
-        "Analyze this text to identify which of the five moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation. Include in your response only identified moral foundations. Text: ",
+        "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation. Include in your response only identified moral foundations. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -321,7 +321,7 @@ export default {
       const robotsUrl = this.proxyRobotsUrl
       console.log(robotsUrl)
 
-      this.logContent = "discourse_crawler: Checking robots.txt at: " + this.robotsDomain
+      this.logContent = "🌐 discourse_crawler: checking robots.txt at: " + this.robotsDomain
       this.outputToLog()
 
       axios
@@ -329,7 +329,7 @@ export default {
         .then((response) => {
           this.robotsDotText = response.data
           console.log(this.robotsDotText)
-          this.logContent = "discourse_crawler: " + this.robotsDotText
+          this.logContent = "🤖 discourse_crawler: robots.txt: " + this.robotsDotText
           this.outputToLog()
 
           const robots = robotsParser(
@@ -345,15 +345,14 @@ export default {
           console.log(this.robotsDomain + ': main Page Crawlable: ', value);
           this.goAhead = value
 
-          this.logContent = "discourse_crawler: " + this.robotsDomain + ': main Page Crawlable: ' + value
-          this.outputToLog()
-
             if (this.goAhead == true) {
+              this.logContent = "✅ discourse_crawler: " + this.robotsDomain + ': main Page Crawlable: ' + value
+              this.outputToLog()
               this.grabPage()
               this.goAhead = false
             }else {
               this.msg = "discourse_crawler: Cannot crawl page as per robots.txt"
-              this.logContent = "cannot crawl page as per robots.txt"
+              this.logContent = "🔴 discourse_crawler: " + this.robotsDomain + ': cannot crawl as per robots.txt'
               this.outputToLog()
               this.goAhead = false
             }
@@ -468,12 +467,12 @@ export default {
                     anchors.push(l[i].href);
                     console.log(html.links[i].href + ': crawlable: ', value);
                     this.goAhead = false
-                    this.logContent = "discourse_crawler: " + html.links[i].href + ': crawlable: ' + value
+                    this.logContent = "✅ discourse_crawler: " + html.links[i].href + ': crawlable: ' + value
                     this.outputToLog()
                   } else {
                     console.log(l[i].href + ": cannot crawl page as per robots.txt")
                     this.goAhead = false
-                    this.logContent = "discourse_crawler: " + l[i].href + ": Cannot crawl page as per robots.txt"
+                    this.logContent = "🔴 discourse_crawler: " + l[i].href + ": cannot crawl page as per robots.txt"
                     this.outputToLog()
                   }
 
@@ -512,12 +511,12 @@ export default {
                       anchors.push(htmlConstructor);
                       console.log(htmlConstructor + ': crawlable: ', value);
                       this.goAhead = false
-                      this.logContent = "discourse_crawler: " + html.links[i].href + ': crawlable: ' + value
+                      this.logContent = "✅ discourse_crawler: " + html.links[i].href + ': crawlable: ' + value
                       this.outputToLog()
                     } else {
                       console.log(htmlConstructor + ": cannot crawl page as per robots.txt")
                       this.goAhead = false
-                      this.logContent = "discourse_crawler: " + l[i].href + ": Cannot crawl page as per robots.txt"
+                      this.logContent = "🔴 discourse_crawler: " + l[i].href + ": cannot crawl page as per robots.txt"
                       this.outputToLog()
                     }
 
@@ -541,6 +540,8 @@ export default {
         .catch((errors) => {
           console.log(errors);
           this.msg = errors; // Errors and stuff
+          this.logContent = "💀 discourse_crawler: " + errors
+          this.outputToLog()
         });
     },
 
@@ -548,7 +549,7 @@ export default {
       let i,
         len = this.anchorsForCrawl.length;
       console.log(this.anchorsForCrawl);
-      this.logContent = "discourse_crawler: URLs to be scraped: " + this.anchorsForCrawl.length + ": " + this.anchorsForCrawl
+      this.logContent = "🔗 discourse_crawler: URLs to be scraped: " + this.anchorsForCrawl.length + ": " + this.anchorsForCrawl
       this.outputToLog()
       const ticker = this.anchorsForCrawl.length;
       const workingAnchorsArray = this.anchorsForCrawl;
@@ -613,7 +614,7 @@ export default {
                   
                 }
                 this.pageType = "whole";
-                instance.logContent = "discourse_crawler: " + usableURL + ": Page Type: Whole: " + actualText2.substring(100, 0)
+                instance.logContent = "📗 discourse_crawler: " + usableURL + ": page Type: whole: " + actualText2.substring(100, 0)
                 instance.outputToLog()
                 var div = document.getElementById("specificAnalysis");
                 var p = document.createElement("div");
@@ -645,9 +646,9 @@ export default {
                   actualText = actualText2.substring(49999, 0) + ".";
                   console.log("no period");
                 }
-                this.pageType = "partial";
-                this.logContent = "discourse_crawler: " + usableURL + ": Page Type: Partial: " + actualText2.substring(100, 0)
-                this.outputToLog()
+                instance.pageType = "partial";
+                instance.logContent = "📙 discourse_crawler: " + usableURL + ": page type: partial: " + actualText2.substring(100, 0)
+                instance.outputToLog()
                 var div2 = document.getElementById("specificAnalysis");
                 var p2 = document.createElement("div");
                   p2.innerHTML =
@@ -677,10 +678,10 @@ export default {
             })
             .catch((errors) => {
               console.log(errors);
-              this.msg = errors; 
-              this.pageType = "whole";
-              this.logContent = "discourse_crawler: Page Type: Not Crawled: " + usableURL
-              this.outputToLog()
+              instance.msg = errors; 
+              instance.pageType = "whole";
+              instance.logContent = "📕 discourse_crawler: page type: not crawled: " + usableURL
+              instance.outputToLog()
               var div = document.getElementById("specificAnalysis");
               var p = document.createElement("div");
                 p.innerHTML =
@@ -972,7 +973,7 @@ export default {
                 number + "/" + instance.overallNumber + ": " + usableURL;
               const rawResult = result.data.choices[0].message.content;
               const justTheJSON = rawResult.substring(rawResult.indexOf("{"));
-              instance.logContent = "discourse_crawler: Variables for: " + usableURL + ": " + justTheJSON
+              instance.logContent = "📟 discourse_crawler: quantitative results for: " + usableURL + ": " + justTheJSON
               instance.outputToLog()
               console.log(i2 + ": " + justTheJSON);
 
@@ -1037,7 +1038,7 @@ export default {
             .catch((error) => {
               console.log(error);
               instance.msg = error;
-              instance.logContent = "discourse_crawler: Variables error: " + error
+              instance.logContent = "💀 📟 discourse_crawler: quantitative analysis error: " + error
               instance.outputToLog()
             });
           if (counterTicker2 === ticker2 - 1) {
@@ -1169,7 +1170,7 @@ var div = document.getElementById("specificAnalysis2");
               instance.moralFoundationAnalysis =
                 moralFoundationResults.replaceAll("'", "");
 
-              instance.logContent = "discourse_crawler: Qualitative analysis for: " + usableURL2 + instance.moralFoundationAnalysis
+              instance.logContent = "💡 discourse_crawler: qualitative analysis for: " + usableURL2 + ": " + instance.moralFoundationAnalysis
               instance.outputToLog()
 
               var div = document.getElementById("specificAnalysis3");
@@ -1230,7 +1231,7 @@ var div = document.getElementById("specificAnalysis2");
             .catch((error) => {
               console.log(error);
               instance.msg = error;
-              instance.logContent = "discourse_crawler: Qualitative error: " + error
+              instance.logContent = "💀 💡 discourse_crawler: qualitative analysis error: " + error
               instance.outputToLog()
             });
           if (counterTicker3 === ticker3 - 1) {
@@ -1408,7 +1409,6 @@ var div = document.getElementById("specificAnalysis3");
               p7.setAttribute("id", "overalExplanation3");
               p7.innerHTML = "Raw Data";
               div7.appendChild(p7);
-              this.renderOverallEmotion();
               if (this.qualQuantSummary == true) {
                 this.getOverallMoralFoundationScores();
               }
@@ -1777,8 +1777,15 @@ var div = document.getElementById("specificAnalysis3");
       this.showPrint = false;
       document.getElementById("specificAnalysis4").style.display = "none";
       document.getElementById("specificAnalysis").style.display = "none";
-      this.logContent = "discourse_crawler: Analysis complete" 
+      this.logContent = "🎉 discourse_crawler: analysis complete" 
       this.outputToLog()
+      const robots = robotsParser(
+        {
+          userAgent: 'Googlebot', // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
+          allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
+        },
+      );
+      robots.clearCache()
     },
 
     getReadabilityStats: function () {
@@ -1884,17 +1891,19 @@ var div = document.getElementById("specificAnalysis3");
     pdfResults: function () {
       this.showPrint = true;
       this.msg = "";
+      document.getElementById("log").style.height = "100%"
       setTimeout(() => {
         this.prepForPrinting();
       }, 500);
     },
 
     prepForPrinting: function () {
+
       this.saveJSON();
       window.print();
       this.showPrint = false;
-      robotsParser.clearCache()
       this.msg = "Analysis Complete";
+      document.getElementById("log").style.height = "100%"
     },
 
     saveJSON: function () {
