@@ -247,7 +247,7 @@ export default {
       promptInput:
         "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
       promptInput2:
-        "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 100 words. Include in your response only identified moral foundations. Text: ",
+        "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 50 words. Include in your response only identified moral foundations. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -1449,12 +1449,12 @@ var div = document.getElementById("specificAnalysis3");
           });
 
           const params = {
-            model: "gpt-3.5-turbo-16k",
+            model: "gpt-4-turbo",
             messages: [
               {
                 role: "user",
                 content:
-                  "Synthesize the following statements into a brief analytic summary about the overall text that those statements are referring to. Statements:" +
+                  "Synthesize the following statements into a brief 200 word summary that reports the overall conclusions of the statements. Statements:" +
                   instance.overallSummaryOutput,
               },
             ],
@@ -1533,12 +1533,12 @@ var div = document.getElementById("specificAnalysis3");
           });
 
           const params = {
-            model: "gpt-3.5-turbo-16k",
+            model: "gpt-4-turbo",
             messages: [
               {
                 role: "user",
                 content:
-                  'Give me numerical scores that indicate proportions of care, fairness, loyalty, authority, and purity represented in the following text formatted in JSON as {"care": number score,"fairness": number score,"loyalty": number score,"authority": number score,"purity": number score}. Explain those scores. Text:' +
+                'Analyze the contents of the following texts and give me numerical scores between 1 and 10 indicating the care, fairness, loyalty, authority, and purity represented in them formatted in JSON as {"care": numerical score,"fairness": numerical score,"loyalty": numerical score,"authority": numerical score,"purity": numerical score}. Include the json at the very beginning of the response and do not include ```s in the response. Explain those scores. Text:' +
                   instance.overallSummaryOutput,
               },
             ],
