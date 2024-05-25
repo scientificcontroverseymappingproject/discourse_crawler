@@ -1,9 +1,9 @@
 <template>
   <div id="body" class="dashboard">
-    <br /><button v-if="!showPrint" id="apiButton" @click="pdfResults">
+    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    <br /><button v-if="!showPrint" id="startButton" @click="pdfResults">
       Save Results as JSON and PDF
     </button>
-    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
     <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
     <div v-if="!loader" class="loader"></div>
     <div v-if="!loader2" class="loader2"></div>
@@ -35,25 +35,13 @@
     </button>
 
     <section id="overallVariables2" v-if="showPassword">
-      <p id="results">
-      <span id="overallMoralFoundations"></span><br />
-      <section id="overalExplanation2">
-        <h2 v-if="overallQuant">
-          Summary of
-          <span style="color: hotpink">Quantitative</span>
-          Analysis
-          
-        </h2>
-        <span id="overallVariables"></span>
-      </section>
-      </p>
-      <section v-if="!showProcess2" id="overalExplanation">
-        <h2>
-          Summary of <span style="color: orange">Qualitative</span> Analysis
-        </h2>
-        {{ overallOutputExplanation }}
-      </section>
+      
       <section v-if="showPrompt">
+        <h2 id="quant">Model Selection</h2>
+          <span id="model1">Mistral  </span><label class="switch">
+            <input type="checkbox" id="myCheckbox" @change="toggleCheck()" checked>
+            <span class="slider round"></span>
+          </label><span id="model2">  OpenAI</span><br><br>
         <hr class="quantLine" />
         <h2 id="quant">Quantitative Module</h2>
         Priming Text<br />
@@ -129,7 +117,7 @@
           placeholder="Perform sentiment analysis on the following text, outputting scores between 1 and 10 for "
         /><br /><br />
         <hr class="quantLine" />
-        <br />
+        <h2 id="quant">URL Input</h2>
         URL to Crawl<br />
         <input
           v-if="showProcess"
@@ -140,8 +128,8 @@
         />
         <br />
 
-        <input id="fileUpload" v-if="dataInput" type="file" />
-
+        <input id="fileUpload" v-if="dataInput" type="file" /><br>
+        <hr class="quantLine" /><br>
         <p></p>
         <button
           v-if="showProcess"
@@ -154,6 +142,24 @@
           Run Prompts on Data
         </button>
       </section>
+      <p id="results">
+        <span id="overallMoralFoundations"></span><br />
+        <section id="overalExplanation2">
+          <h2 v-if="overallQuant">
+            Summary of
+            <span style="color: hotpink">Quantitative</span>
+            Analysis
+            
+          </h2>
+          <span id="overallVariables"></span>
+        </section>
+        </p>
+        <section v-if="!showProcess2" id="overalExplanation">
+          <h2>
+            Summary of <span style="color: orange">Qualitative</span> Analysis
+          </h2>
+          {{ overallOutputExplanation }}
+        </section>
       <!-- <button @click="renderVisuals">Overall</button> 
 
    
@@ -270,7 +276,9 @@ export default {
       robotsDotText: "", 
       proxyRobotsUrl: "", 
       log: false, 
-      logContent: ""
+      logContent: "",
+      openAI: true, 
+      mistral: false
     };
   },
 
@@ -284,6 +292,22 @@ export default {
 			document.getElementById("logItems").appendChild(node);
 			var elem = document.getElementById('log');
 			elem.scrollTop = elem.scrollHeight;
+    },
+
+    toggleCheck: function() {
+      if (document.getElementById("myCheckbox").checked === true){
+        this.openAI = true; 
+        this.mistral = false; 
+        document.getElementById("model2").style.color = '#71c68b';
+        document.getElementById("model1").style.color = 'white';
+        console.log("OpenAI selected")
+      } else {
+        this.openAI = false; 
+        this.mistral = true; 
+        document.getElementById("model1").style.color = 'hotpink';
+        document.getElementById("model2").style.color = 'white';
+        console.log("Mistral selected")
+      }
     },
 
     registerVariables: function () {
@@ -312,6 +336,14 @@ export default {
     },
 
     checkBots: function () {
+      if (this.openAI === true) {
+        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo-16k (quantitative analysis, qualitative analysis, and quantitative summary); gpt-4-turbo (qualitative summary)"
+        this.outputToLog()
+      }
+      if (this.mistral === true) {
+        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: mistral-medium-latest (quantitative analysis, qualitative analysis, and quantitative summary); mistral-large-latest (qualitative summary) [note that this is a placeholder option; OpenAI models are current default regardless of selection. Mistral option has not yet been implemented]"
+        this.outputToLog()
+      }
       var pathArray = this.urlToScrape.split( '/' );
       var protocol = pathArray[0];
       var host = pathArray[2];
@@ -1935,6 +1967,11 @@ var div = document.getElementById("specificAnalysis3");
   word-break: break-word;
   color: hotpink;
 }
+
+#mainTitle {
+  font-size: 65px;
+  margin-top: -40px;
+}
 #overallVariables {
 margin: 0 auto;
 
@@ -1977,6 +2014,7 @@ margin: 0 auto;
 
 #results {
   margin: auto;
+  display: hidden;
 }
 #overallMoralFoundations {
   display: inline-block;
@@ -2068,13 +2106,10 @@ margin: 0 auto;
   white-space: normal;
 }
 
-#quant {
-  color: hotpink;
-}
-
 #quant,
 #qual {
   color: orange;
+  font-size: 40px;
 }
 
 .quantLine {
@@ -2085,14 +2120,16 @@ margin: 0 auto;
   width: 400px;
 }
 #startButton {
-  background: #2f4858;
-  font-size: 30px;
-  color: white;
-  border: none;
+  font-size: 35px;
+  color: orange;
+  border-color: white;
+  border-style: solid;
+  margin-top:5px;
+  background-color: #2b2d42;
 }
 
 #startButton:hover {
-  background: purple;
+  background: #dd06d6;
 }
 
 #promptButton {
@@ -2179,6 +2216,7 @@ div {
 #messageTwo {
   color: #92dce5;
   font-size: 25px;
+  line-break: anywhere;
 }
 
 #messageThree {
@@ -2749,5 +2787,69 @@ overflow: scroll;
 height: 180px; 
 font-size: 10px;
 
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: hotpink;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: #71c68b;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+#model2 {
+color: #71c68b; 
+  font-size: 25px; 
+}
+#model1 {
+  font-size: 25px;
 }
 </style>
