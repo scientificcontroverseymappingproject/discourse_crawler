@@ -211,10 +211,10 @@ import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 import Plotly from "plotly.js-dist";
-//import dotenv from "dotenv";
+import dotenv from "dotenv";
 import robotsParser from 'robots-txt-parser'
 //import OpenAI from "openai";
-//dotenv.config();
+dotenv.config();
 export default {
   name: "discourse_crawler",
   props: {},
@@ -242,7 +242,7 @@ export default {
       five: 0,
       six: 0,
       showPassword: false,
-      password: VUE_APP_ROOT_PASSWORD,
+      password: process.env.VUE_APP_ROOT_PASSWORD,
       showPassword2: true,
       userPassword: "",
       readability: 0,
@@ -258,10 +258,10 @@ export default {
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: VUE_APP_ROOT_API,
-      apiKEY2: VUE_APP_ROOT_API2,
-      apiURL: VUE_APP_ROOT_URL,
-      apiURL2: VUE_APP_ROOT_URL2,
+      apiKEY: process.env.VUE_APP_ROOT_API,
+      apiKEY2: process.env.VUE_APP_ROOT_API2,
+      apiURL: process.env.VUE_APP_ROOT_URL,
+      apiURL2: process.env.VUE_APP_ROOT_URL2,
       analysisModel: "gpt-3.5-turbo-16k",
       analysisModel2: "mistral-medium-latest",
       summaryModel: "gpt-4-turbo",
