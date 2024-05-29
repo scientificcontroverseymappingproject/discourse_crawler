@@ -1,16 +1,24 @@
 <template>
   <div id="body" class="dashboard">
-    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    
     <br /><button v-if="!showPrint" id="startButton" @click="pdfResults">
       Save Results as JSON and PDF
     </button>
-    <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
-    <div v-if="!loader" class="loader"></div>
-    <div v-if="!loader2" class="loader2"></div>
+    
+    
 
+   
+    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    <h1 v-if="showProcess3" >{{ msg7 }}</h1>
     <div v-if="!progress" class="progress">
       <div class="color"></div>
     </div>
+    <div v-if="space" id="spacer"> </div>
+    <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
+    <div v-if="!loader" class="loader"></div>
+    <div v-if="!loader2" class="loader2"></div>
+   
+    
     <div v-if="!pacman" class="pacman">
       <!-- <div class="pacman__eye"></div> -->
       <div class="pacman__mouth"></div>
@@ -20,7 +28,7 @@
     <p v-if="showProcess2" id="messageTwo">
       {{ msg2 }}
     </p>
-    <p v-if="showProcess" id="messageThree">
+    <p v-if="showTagline" id="messageThree">
       {{ msg3 }}
     </p>
     <input
@@ -117,8 +125,8 @@
           placeholder="Perform sentiment analysis on the following text, outputting scores between 1 and 10 for "
         /><br /><br />
         <hr class="quantLine" />
-        <h2 id="quant">URL Input</h2>
-        URL to Crawl<br />
+        <h2 id="urlInputHeader">URL Input</h2>
+        <span id="urlInputHeaderInstructions" >URL to Crawl</span><br />
         <input
           v-if="showProcess"
           id="URLInput"
@@ -213,10 +221,11 @@ export default {
   data() {
     return {
       msg: "Discourse Crawler",
-      msg2: "An AI-powered tool for performing top-level analysis of websites.",
-      msg3: "",
+      msg2: "",
+      msg3: "An AI-powered tool for performing top-level analysis of websites.",
       msg5: "",
       msg6: "",
+      msg7: "", 
       pacman: true,
       progress: true,
       rawData: true,
@@ -278,7 +287,9 @@ export default {
       log: false, 
       logContent: "",
       openAI: true, 
-      mistral: false
+      mistral: false, 
+      showTagline: true, 
+      space: false
     };
   },
 
@@ -326,9 +337,9 @@ export default {
       if (this.userPassword == this.password) {
         this.showPassword = true;
         this.showPassword2 = false;
-        this.msg = "Discourse Crawler";
-        this.msg2 =
-          "An AI-powered tool for performing top-level analysis of websites.";
+        this.msg = "";
+        this.msg2 = ""; 
+        this.showTagline = false; 
       } else {
         this.msg = "incorrect password";
         this.msg2 = "try again";
@@ -396,7 +407,6 @@ export default {
     },
 
     checkForQualQuantSummary: function () {
-      this.log = true
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
       this.progress = false;
@@ -407,26 +417,32 @@ export default {
         this.msg = "Initializing";
         this.msg2 = "";
         this.showProcess = false;
+        this.progress = true; 
+        this.msg = ""; 
+        document.getElementById("urlInputHeader").innerHTML = "Data Input";
+        document.getElementById("urlInputHeaderInstructions").innerHTML = "Select JSON data file (should only contain values for 'name' and 'text').";
       }
 
       if (workingUrl2 != "data") {
         if (workingUrl2.endsWith("$")) {
+          this.log = true
           this.qualQuantSummary = true;
           this.urlToScrape = workingUrl2.slice(0, -1);
           console.log("qualquant summary for " + this.urlToScrape);
           this.checkBots()
         } else {
+          this.log = true
           this.checkBots()
         }
       }
     },
 
     runPromptsOnData: function () {
+      this.log = true
       this.registerData();
       this.registerVariables();
 
       setTimeout(() => {
-        this.progress = true;
         this.getEmotionStats();
       }, 3000);
     },
@@ -1081,7 +1097,7 @@ export default {
           }
         }
         if (usableText == null ) {
-var div = document.getElementById("specificAnalysis2");
+              var div = document.getElementById("specificAnalysis2");
               var p = document.createElement("div");
               p.innerHTML =
                 '{"pageType":' +
@@ -1274,7 +1290,7 @@ var div = document.getElementById("specificAnalysis2");
           }
           }
           if (usableText2 == null) {
-var div = document.getElementById("specificAnalysis3");
+              var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
               p.innerHTML =
                 '{"pageType":' +
@@ -1347,6 +1363,9 @@ var div = document.getElementById("specificAnalysis3");
 
       setTimeout(() => {
         console.log("Delayed for 1 second.");
+        this.msg7 = "Finishing Up"; 
+        this.progress = false; 
+        this.space = true;
         this.renderVisuals();
       }, 2000);
     },
@@ -1434,7 +1453,6 @@ var div = document.getElementById("specificAnalysis3");
           if (i === len - 1) {
             setTimeout(() => {
               console.log("Delayed for 4 seconds.");
-              this.msg = "Analysis Complete";
               this.msg2 = "";
               var div7 = document.getElementById("rawData2");
               var p7 = document.createElement("h2");
@@ -1452,9 +1470,8 @@ var div = document.getElementById("specificAnalysis3");
         }
       }
     },
-    getOverallQualSummary: function () {
+    getOverallQualSummary: function () { 
       this.showProcess2 = false;
-      this.msg5 = this.urlToScrape;
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
@@ -1538,7 +1555,6 @@ var div = document.getElementById("specificAnalysis3");
 
     getOverallMoralFoundationScores: function () {
       this.showProcess2 = false;
-      this.msg5 = this.urlToScrape;
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
@@ -1690,7 +1706,7 @@ var div = document.getElementById("specificAnalysis3");
               setTimeout(() => {
                 console.log("Delayed for 1 second.");
                 this.renderOverallEmotion();
-              }, 1000);
+              }, 3000);
             })
             .catch((error) => {
               console.log(error);
@@ -1809,6 +1825,7 @@ var div = document.getElementById("specificAnalysis3");
       this.showPrint = false;
       document.getElementById("specificAnalysis4").style.display = "none";
       document.getElementById("specificAnalysis").style.display = "none";
+      this.msg5 = this.urlToScrape;
       this.logContent = "🎉 discourse_crawler: analysis complete" 
       this.outputToLog()
       const robots = robotsParser(
@@ -1818,6 +1835,10 @@ var div = document.getElementById("specificAnalysis3");
         },
       );
       robots.clearCache()
+      this.msg = ""
+      this.msg7 = ""
+      this.progress = true; 
+      this.space = false;
     },
 
     getReadabilityStats: function () {
@@ -1934,7 +1955,6 @@ var div = document.getElementById("specificAnalysis3");
       this.saveJSON();
       window.print();
       this.showPrint = false;
-      this.msg = "Analysis Complete";
       document.getElementById("log").style.height = "100%"
     },
 
@@ -1970,7 +1990,7 @@ var div = document.getElementById("specificAnalysis3");
 
 #mainTitle {
   font-size: 65px;
-  margin-top: -40px;
+  margin-top: -20px;
 }
 #overallVariables {
 margin: 0 auto;
@@ -2112,6 +2132,13 @@ margin: 0 auto;
   font-size: 40px;
 }
 
+#urlInputHeader {
+
+  color: orange;
+  font-size: 40px;
+
+}
+
 .quantLine {
   width: 50%;
 }
@@ -2220,9 +2247,10 @@ div {
 }
 
 #messageThree {
-  color: white;
-  font-size: 25px;
-  margin-left: 10%;
+  color: #92dce5;
+  font-size: 18.5px; 
+  margin-top: -5%; 
+  margin-bottom: 8%; 
 }
 
 #begin {
@@ -2851,5 +2879,11 @@ color: #71c68b;
 }
 #model1 {
   font-size: 25px;
+  color: white
+}
+
+#spacer {
+  margin-bottom: 1000px; 
+
 }
 </style>
