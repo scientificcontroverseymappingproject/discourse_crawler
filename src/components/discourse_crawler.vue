@@ -259,6 +259,13 @@ export default {
       JSON4: null,
       moralFoundationAnalysis: "",
       apiKEY: process.env.VUE_APP_ROOT_API,
+      apiKEY2: process.env.VUE_APP_ROOT_API2,
+      apiURL: process.env.VUE_APP_ROOT_URL,
+      apiURL2: process.env.VUE_APP_ROOT_URL2,
+      analysisModel: "gpt-3.5-turbo-16k",
+      analysisModel2: "mistral-medium-latest",
+      summaryModel: "gpt-4-turbo",
+      summaryModel2: "mistral-large-latest",
       promptInput:
         "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
       promptInput2:
@@ -279,6 +286,7 @@ export default {
       dataInput: false,
       showDataButon: false,
       delayTime: 3000,
+      mistralDelay: 5000,
       overallNumber: "",
       goAhead: false, 
       robotsDomain: "", 
@@ -318,6 +326,11 @@ export default {
         document.getElementById("model1").style.color = 'hotpink';
         document.getElementById("model2").style.color = 'white';
         console.log("Mistral selected")
+        this.apiKEY = this.apiKEY2
+        this.apiURL = this.apiURL2
+        this.summaryModel = this.summaryModel2
+        this.analysisModel = this.analysisModel2
+        this.mistralDelay = 20000
       }
     },
 
@@ -348,11 +361,11 @@ export default {
 
     checkBots: function () {
       if (this.openAI === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo-16k (quantitative analysis, qualitative analysis, and quantitative summary); gpt-4-turbo (qualitative summary)"
+        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo-16k (quantitative analysis and qualitative analysis); gpt-4-turbo (qualitative summary)"
         this.outputToLog()
       }
       if (this.mistral === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: mistral-medium-latest (quantitative analysis, qualitative analysis, and quantitative summary); mistral-large-latest (qualitative summary) [note that this is a placeholder option; OpenAI models are current default regardless of selection. Mistral option has not yet been implemented]"
+        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: mistral-medium-latest (quantitative analysis and qualitative analysis); mistral-large-latest (qualitative summary) [note that this is a placeholder option; OpenAI models are current default regardless of selection. Mistral option has not yet been implemented]"
         this.outputToLog()
       }
       var pathArray = this.urlToScrape.split( '/' );
@@ -966,7 +979,7 @@ export default {
               instance.variableSix +
               ", returning the response in JSON only. Format as" +
               jsonOne +
-              ". " +
+              ". Do not include any text other than the JSON in the response. " +
               "Text: " +
               usableText
           );
@@ -978,7 +991,7 @@ export default {
           });
 
           const params = {
-            model: "gpt-3.5-turbo-16k",
+            model: instance.analysisModel,
             messages: [
               {
                 role: "user",
@@ -995,22 +1008,18 @@ export default {
                   instance.variableFive +
                   commaFive +
                   instance.variableSix +
-                  ", returning the response in JSON only. Format as" +
+                  ", returning the response in JSON. Format as" +
                   jsonOne +
-                  ". " +
+                  ". Do not include any text other than the JSON. " +
                   "Text: " +
                   usableText,
               },
             ],
             temperature: 0,
-            max_tokens: 500,
-            top_p: 0,
-            frequency_penalty: 0,
-            presence_penalty: 0,
           };
 
           client
-            .post("https://api.openai.com/v1/chat/completions", params)
+            .post(instance.apiURL, params)
             .then((result) => {
               instance.pacman = true;
               document.getElementById("mainTitle").style.color = "hotpink";
@@ -1188,7 +1197,7 @@ export default {
           });
 
           const params = {
-            model: "gpt-3.5-turbo-16k",
+            model: instance.analysisModel,
             messages: [
               {
                 role: "user",
@@ -1196,14 +1205,10 @@ export default {
               },
             ],
             temperature: 0,
-            max_tokens: 500,
-            top_p: 0,
-            frequency_penalty: 0,
-            presence_penalty: 0,
           };
 
           client
-            .post("https://api.openai.com/v1/chat/completions", params)
+            .post(instance.apiURL, params)
             .then((result) => {
               instance.loader = true;
               document.getElementById("mainTitle").style.color = "orange";
@@ -1286,7 +1291,7 @@ export default {
             setTimeout(() => {
               console.log("Qual delayed for 5 seconds.");
               instance.returnJSON();
-            }, 5000);
+            }, instance.mistralDelay);
           }
           }
           if (usableText2 == null) {
@@ -1498,7 +1503,7 @@ export default {
           });
 
           const params = {
-            model: "gpt-4-turbo",
+            model: instance.summaryModel,
             messages: [
               {
                 role: "user",
@@ -1508,14 +1513,10 @@ export default {
               },
             ],
             temperature: 0,
-            max_tokens: 500,
-            top_p: 0,
-            frequency_penalty: 0,
-            presence_penalty: 0,
           };
 
           client
-            .post("https://api.openai.com/v1/chat/completions", params)
+            .post(instance.apiURL, params)
             .then((result) => {
               instance.msg5 = instance.urlToScrape;
               const rawResultA = result.data.choices[0].message.content;
@@ -1581,7 +1582,7 @@ export default {
           });
 
           const params = {
-            model: "gpt-4-turbo",
+            model: instance.summaryModel,
             messages: [
               {
                 role: "user",
@@ -1591,14 +1592,10 @@ export default {
               },
             ],
             temperature: 0,
-            max_tokens: 3000,
-            top_p: 0,
-            frequency_penalty: 0,
-            presence_penalty: 0,
           };
 
           client
-            .post("https://api.openai.com/v1/chat/completions", params)
+            .post(instance.apiURL, params)
             .then((result) => {
               instance.msg5 = instance.urlToScrape;
               const rawResultA = result.data.choices[0].message.content;
@@ -1806,7 +1803,7 @@ export default {
           setTimeout(() => {
             console.log("Delayed for 1 second.");
             instance.returnJSONAgain();
-          }, 1000);
+          }, 3000);
         }
       }
     },
