@@ -211,10 +211,10 @@ import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 import Plotly from "plotly.js-dist";
-import dotenv from "dotenv";
+//import dotenv from "dotenv";
 import robotsParser from 'robots-txt-parser'
 //import OpenAI from "openai";
-dotenv.config();
+//dotenv.config();
 export default {
   name: "discourse_crawler",
   props: {},
@@ -242,7 +242,7 @@ export default {
       five: 0,
       six: 0,
       showPassword: false,
-      password: process.env.VUE_APP_ROOT_PASSWORD,
+      password: VUE_APP_ROOT_PASSWORD,
       showPassword2: true,
       userPassword: "",
       readability: 0,
