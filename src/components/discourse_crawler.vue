@@ -11,14 +11,8 @@
     <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
     <h1 v-if="showProcess3" >{{ msg7 }}</h1>
     <div v-if="!progress" class="progress">
-      <div class="color"></div>
+      <div id="progressColor" class="color"></div>
     </div>
-    <div v-if="space" id="spacer"> </div>
-    <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
-    <div v-if="!loader" class="loader"></div>
-    <div v-if="!loader2" class="loader2"></div>
-   
-    
     <div v-if="!pacman" class="pacman">
       <!-- <div class="pacman__eye"></div> -->
       <div class="pacman__mouth"></div>
@@ -28,6 +22,13 @@
     <p v-if="showProcess2" id="messageTwo">
       {{ msg2 }}
     </p>
+    <div v-if="space" id="spacer"> </div>
+    <h1 v-if="showProcess3" id="mainTitle2">{{ msg5 }}</h1>
+    <div v-if="!loader" class="loader"></div>
+    <div v-if="!loader2" class="loader2"></div>
+   
+    
+  
     <p v-if="showTagline" id="messageThree">
       {{ msg3 }}
     </p>
@@ -194,7 +195,7 @@
       <br />
       <section id="rawData2"></section>
       <section id="specificAnalysis5"></section><br><br>
-      <section v-if="log"><hr>Crawl and Analysis Log<hr></section><section id="log"><ul id="logItems"></ul></section>
+      <section v-if="log"><hr><span id="logTitle">Crawl and Analysis Log</span><hr></section><section id="log"><ul id="logItems"></ul></section>
       <section id="specificAnalysis"></section>
       <section id="specificAnalysis2"></section>
       <section id="specificAnalysis3"></section>
@@ -297,7 +298,8 @@ export default {
       openAI: true, 
       mistral: false, 
       showTagline: true, 
-      space: false
+      space: false, 
+      noQuantUsed: true
     };
   },
 
@@ -338,7 +340,7 @@ export default {
       this.showPrompt = false;
       const workingUrl = this.urlToScrape;
       if (this.variableOne == "" || this.promptInput2 == "") {
-        alert("Please fill out the prompt parameters fully.");
+        alert("No variables have been entered. Quantitative analysis will not be performed. Click okay to proceed with only qualitative analysis. Otherwise refresh the page and start over.");
       }
       if (!workingUrl.endsWith("/")) {
         this.urlToScrape = this.urlToScrape + "/";
@@ -399,8 +401,7 @@ export default {
           robots.canCrawlSync(this.robotsDomain); // Returns true if the link can be crawled, false if not.
           robots.canCrawl(this.robotsDomain, (value) => {
           console.log(this.robotsDomain + ': main Page Crawlable: ', value);
-          this.goAhead = value
-
+          this.goAhead = value;
             if (this.goAhead == true) {
               this.logContent = "✅ discourse_crawler: " + this.robotsDomain + ': main Page Crawlable: ' + value
               this.outputToLog()
@@ -778,11 +779,39 @@ export default {
         this.JSONHolder = this.dataSet;
       }
       const workingJSON1 = this.JSONHolder;
+      let modifier = ""
       console.log(workingJSON1.length);
       let i2,
         len2 = workingJSON1.length;
       const ticker2 = workingJSON1.length;
       const instance = this;
+      let goAheadWithQuant = false
+      let goAheadWithoutQuant = false
+
+      if (
+        instance.variableOne != "" ||
+        instance.variableTwo != "" ||
+        instance.variableTwo != "" ||
+        instance.variableThree != "" ||
+        instance.variableFour != "" ||
+        instance.variableFive != "" ||
+        instance.variableSix != ""
+      ){
+        goAheadWithQuant = true
+        instance.noQuantUsed = false
+      }
+
+      if (
+        instance.variableOne == "" &&
+        instance.variableTwo == "" &&
+        instance.variableThree == "" &&
+        instance.variableFour == "" &&
+        instance.variableFive == "" &&
+        instance.variableSix == ""
+      ){
+        goAheadWithoutQuant = true
+        instance.noQuantUsed = true
+      }
 
       var commaOne = "";
       var commaTwo = "";
@@ -833,13 +862,15 @@ export default {
         instance.variableFive != "" &&
         instance.variableSix == ""
       ) {
+        modifier = "Assign any instances of emptyValue a number score of null. "
+        instance.variableSix = "emptyValue6"
         commaOne = ", ";
         commaTwo = ", ";
         commaThree = ", ";
         commaFour = ", and ";
         commaFive = "";
         jsonOne =
-          '{"' +
+        '{"' +
           instance.variableOne +
           '": number score,' +
           '"' +
@@ -853,6 +884,9 @@ export default {
           '": number score,' +
           '"' +
           instance.variableFive +
+          '": number score,' +
+          '"' +
+          instance.variableSix +
           '": number score}';
       }
 
@@ -864,13 +898,16 @@ export default {
         instance.variableFive == "" &&
         instance.variableSix == ""
       ) {
+        modifier = "Assign any instances of emptyValue a number score of null. "
+        instance.variableFive = "emptyValue5"
+        instance.variableSix = "emptyValue6"
         commaOne = ", ";
         commaTwo = ", ";
         commaThree = ", and ";
         commaFour = "";
         commaFive = "";
         jsonOne =
-          '{"' +
+        '{"' +
           instance.variableOne +
           '": number score,' +
           '"' +
@@ -881,6 +918,12 @@ export default {
           '": number score,' +
           '"' +
           instance.variableFour +
+          '": number score,' +
+          '"' +
+          instance.variableFive +
+          '": number score,' +
+          '"' +
+          instance.variableSix +
           '": number score}';
       }
 
@@ -892,13 +935,17 @@ export default {
         instance.variableFive == "" &&
         instance.variableSix == ""
       ) {
+        modifier = "Assign any instances of emptyValue a number score of null. "
+        instance.variableFour = "emptyValue4"
+        instance.variableFive = "emptyValue5"
+        instance.variableSix = "emptyValue6"
         commaOne = ", ";
         commaTwo = ", and ";
         commaThree = "";
         commaFour = "";
         commaFive = "";
         jsonOne =
-          '{"' +
+        '{"' +
           instance.variableOne +
           '": number score,' +
           '"' +
@@ -906,6 +953,15 @@ export default {
           '": number score,' +
           '"' +
           instance.variableThree +
+          '": number score,' +
+          '"' +
+          instance.variableFour +
+          '": number score,' +
+          '"' +
+          instance.variableFive +
+          '": number score,' +
+          '"' +
+          instance.variableSix +
           '": number score}';
       }
 
@@ -917,17 +973,34 @@ export default {
         instance.variableFive == "" &&
         instance.variableSix == ""
       ) {
+        modifier = "Assign any instances of emptyValue a number score of null. "
+        instance.variableThree = "emptyValue3"
+        instance.variableFour = "emptyValue4"
+        instance.variableFive = "emptyValue5"
+        instance.variableSix = "emptyValue6"
         commaOne = " and ";
         commaTwo = "";
         commaThree = "";
         commaFour = "";
         commaFive = "";
         jsonOne =
-          '{"' +
+        '{"' +
           instance.variableOne +
           '": number score,' +
           '"' +
           instance.variableTwo +
+          '": number score,' +
+          '"' +
+          instance.variableThree +
+          '": number score,' +
+          '"' +
+          instance.variableFour +
+          '": number score,' +
+          '"' +
+          instance.variableFive +
+          '": number score,' +
+          '"' +
+          instance.variableSix +
           '": number score}';
       }
 
@@ -939,18 +1012,45 @@ export default {
         instance.variableFive == "" &&
         instance.variableSix == ""
       ) {
+        modifier = "Assign any instances of emptyValue a number score of null. "
+        instance.variableTwo = "emptyValue2"
+        instance.variableThree = "emptyValue3"
+        instance.variableFour = "emptyValue4"
+        instance.variableFive = "emptyValue5"
+        instance.variableSix = "emptyValue6"
         commaOne = "";
         commaTwo = "";
         commaThree = "";
         commaFour = "";
         commaFive = "";
-        jsonOne = '{"' + instance.variableOne + '": number score}';
+        jsonOne = '{"' +
+          instance.variableOne +
+          '": number score,' +
+          '"' +
+          instance.variableTwo +
+          '": number score,' +
+          '"' +
+          instance.variableThree +
+          '": number score,' +
+          '"' +
+          instance.variableFour +
+          '": number score,' +
+          '"' +
+          instance.variableFive +
+          '": number score,' +
+          '"' +
+          instance.variableSix +
+          '": number score}';
       }
 
-      for (i2 = 0; i2 < len2; i2++) {
-        fire(i2);
-      }
+      if (
+        goAheadWithQuant == true
+      ) {
 
+        for (i2 = 0; i2 < len2; i2++) {
+          fire(i2);
+        }
+      }
       function fire(i2) {
         setTimeout(function () {
           //const usableText = JSON.stringify(this.JSON1[0].text);
@@ -977,7 +1077,7 @@ export default {
               instance.variableFive +
               commaFive +
               instance.variableSix +
-              ", returning the response in JSON only. Format as" +
+              ", returning the response in JSON." + modifier + "Format as" +
               jsonOne +
               ". Do not include any text other than the JSON in the response. " +
               "Text: " +
@@ -1008,7 +1108,7 @@ export default {
                   instance.variableFive +
                   commaFive +
                   instance.variableSix +
-                  ", returning the response in JSON. Format as" +
+                  ", returning the response in JSON. " + modifier + "Format as" +
                   jsonOne +
                   ". Do not include any text other than the JSON. " +
                   "Text: " +
@@ -1120,9 +1220,7 @@ export default {
                 '"' +
                 "," +
                 '"text":' +
-                
                 null +
-                
                 "," +
                 '"' +
                 instance.variableOne +
@@ -1158,6 +1256,80 @@ export default {
 
         }
         }, instance.delayTime * i2);
+      }
+
+      if (
+        goAheadWithoutQuant == true
+      ) {
+        instance.variableOne = "emptyValue1"
+        instance.variableTwo = "emptyValue2"
+        instance.variableThree = "emptyValue3"
+        instance.variableFour = "emptyValue4"
+        instance.variableFive = "emptyValue5"
+        instance.variableSix = "emptyValue6"
+        instance.pacman = true;
+        for (i2 = 0; i2 < len2; i2++) {
+
+          const usableURL = workingJSON1[i2].name;
+          const usableText = workingJSON1[i2].text;
+          const pType = workingJSON1[i2].pageType;
+         
+              var div = document.getElementById("specificAnalysis2");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"pageType":' +
+                '"' +
+                pType +
+                '"' +
+                "," +
+                '"name":' +
+                '"' +
+                usableURL +
+                '"' +
+                "," +
+                '"text":' +
+                '"' +
+                usableText +
+                '"' +
+                "," +
+                '"' +
+                instance.variableOne +
+                '":' +
+                instance.one +
+                "," +
+                '"' +
+                instance.variableTwo +
+                '":' +
+                instance.two +
+                "," +
+                '"' +
+                instance.variableThree +
+                '":' +
+                instance.three +
+                "," +
+                '"' +
+                instance.variableFour +
+                '":' +
+                instance.four +
+                "," +
+                '"' +
+                instance.variableFive +
+                '":' +
+                instance.five +
+                "," +
+                '"' +
+                instance.variableSix +
+                '":' +
+                instance.six +
+                "},";
+              div.appendChild(p);
+          if (i2 == len2 -2){
+            setTimeout(() => {
+              console.log("Quant delayed for 3 seconds.");
+              instance.getMoralFoundations();
+            }, 3000);
+          }
+        }
       }
     },
 
@@ -1355,6 +1527,13 @@ export default {
     },
 
     returnJSON: function () {
+      document.getElementById("mainTitle").style.color = "#71c68b";
+      this.loader2 = true;
+      this.msg = "";
+      this.msg2 = "";
+      this.space = true;
+      this.msg7 = "Finishing Up"; 
+      this.progress = false;
       var workingJSON = document.getElementById("specificAnalysis3").innerText;
       var middleJSON = "[" + workingJSON.slice(0, -1) + "]";
       const middleJSON2 = middleJSON.replace(/(\r\n|\r|\n)/g, '');
@@ -1367,28 +1546,23 @@ export default {
       div.appendChild(p);
 
       setTimeout(() => {
-        console.log("Delayed for 1 second.");
-        this.msg7 = "Finishing Up"; 
-        this.progress = false; 
-        this.space = true;
+        console.log("Delayed for 1 second."); 
+        document.getElementById("visuals").style.display = "block";
         this.renderVisuals();
       }, 2000);
     },
 
     renderVisuals: function () {
-      document.getElementById("mainTitle").style.color = "#71c68b";
-      this.loader2 = true;
-      document.getElementById("visuals").style.display = "block";
-      this.msg = "";
-      this.msg2 = "";
 
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
-
+      this.msg2 = "Rendering Overall Page Summaries"
       //const usableText = JSON.stringify(this.JSON1[0].text);
 
       if (this.JSON4 != null) {
-        console.log("test");
+        document.getElementById('progressColor').style.backgroundColor="hotpink";
+        document.getElementById('messageTwo').style.color="hotpink";
+        this.msg2 = "Rendering Overall Page Summaries"
         var i,
           len = this.JSON4.length;
         for (i = 0; i < len; i++) {
@@ -1476,7 +1650,7 @@ export default {
       }
     },
     getOverallQualSummary: function () { 
-      this.showProcess2 = false;
+      
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
@@ -1485,6 +1659,9 @@ export default {
 
       const e = test.length;
       for (var i = 0; i < e; i++) {
+        document.getElementById('progressColor').style.backgroundColor="yellow";
+        document.getElementById('messageTwo').style.color="yellow";
+        this.msg2 = "Rendering Overall Qualitative Summary"
         overallMoralAnalysis = overallMoralAnalysis += test[i].qualResponse; //.substring(0, 70);
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
@@ -1555,7 +1732,6 @@ export default {
     },
 
     getOverallMoralFoundationScores: function () {
-      this.showProcess2 = false;
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       const test = JSON.parse(workingJSON);
       const instance = this;
@@ -1564,6 +1740,9 @@ export default {
 
       const e = test.length;
       for (var i = 0; i < e; i++) {
+        document.getElementById('progressColor').style.backgroundColor="yellow";
+        document.getElementById('messageTwo').style.color="yellow";
+        this.msg2 = "Rendering Overall Qualitative Summary"
         overallMoralAnalysis = overallMoralAnalysis += test[i].qualResponse; //.substring(0, 70);
         if (i === e - 1) {
           instance.overallSummaryOutput = overallMoralAnalysis;
@@ -1702,6 +1881,8 @@ export default {
               Plotly.newPlot("overallMoralFoundations", data, layout, config);
               setTimeout(() => {
                 console.log("Delayed for 1 second.");
+                this.msg7 = "Finishing Up"; 
+                this.progress = false;
                 this.renderOverallEmotion();
               }, 3000);
             })
@@ -1726,9 +1907,23 @@ export default {
       let overallSix = 0;
       console.log(test.length);
       const instance = this;
-      instance.overallQuant = true;
+
+          if (instance.noQuantUsed == false){
+            instance.overallQuant = true;
+          }
+
+          if (instance.noQuantUsed == true){
+            document.getElementById("overallVariables").style.display = "none";
+          }
+
+
+          
+
       const e = test.length;
       for (var i = 0; i < e; i++) {
+        document.getElementById('progressColor').style.backgroundColor="#92dce5";
+        document.getElementById('messageTwo').style.color="#92dce5";
+        this.msg2 = "Rendering Overall Quantitative Summary"
         overallOne = overallOne + test[i][instance.variableOne];
         overallTwo = overallTwo + test[i][instance.variableTwo];
         overallThree = overallThree + test[i][instance.variableThree];
@@ -1836,6 +2031,12 @@ export default {
       this.msg7 = ""
       this.progress = true; 
       this.space = false;
+      document.getElementById('progressColor').style.backgroundColor="#71c68b";
+      document.getElementById('messageTwo').style.color="#71c68b";
+        this.msg2 = "Rendering Overall Data Output"
+      
+      this.msg = ""
+      this.showProcess2 = false;
     },
 
     getReadabilityStats: function () {
@@ -2246,7 +2447,7 @@ div {
 #messageThree {
   color: #92dce5;
   font-size: 18.5px; 
-  margin-top: -5%; 
+  margin-top: -4%; 
   margin-bottom: 8%; 
 }
 
@@ -2767,7 +2968,7 @@ body {
 .loader:after {
   --c: #000;
   background-color: #92dce5;
-  box-shadow: 0 -2px 0 0 #fff;
+  box-shadow: 0 0 0 0 #fff;
   clip-path: inset(-2px calc(50% - 10px));
 }
 @keyframes l4 {
@@ -2794,7 +2995,7 @@ body {
 .loader2:after {
   --c: #000;
   background-color: #71c68b;
-  box-shadow: 0 -2px 0 0 #fff;
+  box-shadow: 0 0 0 0 #fff;
   clip-path: inset(-2px calc(50% - 10px));
 }
 @keyframes l4 {
@@ -2810,7 +3011,10 @@ width: 80%;
 text-align: left; 
 overflow: scroll; 
 height: 180px; 
-font-size: 10px;
+font-size: 11px;
+}
+#logTitle {
+color:white;
 
 }
 
