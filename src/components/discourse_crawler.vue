@@ -127,8 +127,10 @@
         /><br /><br />
         <hr class="quantLine" />
         <h2 id="urlInputHeader">URL Input</h2>
-        <span id="urlInputHeaderInstructions" >URL to Crawl</span><br />
-        <input
+        <span id="urlInputHeaderInstructions" >URL(s) to Crawl</span><br />
+        <textarea
+          rows="4"
+          cols="50"
           v-if="showProcess"
           id="URLInput"
           type="input"
@@ -145,7 +147,7 @@
           id="startButton"
           @click="checkForQualQuantSummary"
         >
-          Crawl Website</button
+          Crawl Website(s)</button
         ><br />
         <button v-if="showDataButon" id="startButton" @click="runPromptsOnData">
           Run Prompts on Data
@@ -234,6 +236,7 @@ export default {
       loader2: true,
       overallQuant: false,
       urlToScrape: "https://www.milesccoleman.com/test$",
+      urlToScrape2: "", 
       pageText: "",
       pageType: "whole",
       one: 0,
@@ -263,7 +266,7 @@ export default {
       apiKEY2: process.env.VUE_APP_ROOT_API2,
       apiURL: process.env.VUE_APP_ROOT_URL,
       apiURL2: process.env.VUE_APP_ROOT_URL2,
-      analysisModel: "gpt-3.5-turbo-16k",
+      analysisModel: "gpt-3.5-turbo",
       analysisModel2: "mistral-medium-latest",
       summaryModel: "gpt-4-turbo",
       summaryModel2: "mistral-large-latest",
@@ -299,13 +302,85 @@ export default {
       mistral: false, 
       showTagline: true, 
       space: false, 
-      noQuantUsed: true
+      noQuantUsed: true, 
+      elementInListOfURLs: "", 
+      listCount: 0
     };
   },
 
   created: function () {},
 
   methods: {
+
+    urlListMode: function() {
+      this.registerVariables();
+      this.msg = "Initializing";
+      this.msg2 = "";
+      this.showProcess = false;
+      const listOfURLs1 = this.urlToScrape
+      this.listCount = 0
+      if (this.openAI === true) {
+        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo (quantitative analysis and qualitative analysis); gpt-4-turbo (qualitative summary)"
+        this.outputToLog()
+      }
+      if (this.mistral === true) {
+        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: mistral-medium-latest (quantitative analysis and qualitative analysis); mistral-large-latest (qualitative summary) [note that this is a placeholder option; OpenAI models are current default regardless of selection. Mistral option has not yet been implemented]"
+        this.outputToLog()
+      }
+     
+     if (listOfURLs1.endsWith('\r\n')) {
+      const listOfURLs = listOfURLs1.slice(0, -4)
+      const listOrURLsStepOne = '"' + listOfURLs.replace(/(\r\n|\r|\n)/g, '"'+ ','+ '"')
+      const listOrURLsStepTwo = "[" + listOrURLsStepOne + '"' + "]"
+      const listOfURLsStepThree = JSON.parse(listOrURLsStepTwo)
+      const listCount = listOfURLsStepThree.length
+      console.log(listCount + listOfURLsStepThree)
+      listOfURLsStepThree.forEach((element) => this.checkBots2(element, listCount));
+
+        setTimeout(() => {
+          console.log(this.anchorsForCrawl)
+          this.grabSubpages()
+        }, 1000 * listCount);
+         
+
+     }
+     if (listOfURLs1.endsWith('\r') || listOfURLs1.endsWith('\n')) {
+      const listOfURLs = listOfURLs1.slice(0, -2)
+      const listOrURLsStepOne = '"' + listOfURLs.replace(/(\r\n|\r|\n)/g, '"'+ ','+ '"')
+      const listOrURLsStepTwo = "[" + listOrURLsStepOne + '"' + "]"
+      const listOfURLsStepThree = JSON.parse(listOrURLsStepTwo)
+      const listCount = listOfURLsStepThree.length
+      console.log(listCount + listOfURLsStepThree)
+      listOfURLsStepThree.forEach((element) => this.checkBots2(element, listCount));
+      
+      setTimeout(() => {
+          console.log(this.anchorsForCrawl)
+          this.grabSubpages()
+        }, 1000 * listCount);
+
+    } 
+
+    else {
+      const listOfURLs = listOfURLs1
+      const listOrURLsStepOne = '"' + listOfURLs.replace(/(\r\n|\r|\n)/g, '"'+ ','+ '"')
+      const listOrURLsStepTwo = "[" + listOrURLsStepOne + '"' + "]"
+      const listOfURLsStepThree = JSON.parse(listOrURLsStepTwo)
+      const listCount = listOfURLsStepThree.length
+      console.log(listCount + listOfURLsStepThree)
+      listOfURLsStepThree.forEach((element) => this.checkBots2(element, listCount));
+
+      setTimeout(() => {
+          console.log(this.anchorsForCrawl)
+          this.grabSubpages()
+        }, 1000 * listCount);
+
+    }
+      
+
+
+    
+
+    }, 
 
     outputToLog: function() {
       var node = document.createElement('li');
@@ -342,9 +417,10 @@ export default {
       if (this.variableOne == "" || this.promptInput2 == "") {
         alert("No variables have been entered. Quantitative analysis will not be performed. Click okay to proceed with only qualitative analysis. Otherwise refresh the page and start over.");
       }
-      if (!workingUrl.endsWith("/")) {
+      if (!workingUrl.endsWith("/") && !workingUrl.includes('\r\n') || !workingUrl.includes('\r') || !workingUrl.includes('\n')) {
         this.urlToScrape = this.urlToScrape + "/";
         console.log("added slash");
+        
       }
     },
 
@@ -363,7 +439,7 @@ export default {
 
     checkBots: function () {
       if (this.openAI === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo-16k (quantitative analysis and qualitative analysis); gpt-4-turbo (qualitative summary)"
+        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo (quantitative analysis and qualitative analysis); gpt-4-turbo (qualitative summary)"
         this.outputToLog()
       }
       if (this.mistral === true) {
@@ -420,6 +496,61 @@ export default {
          })
     },
 
+    checkBots2: function (element, listCount) {
+      this.listCount = this.listCount + 1
+      var pathArray = element.split( '/' );
+      var protocol = pathArray[0];
+      var host = pathArray[2];
+      const robotsDomain = protocol + '//' + host;
+      const proxyRobotsUrl =   "https://api.allorigins.win/raw?url=" +
+              encodeURIComponent(robotsDomain + "/robots.txt")
+      const robotsUrl = proxyRobotsUrl
+      console.log(robotsUrl)
+
+      axios
+        .get(robotsUrl)
+        .then((response) => {
+          this.logContent = "🌐 discourse_crawler: checking robots.txt at: " + robotsDomain
+          this.outputToLog()
+          console.log("total" + listCount)
+          console.log(this.listCount + " " + element)
+          const robotsDotText = response.data
+          console.log(robotsDotText)
+          this.logContent = "🤖 discourse_crawler: robots.txt: " + robotsDotText
+          this.outputToLog()
+
+          const robots = robotsParser(
+            {
+              userAgent: 'Googlebot', // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
+              allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
+            },
+          );
+        
+          robots.parseRobots(robotsDomain, robotsDotText)
+          robots.useRobotsFor(robotsDomain)
+          robots.canCrawlSync(element); // Returns true if the link can be crawled, false if not.
+          robots.canCrawl(element, (value) => {
+          console.log(element + ': Page Crawlable: ', value);
+          this.goAhead = value;
+            if (this.goAhead == true) {
+              this.logContent = "✅ discourse_crawler: " + element + ': main Page Crawlable: ' + value
+              this.outputToLog()
+              this.anchorsForCrawl.push(element);
+              console.log(this.anchorsForCrawl)
+              this.goAhead = false
+            }else {
+              this.logContent = "🔴 discourse_crawler: " + element + ': cannot crawl as per robots.txt'
+              this.outputToLog()
+              console.log(this.anchorsForCrawl)
+              this.goAhead = false
+            }
+          }); 
+        })
+        .catch((errors) => {
+              console.log(errors);
+         })
+    },
+
     checkForQualQuantSummary: function () {
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
@@ -437,7 +568,21 @@ export default {
         document.getElementById("urlInputHeaderInstructions").innerHTML = "Select JSON data file (should only contain values for 'name' and 'text').";
       }
 
-      if (workingUrl2 != "data") {
+      if (workingUrl2.includes('\r\n') || workingUrl2.includes('\r') || workingUrl2.includes('\n')) {
+        if (workingUrl2.endsWith("$")) {
+          this.log = true
+          this.qualQuantSummary = true;
+          this.urlToScrape = workingUrl2.slice(0, -1);
+          console.log("qualquant summary for " + this.urlToScrape);
+          this.urlListMode()
+        } else {
+          console.log("missed")
+          this.log = true
+          this.urlListMode()
+        } 
+      }
+
+      if (workingUrl2 != "data" && !workingUrl2.includes('\r\n') && !workingUrl2.includes('\r') && !workingUrl2.includes('\n')) {
         if (workingUrl2.endsWith("$")) {
           this.log = true
           this.qualQuantSummary = true;
@@ -445,6 +590,7 @@ export default {
           console.log("qualquant summary for " + this.urlToScrape);
           this.checkBots()
         } else {
+          console.log("missed")
           this.log = true
           this.checkBots()
         }
@@ -1697,6 +1843,8 @@ export default {
             .then((result) => {
               instance.msg5 = instance.urlToScrape;
               const rawResultA = result.data.choices[0].message.content;
+              const rawResultB = rawResultA.replace("'", "")
+              const rawResultC = rawResultB.replace('"', '')
               instance.overallOutputExplanation = rawResultA;
               var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
@@ -1713,7 +1861,7 @@ export default {
                 "," +
                 '"qualResponse":' +
                 '"' +
-                rawResultA +
+                rawResultC +
                 '"' +
                 "},";
               div.appendChild(p);
@@ -1794,6 +1942,8 @@ export default {
               const overallAuthority = moralResultsA.authority;
               const overallPurity = moralResultsA.purity;
               instance.overallOutputExplanation = justTheTextA;
+              const rawResultB = justTheTextA.replace("'", "")
+              const rawResultC = rawResultB.replace('"', '')
               //const moralFoundationResults3 = justTheTextA;
               // justTheTextA.text.replaceAll('"', "");
               // 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
@@ -1829,7 +1979,7 @@ export default {
                 "," +
                 '"qualOverall":' +
                 '"' +
-                justTheTextA +
+                rawResultC +
                 '"' +
                 "},";
               div.appendChild(p);
@@ -2245,9 +2395,9 @@ margin: 0 auto;
 }
 
 #URLInput {
-  width: 50%;
+  width: 70%;
   font-size: 30px;
-  text-align: center;
+  text-align: left;
   background-color: #f7ec59;
   color: #252627;
   border: none;
@@ -2316,7 +2466,7 @@ margin: 0 auto;
 }
 
 #promptInput {
-  width: 50%;
+  width: 70%;
   font-size: 20px;
   background-color: hotpink;
   color: #252627;
