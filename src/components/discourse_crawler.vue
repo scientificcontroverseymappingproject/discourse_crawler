@@ -36,9 +36,16 @@
     <input
       v-if="showPassword2"
       id="passWordInput"
-      type="input"
-      v-model="userPassword"
-      placeholder="PWord"
+      type="password"
+      v-model="apiKEY"
+      placeholder="OpenAI API Key"
+    /><br>
+    <input
+    v-if="showPassword2"
+    id="passWordInput"
+    type="password"
+    v-model="apiKEY2"
+    placeholder="Mistral API Key"
     /><br />
     <button v-if="showPassword2" id="startButton" @click="checkPassWord">
       Submit
@@ -242,10 +249,10 @@ import * as rs from "text-readability";
 //import * as cheerio from 'cheerio';
 import axios from "axios";
 import Plotly from "plotly.js-dist";
-import dotenv from "dotenv";
+//import dotenv from "dotenv";
 import robotsParser from 'robots-txt-parser'
 //import OpenAI from "openai";
-dotenv.config();
+//dotenv.config();
 export default {
   name: "discourse_crawler",
   props: {},
@@ -274,7 +281,7 @@ export default {
       five: 0,
       six: 0,
       showPassword: false,
-      password: process.env.VUE_APP_ROOT_PASSWORD,
+      password: "superSecretPassword",
       showPassword2: true,
       userPassword: "",
       readability: 0,
@@ -290,10 +297,10 @@ export default {
       JSON3: null,
       JSON4: null,
       moralFoundationAnalysis: "",
-      apiKEY: process.env.VUE_APP_ROOT_API,
-      apiKEY2: process.env.VUE_APP_ROOT_API2,
-      apiURL: process.env.VUE_APP_ROOT_URL,
-      apiURL2: process.env.VUE_APP_ROOT_URL2,
+      apiKEY: "",
+      apiKEY2: "",
+      apiURL: "https://api.openai.com/v1/chat/completions",
+      apiURL2: "https://api.mistral.ai/v1/chat/completions",
       analysisModel: "gpt-3.5-turbo",
       analysisModel2: "mistral-medium-latest",
       summaryModel: "gpt-4-turbo",
@@ -483,16 +490,12 @@ export default {
     },
 
     checkPassWord: function () {
-      if (this.userPassword == this.password) {
         this.showPassword = true;
         this.showPassword2 = false;
         this.msg = "";
         this.msg2 = ""; 
         this.showTagline = false; 
-      } else {
-        this.msg = "incorrect password";
-        this.msg2 = "try again";
-      }
+ 
     },
 
     checkBots: function () {
@@ -2589,7 +2592,7 @@ margin: 0 auto;
   border: none;
 }
 #passWordInput {
-  width: 20%;
+  width: 50%;
   font-size: 30px;
   text-align: center;
   background-color: lightgray;
