@@ -8,7 +8,7 @@
     
 
    
-    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1>
+    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1><img id="logo" v-if="showPassword2" src="DCLogo.png">
     <h1 v-if="showProcess3" >{{ msg7 }}</h1>
     <div v-if="!progress" class="progress">
       <div id="progressColor" class="color"></div>
@@ -32,6 +32,7 @@
     <p v-if="showTagline" id="messageThree">
       {{ msg3 }}
     </p>
+    
     <input
       v-if="showPassword2"
       id="passWordInput"
@@ -51,6 +52,33 @@
             <input type="checkbox" id="myCheckbox" @change="toggleCheck()" checked>
             <span class="slider round"></span>
           </label><span id="model2">  OpenAI</span><br><br>
+          <span id="dropdownWrapper">
+            
+            <label for="analysisModel" alt="Choose model for analysis module"></label>
+            Analysis Model / Summary Model<br>
+            <select name="analysisModel" id="analysisModel">
+              <option value="gpt-4-turbo">gpt-4-turbo</option>
+              <option selected="selected" value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+              <option disabled="disabled" value="open-mistral-7b">open-mistral-7b</option>
+              <option disabled="disabled" value="mistral-medium-latest">mistral-medium-latest</option>
+              <option disabled="disabled" value="mistral-large-latest">mistral-large-latest</option>
+            </select>
+          </span>
+    
+          
+      
+          <span id="dropdownWrapper2">
+            
+            <label for="summaryModel" alt="Choose model for analysis summary"></label>
+            
+            <select name="summaryModel" id="summaryModel">
+              <option selected="selected" value="gpt-4-turbo">gpt-4-turbo</option>
+              <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+              <option disabled="disabled" value="open-mistral-7b">open-mistral-7b</option>
+              <option disabled="disabled" value="mistral-medium-latest">mistral-medium-latest</option>
+              <option disabled="disabled" value="mistral-large-latest">mistral-large-latest</option>
+            </select>
+          </span><br><br>
         <hr class="quantLine" />
         <h2 id="quant">Quantitative Module</h2>
         Priming Text<br />
@@ -186,7 +214,7 @@
       <section v-if="!showProcess2">
         <h2 id="overalExplanation3">
           <span style="color: white"
-            ><span style="color: rgb(113, 198, 139)">Individual</span> Page
+            ><span style="color: rgb(113, 198, 139)">Individual</span> Text
             Summaries</span
           >
         </h2>
@@ -270,10 +298,8 @@ export default {
       analysisModel2: "mistral-medium-latest",
       summaryModel: "gpt-4-turbo",
       summaryModel2: "mistral-large-latest",
-      promptInput:
-        "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
-      promptInput2:
-        "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 50 words. Include in your response only identified moral foundations. Text: ",
+      promptInput: "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
+      promptInput2: "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 50 words. Include in your response only identified moral foundations. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -304,7 +330,14 @@ export default {
       space: false, 
       noQuantUsed: true, 
       elementInListOfURLs: "", 
-      listCount: 0
+      listCount: 0, 
+      overallVariableOne: 0,
+      overallVariableTwo: 0,
+      overallVariableThree: 0,
+      overallVariableFour: 0,
+      overallVariableFive: 0,
+      overallVariableSix: 0
+
     };
   },
 
@@ -320,11 +353,11 @@ export default {
       const listOfURLs1 = this.urlToScrape
       this.listCount = 0
       if (this.openAI === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo (quantitative analysis and qualitative analysis); gpt-4-turbo (qualitative summary)"
+        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: " + this.analysisModel + " (quantitative analysis and qualitative analysis);" + this.summaryModel + " (qualitative summary)"
         this.outputToLog()
       }
       if (this.mistral === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: mistral-medium-latest (quantitative analysis and qualitative analysis); mistral-large-latest (qualitative summary) [note that this is a placeholder option; OpenAI models are current default regardless of selection. Mistral option has not yet been implemented]"
+        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: " + this.analysisModel + " (quantitative analysis and qualitative analysis);" + this.summaryModel + " (qualitative summary)"
         this.outputToLog()
       }
      
@@ -397,6 +430,18 @@ export default {
         document.getElementById("model2").style.color = '#71c68b';
         document.getElementById("model1").style.color = 'white';
         console.log("OpenAI selected")
+        document.getElementById("analysisModel").selectedIndex = 1;
+        document.getElementById("summaryModel").selectedIndex = 0;
+        document.getElementById("analysisModel").options[0].disabled = false;
+        document.getElementById("analysisModel").options[1].disabled = false;
+        document.getElementById("summaryModel").options[0].disabled = false;
+        document.getElementById("summaryModel").options[1].disabled = false;
+        document.getElementById("analysisModel").options[2].disabled = true;
+        document.getElementById("analysisModel").options[3].disabled = true;
+        document.getElementById("analysisModel").options[4].disabled = true;
+        document.getElementById("summaryModel").options[2].disabled = true;
+        document.getElementById("summaryModel").options[3].disabled = true;
+        document.getElementById("summaryModel").options[4].disabled = true;
       } else {
         this.openAI = false; 
         this.mistral = true; 
@@ -408,6 +453,19 @@ export default {
         this.summaryModel = this.summaryModel2
         this.analysisModel = this.analysisModel2
         this.mistralDelay = 20000
+        document.getElementById("analysisModel").selectedIndex = 3;
+        document.getElementById("summaryModel").selectedIndex = 4;
+        document.getElementById("analysisModel").options[0].disabled = true;
+        document.getElementById("analysisModel").options[1].disabled = true;
+        document.getElementById("summaryModel").options[0].disabled = true;
+        document.getElementById("summaryModel").options[1].disabled = true;
+        document.getElementById("analysisModel").options[2].disabled = false;
+        document.getElementById("analysisModel").options[3].disabled = false;
+        document.getElementById("analysisModel").options[4].disabled = false;
+        document.getElementById("summaryModel").options[2].disabled = false;
+        document.getElementById("summaryModel").options[3].disabled = false;
+        document.getElementById("summaryModel").options[4].disabled = false;
+        
       }
     },
 
@@ -439,11 +497,11 @@ export default {
 
     checkBots: function () {
       if (this.openAI === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: gpt-3.5-turbo (quantitative analysis and qualitative analysis); gpt-4-turbo (qualitative summary)"
+        this.logContent = "🌩️ discourse_crawler: model selected: openai: current models in use: " + this.analysisModel + " (quantitative analysis and qualitative analysis); " + this.summaryModel + " (qualitative summary)"
         this.outputToLog()
       }
       if (this.mistral === true) {
-        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: mistral-medium-latest (quantitative analysis and qualitative analysis); mistral-large-latest (qualitative summary) [note that this is a placeholder option; OpenAI models are current default regardless of selection. Mistral option has not yet been implemented]"
+        this.logContent = "🌩️ discourse_crawler: model selected: mistral: current models in use: " + this.analysisModel + " (quantitative analysis and qualitative analysis); " + this.summaryModel + " (qualitative summary)"
         this.outputToLog()
       }
       var pathArray = this.urlToScrape.split( '/' );
@@ -555,6 +613,11 @@ export default {
       const workingUrl2 = this.urlToScrape;
       console.log(workingUrl2);
       this.progress = false;
+      this.analysisModel = document.getElementById("analysisModel").value;
+      this.analysisModel2 = document.getElementById("analysisModel").value;
+
+      this.summaryModel = document.getElementById("summaryModel").value;
+      this.summaryModel2 = document.getElementById("summaryModel").value;
       
       if (workingUrl2 == "data") {
         this.dataInput = true;
@@ -663,6 +726,10 @@ export default {
               const counterTickerA = i;
 
               if (html.links[i].href.includes(this.urlToScrape)) {
+                if (html.links[i].href.includes(".pdf" || "%")) {
+                this.logContent = "🔴 discourse_crawler: " + html.links[i].href + ': cannot crawl (broken link or uncrawlable file)'
+                this.outputToLog()
+                }
                 
                 if (!html.links[i].href.includes(".pdf" || "%")) {
                   robots.parseRobots(this.robotsDomain, this.robotsDotText)
@@ -701,6 +768,11 @@ export default {
               }
 
               if (html.links[i].href.includes(window.location.origin)) {
+                if (html.links[i].href.includes(".pdf" || "%")) {
+                this.logContent = "🔴 discourse_crawler: " + html.links[i].href + ': cannot crawl (broken link or uncrawlable file)'
+                this.outputToLog()
+                }
+                
                 if (!html.links[i].href.includes(".pdf" || "%")) {
                   const htmlConstructor =
                     this.urlToScrape +
@@ -879,6 +951,19 @@ export default {
               }
               if (counterTicker === ticker - 1) {
                 setTimeout(() => {
+                  instance.logContent = "📟 📣 discourse_crawler: quantitative prompt: " + instance.promptInput + " " +
+                  instance.variableOne +
+                  ", " +
+                  instance.variableTwo +
+                  ", " +
+                  instance.variableThree +
+                  ", " +
+                  instance.variableFour +
+                  ", " +
+                  instance.variableFive +
+                  ", " +
+                  instance.variableSix;
+                  instance.outputToLog()
                   console.log("Delayed for 2 seconds.");
                   instance.getEmotionStats();
                 }, 3000);
@@ -1347,6 +1432,8 @@ export default {
           if (counterTicker2 === ticker2 - 1) {
             setTimeout(() => {
               console.log("Quant delayed for 3 seconds.");
+              instance.logContent = "💡 📣 discourse_crawler: qualitative prompt: " + instance.promptInput2
+              instance.outputToLog()
               instance.getMoralFoundations();
             }, 5000);
           }
@@ -1471,6 +1558,8 @@ export default {
               div.appendChild(p);
           if (i2 == len2 -2){
             setTimeout(() => {
+              instance.logContent = "💡 📣 discourse_crawler: qualitative prompt: " + instance.promptInput2
+              instance.outputToLog()
               console.log("Quant delayed for 3 seconds.");
               instance.getMoralFoundations();
             }, 3000);
@@ -1702,13 +1791,13 @@ export default {
 
       var workingJSON = document.getElementById("specificAnalysis4").innerText;
       this.JSON4 = JSON.parse(workingJSON);
-      this.msg2 = "Rendering Overall Page Summaries"
+      this.msg2 = "Rendering Overall Text Summaries"
       //const usableText = JSON.stringify(this.JSON1[0].text);
 
       if (this.JSON4 != null) {
         document.getElementById('progressColor').style.backgroundColor="hotpink";
         document.getElementById('messageTwo').style.color="hotpink";
-        this.msg2 = "Rendering Overall Page Summaries"
+        this.msg2 = "Rendering Overall Text Summaries"
         var i,
           len = this.JSON4.length;
         for (i = 0; i < len; i++) {
@@ -1842,9 +1931,9 @@ export default {
             .post(instance.apiURL, params)
             .then((result) => {
               instance.msg5 = instance.urlToScrape;
-              const rawResultA = result.data.choices[0].message.content;
-              const rawResultB = rawResultA.replace("'", "")
-              const rawResultC = rawResultB.replace('"', '')
+              const rawResultA = result.data.choices[0].message.content
+              const rawResultB = rawResultA.replaceAll("'", "")
+              const rawResultC = rawResultB.replaceAll('"', '')
               instance.overallOutputExplanation = rawResultA;
               var div = document.getElementById("specificAnalysis3");
               var p = document.createElement("div");
@@ -1942,8 +2031,8 @@ export default {
               const overallAuthority = moralResultsA.authority;
               const overallPurity = moralResultsA.purity;
               instance.overallOutputExplanation = justTheTextA;
-              const rawResultB = justTheTextA.replace("'", "")
-              const rawResultC = rawResultB.replace('"', '')
+              const rawResultB = justTheTextA.replaceAll("'", "")
+              const rawResultC = rawResultB.replaceAll('"', '')
               //const moralFoundationResults3 = justTheTextA;
               // justTheTextA.text.replaceAll('"', "");
               // 					instance.moralFoundationAnalysis = moralFoundationResults3.replaceAll("'", "");
@@ -2081,12 +2170,20 @@ export default {
         overallFive = overallFive + test[i][instance.variableFive];
         overallSix = overallSix + test[i][instance.variableSix];
         if (i === e - 1) {
-          overallOne = Math.round(overallOne / e) * 10;
-          overallTwo = Math.round(overallTwo / e) * 10;
-          overallThree = Math.round(overallThree / e) * 10;
-          overallFour = Math.round(overallFour / e) * 10;
-          overallFive = Math.round(overallFive / e) * 10;
-          overallSix = Math.round(overallSix / e) * 10;
+          overallOne = Math.round(overallOne / e); 
+          overallTwo = Math.round(overallTwo / e); 
+          overallThree = Math.round(overallThree / e); 
+          overallFour = Math.round(overallFour / e); 
+          overallFive = Math.round(overallFive / e); 
+          overallSix = Math.round(overallSix / e); 
+
+
+                instance.overallVariableOne = overallOne
+                instance.overallVariableTwo = overallTwo
+                instance.overallVariableThree = overallThree
+                instance.overallVariableFour = overallFour
+                instance.overallVariableFive = overallFive
+                instance.overallVariableSix = overallSix
 
           var data = [
             {
@@ -2144,6 +2241,50 @@ export default {
           };
           var config = { responsive: true };
           Plotly.newPlot("overallVariables", data, layout, config);
+          var div = document.getElementById("specificAnalysis3");
+              var p = document.createElement("div");
+              p.innerHTML =
+                '{"pageType":' +
+                '"' +
+                "overallQuant" +
+                '"' +
+                "," +
+                '"name":' +
+                '"' +
+                instance.urlToScrape +
+                '"' +
+                "," +
+                '"' +
+                "overall_" + instance.variableOne +
+                '":' +
+                instance.overallVariableOne +
+                "," +
+                '"' +
+                "overall_" + instance.variableTwo +
+                '":' +
+                instance.overallVariableTwo +
+                "," +
+                '"' +
+                "overall_" + instance.variableThree +
+                '":' +
+                instance.overallVariableThree +
+                "," +
+                '"' +
+                "overall_" + instance.variableFour +
+                '":' +
+                instance.overallVariableFour +
+                "," +
+                '"' +
+                "overall_" + instance.variableFive +
+                '":' +
+                instance.overallVariableFive +
+                "," +
+                '"' +
+                "overall_" + instance.variableSix +
+                '":' +
+                instance.overallVariableSix +
+                "},";
+              div.appendChild(p);
           instance.rawData = false;
           setTimeout(() => {
             console.log("Delayed for 1 second.");
@@ -2338,7 +2479,7 @@ export default {
 
 #mainTitle {
   font-size: 65px;
-  margin-top: -20px;
+  margin-top: -38px;
 }
 #overallVariables {
 margin: 0 auto;
@@ -2448,7 +2589,7 @@ margin: 0 auto;
   border: none;
 }
 #passWordInput {
-  width: 30%;
+  width: 20%;
   font-size: 30px;
   text-align: center;
   background-color: lightgray;
@@ -2506,6 +2647,33 @@ margin: 0 auto;
 #startButton:hover {
   background: #dd06d6;
 }
+
+#summaryModel {
+font-size: 20px;
+  color: orange;
+  border-color: white;
+  border-style: solid;
+  margin-top:5px;
+  background-color: #2b2d42;
+  width: 140px;
+}
+#summaryModel:hover {
+  background: #dd06d6;
+}
+
+#analysisModel {
+font-size: 20px;
+  color: orange;
+  border-color: white;
+  border-style: solid;
+  margin-top:5px;
+  background-color: #2b2d42;
+  width: 140px;
+}
+#analysisModel:hover {
+  background: #dd06d6;
+}
+
 
 #promptButton {
   background: #2f4858;
@@ -3236,5 +3404,9 @@ color: #71c68b;
 #spacer {
   margin-bottom: 1000px; 
 
+}
+#logo {
+  height: 150px;
+  margin-top: -60px;
 }
 </style>
