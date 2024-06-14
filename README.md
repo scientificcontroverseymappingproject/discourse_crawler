@@ -1,5 +1,7 @@
 # discourse_crawler
 
+Instructions for Running App Locally
+
 ## Project setup
 ```
 npm install
