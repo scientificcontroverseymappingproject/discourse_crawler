@@ -8,7 +8,7 @@
     
 
    
-    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}</h1><img id="logo" v-if="showPassword2" src="DCLogo.png">
+    <h1 v-if="showProcess3" id="mainTitle">{{ msg }}<img id="logo" v-if="showPassword2" src="logo.svg"><img id="logo2" v-if="showPassword2" src="logo.svg"></h1>
     <h1 v-if="showProcess3" >{{ msg7 }}</h1>
     <div v-if="!progress" class="progress">
       <div id="progressColor" class="color"></div>
@@ -258,7 +258,7 @@ export default {
   props: {},
   data() {
     return {
-      msg: "Discourse Crawler",
+      msg: "discourse_crawler",
       msg2: "",
       msg3: "An AI-powered tool for performing top-level analysis of websites.",
       msg5: "",
@@ -2482,7 +2482,6 @@ export default {
 
 #mainTitle {
   font-size: 65px;
-  margin-top: -38px;
 }
 #overallVariables {
 margin: 0 auto;
@@ -2490,6 +2489,7 @@ margin: 0 auto;
 }
 
 #overallVariables2 {
+  margin-top: -75px;
 }
 
 #overalExplanation {
@@ -3409,7 +3409,17 @@ color: #71c68b;
 
 }
 #logo {
-  height: 150px;
+  height: 50px;
   margin-top: -60px;
+  margin-bottom: 20px; 
+  transform: rotate(0deg);
+  filter: brightness(0) saturate(100%) invert(67%) sepia(77%) saturate(2280%) hue-rotate(359deg) brightness(101%) contrast(106%);
 }
+#logo2 {
+  height: 50px;
+  margin-top: -60px;
+  margin-left: -40px;
+  transform: rotate(180deg);
+  filter: brightness(0) saturate(100%) invert(68%) sepia(35%) saturate(6399%) hue-rotate(300deg) brightness(109%) contrast(102%);
+  }
 </style>
