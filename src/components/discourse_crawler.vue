@@ -8,7 +8,7 @@
     
 
    
-  <span v-if="showProcess3" id="mainTitle">{{ msga }}{{ msgb }}</span><img id="logo" v-if="showPassword2" src="logo.svg"><img id="logo2" v-if="showPassword2" src="logo.svg">
+  <span v-if="showProcess3" id="mainTitle">{{ msg }}</span><img id="logo" v-if="showPassword2" src="logo.svg"><img id="logo2" v-if="showPassword2" src="logo.svg">
     <h1 v-if="showProcess3" >{{ msg7 }}</h1>
     <div v-if="!progress" class="progress">
       <div id="progressColor" class="color"></div>
@@ -258,8 +258,7 @@ export default {
   props: {},
   data() {
     return {
-      msga: "discourse _ ",
-      msgb: "crawler", 
+      msg: "discourse _ crawler",
       msg2: "",
       msg3: "An AI-powered tool for performing top-level analysis of websites.",
       msg5: "",
