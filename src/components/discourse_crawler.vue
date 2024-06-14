@@ -42,7 +42,7 @@
     /><br>
     <input
     v-if="showPassword2"
-    id="passWordInput"
+    id="passWordInput2"
     type="password"
     v-model="apiKEY2"
     placeholder="Mistral API Key"
@@ -2593,6 +2593,15 @@ margin: 0 auto;
   border: none;
 }
 #passWordInput {
+  width: 50%;
+  font-size: 30px;
+  text-align: center;
+  background-color: lightgray;
+  color: #252627;
+  border: none;
+  margin-bottom: 1px;
+}
+#passWordInput2 {
   width: 50%;
   font-size: 30px;
   text-align: center;
