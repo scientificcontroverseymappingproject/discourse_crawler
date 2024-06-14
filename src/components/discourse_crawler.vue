@@ -258,7 +258,7 @@ export default {
   props: {},
   data() {
     return {
-      msg: "discourse _ crawler",
+      msg: "discourse" + " _ " + "crawler",
       msg2: "",
       msg3: "An AI-powered tool for performing top-level analysis of websites.",
       msg5: "",
@@ -306,7 +306,7 @@ export default {
       summaryModel: "gpt-4-turbo",
       summaryModel2: "mistral-large-latest",
       promptInput: "Perform sentiment analysis on the following text, outputting scores between 1 and 10 for ",
-      promptInput2: "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 50 words. Include in your response only identified moral foundations. Text: ",
+      promptInput2: "Analyze this text to identify the moral foundations that it represents out of care, fairness, loyalty, authority, and purity. Include an explanation in under 50 words that explains the identified moral foundations. Text: ",
       variableOne: "anger",
       variableTwo: "fear",
       variableThree: "happiness",
@@ -2223,14 +2223,14 @@ export default {
           ];
 
           var layout = {
-            height: 450,
-            width: 550,
+            height: 500,
+            width: 500,
             showlegend: false,
             paper_bgcolor: "#2b2d42",
             title: "",
             font: {
               family: "Avenir, Helvetica, Arial, sans-serif",
-              size: 30,
+              size: 20,
               color: "white",
               weight: "bold",
             },
@@ -2489,7 +2489,7 @@ margin: 0 auto;
 }
 
 #overallVariables2 {
-  margin-top: -75px;
+  margin-top: -75px
 }
 
 #overalExplanation {
@@ -2536,6 +2536,7 @@ margin: 0 auto;
 #overallVariables {
   display: inline-block;
   text-align: center;
+  margin-top: -40px; 
 }
 
 #URLInput {
