@@ -2673,7 +2673,7 @@ footer {
   background-color: #2b2d42;
   padding: 5px;
   position: float; 
-  margin-top: 45%;
+  margin-top: 25%;
   width: 280px;
 
 
