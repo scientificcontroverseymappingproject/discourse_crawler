@@ -239,6 +239,7 @@
       <section id="specificAnalysis4"></section>
      
     </section>
+    <footer><a href="https://discourse-crawler.gitbook.io/discourse_crawler/"><button id="docs">Instructions and Technical Documentation</button></a></footer>
     <a id="downloadAnchorElem" style="display: none"></a>
   </div>
 </template>
@@ -2658,6 +2659,28 @@ margin: 0 auto;
 }
 
 #startButton:hover {
+  background: #dd06d6;
+}
+footer {
+
+
+}
+#docs {
+  font-size: 17px;
+  color:orange; 
+  border-color: white;
+  border-style: solid;
+  background-color: #2b2d42;
+  padding: 5px;
+  position: float; 
+  margin-top: 25%;
+  margin-right: 80%;
+  width: 29%
+
+
+}
+
+#docs:hover {
   background: #dd06d6;
 }
 
