@@ -2666,16 +2666,15 @@ footer {
 
 }
 #docs {
-  font-size: 17px;
+  font-size: 14px;
   color:orange; 
   border-color: white;
   border-style: solid;
   background-color: #2b2d42;
   padding: 5px;
   position: float; 
-  margin-top: 25%;
-  margin-right: 80%;
-  width: 29%
+  margin-top: 45%;
+  width: 280px;
 
 
 }
