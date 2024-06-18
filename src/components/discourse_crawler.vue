@@ -2800,7 +2800,7 @@ div {
 #messageThree {
   color: #92dce5;
   font-size: 18.5px; 
-  margin-top: -4%; 
+  margin-top: -3%; 
   margin-bottom: 8%; 
 }
 
