@@ -261,7 +261,7 @@ export default {
     return {
       msg: "discourse" + " _ " + "crawler",
       msg2: "",
-      msg3: "An AI-powered tool for performing top-level analysis of websites.",
+      msg3: "An AI-powered tool for performing top-level analysis of text.",
       msg5: "",
       msg6: "",
       msg7: "", 
